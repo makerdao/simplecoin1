@@ -68,7 +68,7 @@ contract SimpleStablecoin {
         purchased_quantity = 10**18 * msg.value / (_exchange_price+_exchange_spread);
         if(!safeToAdd(_balances[msg.sender], purchased_quantity))
             throw;
-        if(!safeToAdd(_supply, _purchased_quantity))
+        if(!safeToAdd(_supply, purchased_quantity))
             throw;
         _balances[msg.sender] += purchased_quantity;
         _supply += purchased_quantity;
