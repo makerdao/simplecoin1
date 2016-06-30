@@ -40,6 +40,12 @@ contract SimpleStablecoin {
         _exchange_spread = spread;
         _exchange_expires = expires;
     }
+    function setMaxSupply(uint max_supply)
+        noEther
+        ownerOnly
+    {
+        _max_supply = max_supply;
+    }
     function deposit()
         ownerOnly
     { /* Accept ether from owner */ }
@@ -60,6 +66,7 @@ contract SimpleStablecoin {
             throw;
         _balances[msg.sender] += purchased_quantity;
         _supply += purchased_quantity;
+        if( _supply > _max_supply ) throw;
         return purchased_quantity;
     }
     function redeem(uint stablecoin_quantity)

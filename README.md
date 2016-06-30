@@ -3,13 +3,13 @@ SimpleStablecoin
 
 A SimpleStablecoin is one type of stablecoin which can be run by an individual, organization, or even a ["The TAO"](https://ryepdx.github.io/the-tao/).
 
-It uses a reduced ETH collateral model controlled by the owner address. In the simplest case, stablecoin holders have no protections against the owner, but constraints can be encoded in the owner as a contract.
+It uses a reduced ETH collateral model controlled by an owner address. In the simplest case, stablecoin holders have no protections against the owner, but constraints can be encoded in the owner as a contract.
 
-Some example failure modes are never refreshing the price (lost key / locked out contract), setting a bad a price (or "insider trader"), or withdrawing too much Ether. Contingencies for all failure modes must be decided and written by each owner contract. Or, [just trust Bob](http://intheoreum.org).
+Some example failure modes are never refreshing the price (lost key / locked out contract), setting a bad a price (or "insider trading"), or withdrawing too much Ether. There are many different ways to handle these failure modes, which must be decided and written by each owner contract. Or, [just trust Bob](http://intheoreum.org).
 
 The code is as simple as possible to reduce the cost of independent verification. It is just a building block that needs to be carefully constrained. It is also completely unsuitable for maintaining price stability at scale, besides also being unsuitable for any purpose in general.
 
-The idea is to give potential [oracles](https://feedbase.io), [keepers](https://github.com/nexusdev/keeper) and [market](https://github.com/makerdao/maker-market) [makers](https://github.com/makerdao/maker-market-matcher) something to do while Maker's stablecoin engine undergoes refinement.
+The idea is to give potential [oracles](http://feedbase.io), [keepers](https://github.com/nexusdev/keeper) and [market](https://github.com/makerdao/maker-market) [makers](https://github.com/makerdao/maker-market-matcher) something to do while Maker's stablecoin engine undergoes refinement.
 
 Using
 ---
@@ -42,5 +42,6 @@ Ask us about:
 * Bug bounties
 * Building UIs
 * Writing tests
+* Working on maker-core
 
 https://chat.makerdao.com
