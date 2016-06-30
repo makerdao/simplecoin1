@@ -24,6 +24,10 @@ contract SimpleStablecoin {
     function safeToAdd(uint a, uint b) internal returns (bool) {
         return (a + b >= a);
     }
+    // For testing
+    function getTime() internal returns (uint) {
+        return block.timestamp;
+    }
 
     /* == Owner Functions == */
     function updateOwner(address new_owner)
@@ -61,7 +65,7 @@ contract SimpleStablecoin {
     //== User functions: purchase/redeem stablecoin
     function purchase() returns (uint purchased_quantity)
     {
-        purchased_quantity = (msg.value / (_exchange_price+_exchange_spread)) * (10**18);
+        purchased_quantity = 10**18 * msg.value / (_exchange_price+_exchange_spread);
         if(!safeToAdd(_balances[msg.sender], purchased_quantity))
             throw;
         _balances[msg.sender] += purchased_quantity;
@@ -81,6 +85,10 @@ contract SimpleStablecoin {
         }
         return returned_ether;
     }
+
+
+    //== Getters
+    function getOwner() constant returns (address) { return _owner; }
 
 
     // ERC20 token implementation.
