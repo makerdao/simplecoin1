@@ -68,6 +68,8 @@ contract SimpleStablecoin {
         purchased_quantity = 10**18 * msg.value / (_exchange_price+_exchange_spread);
         if(!safeToAdd(_balances[msg.sender], purchased_quantity))
             throw;
+        if(!safeToAdd(_supply, _purchased_quantity))
+            throw;
         _balances[msg.sender] += purchased_quantity;
         _supply += purchased_quantity;
         if( _supply > _max_supply ) throw;
@@ -77,6 +79,8 @@ contract SimpleStablecoin {
         noEther
         returns (uint returned_ether)
     {
+        if( _balances[msg.sender] < stablecoin_quantity )
+            throw;
         _balances[msg.sender] -= stablecoin_quantity;
         _supply -= stablecoin_quantity;
         returned_ether = (stablecoin_quantity * (_exchange_price-_exchange_spread)) / (10**18);

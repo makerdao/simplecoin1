@@ -16,6 +16,7 @@ contract SimpleStablecoinTest is Test {
     function testFactoryBuildsNonTestableVersionToo() {
         SimpleStablecoinFactory factory;
         var coin = factory.newSimpleStablecoin();
+        assertEq(this, coin.getOwner());
     }
     function testCreatorIsOwner() {
         assertEq(this, ss.getOwner());
