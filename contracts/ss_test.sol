@@ -9,11 +9,13 @@ contract TestableSimpleStablecoin is SimpleStablecoin {
 }
 
 contract SimpleStablecoinTest is Test {
-    SimpleStablecoinFactory factory;
-    SimpleStablecoin ss;
+    TestableSimpleStablecoin ss;
     function setUp() {
-        factory = new SimpleStablecoinFactory();
-        ss = factory.newSimpleStablecoin();
+        ss = new TestableSimpleStablecoin();
+    }
+    function testFactoryBuildsNonTestableVersionToo() {
+        SimpleStablecoinFactory factory;
+        var coin = factory.newSimpleStablecoin();
     }
     function testCreatorIsOwner() {
         assertEq(this, ss.getOwner());

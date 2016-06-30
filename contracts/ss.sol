@@ -100,10 +100,6 @@ contract SimpleStablecoin {
     mapping( address => uint ) _balances;
     mapping( address => mapping( address => uint ) ) _approvals;
     uint _supply;
-    function ERC20Base( uint initial_balance ) {
-        _balances[msg.sender] = initial_balance;
-        _supply = initial_balance;
-    }
     function totalSupply() constant returns (uint supply) {
         return _supply;
     }
