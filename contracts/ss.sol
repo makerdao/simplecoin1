@@ -37,19 +37,19 @@ contract SimpleStablecoin {
     {
         _owner = new_owner;
     }
-    function setPrice(uint price, uint spread, uint64 expires)
+    function setMaxSupply(uint max_supply)
+        noEther
+        ownerOnly
+    {
+        _max_supply = max_supply;
+    }
+    function startTradeWindow(uint price, uint spread, uint64 expires)
         noEther
         ownerOnly
     {
         _exchange_price = price;
         _exchange_spread = spread;
         _exchange_expires = expires;
-    }
-    function setMaxSupply(uint max_supply)
-        noEther
-        ownerOnly
-    {
-        _max_supply = max_supply;
     }
     function deposit()
         ownerOnly

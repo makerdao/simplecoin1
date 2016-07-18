@@ -23,7 +23,7 @@ contract SimpleStablecoinTest is Test {
     }
     function testBasics() {
         ss.setMaxSupply(100 * 10**18);
-        ss.setPrice(10**17, 10**14, 300);
+        ss.startTradeWindow(10**17, 10**14, 300);
         var obtained = ss.purchase.value(100000)();
         assertEq(obtained, 999000);
         assertEq(obtained, ss.balanceOf(this));
