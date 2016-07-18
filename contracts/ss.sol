@@ -1,4 +1,5 @@
 contract SimpleStablecoin {
+    bool _mutex; // manual, use caution
     address _owner;
 
     uint _exchange_price; // Number of wei for each 10**18 of your token
@@ -58,8 +59,10 @@ contract SimpleStablecoin {
         noEther
         ownerOnly
     {
-        // Watch out, someone could steal all the ether with a reentry attack or by being the owner anyway
+        if( _mutex ) { throw; }
+        _mutex = true;
         _owner.call.value(quantity)();
+        _mutex = false;
     }
 
     //== User functions: purchase/redeem stablecoin
