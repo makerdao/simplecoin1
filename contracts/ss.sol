@@ -36,12 +36,10 @@ contract SimpleStablecoin {
     }
 
     modifier noEther() {
-        if(msg.value > 0) throw;
-        _
+        if(msg.value == 0) { _ } else { throw; }
     }
     modifier ownerOnly() {
-        if(msg.sender != _owner) throw;
-        _
+        if(msg.sender == _owner) { _ } else { throw; }
     }
 
     // WARNING: Must manually confirm that no function with a `mutex` modifier
@@ -85,7 +83,7 @@ contract SimpleStablecoin {
             price: price,
             spread: spread,
             expiration: expiration
-        }));
+        })) - 1;
     }
     function cancelTradeWindow(uint window_id)
         noEther
@@ -101,7 +99,7 @@ contract SimpleStablecoin {
             vault: vault,
             current_debt: 0,
             max_debt: 0
-        }));
+        })) - 1;
     }
 
     function withdraw(uint collateral, uint quantity)
