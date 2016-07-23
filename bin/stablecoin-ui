@@ -5,27 +5,34 @@ var morgan = require("morgan")
 var PORT = process.env.PORT || 80
 var URL = `http://localhost:${PORT}`
 
+var env = {}
+for (var key in process.env) {
+  if (/^APP_/.test(key)) {
+    env[key] = process.env[key]
+  }
+}
+
+function getenv(name) {
+  if (name in env) return env[name]
+  console.error(`Missing environment variable: ${name}`)
+  process.exit(1)
+}
+
+var geth = ["geth"]
+if (getenv("APP_ENV") == "morden") geth.push("--testnet")
+geth.push("--rpc")
+geth.push(`--rpcport=${getenv("APP_RPC_PORT")}`)
+geth.push(`--rpccorsdomain=${URL}`)
+
 var app = express()
 app.use(express.static("public"))
 app.use(morgan("dev"))
 
-var env = {
-  ETH_ENV:      process.env.ETH_ENV      || "morden",
-  ETH_RPC_PORT: process.env.ETH_RPC_PORT || 8545,
-}
-
 app.get("/env", (req, res) => res.json(env))
-
-var geth = ["geth"]
-if (env.ETH_ENV == "morden") geth.push("--testnet")
-geth.push("--rpc")
-geth.push(`--rpcport=${env.ETH_RPC_PORT}`)
-geth.push(`--rpccorsdomain=${URL}`)
 
 app.listen(PORT, () => {
   console.log()
   console.log(`Serving stablecoin UI at <${URL}>.`)
-  console.log("Use `.env.local' to change app environment:")
   console.log()
   for (var key in env) console.log(`   ${key}=${env[key]}`)
   console.log()

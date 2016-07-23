@@ -1,32 +1,32 @@
-var env = {}
-var web3 = new Web3
-
-var Feedbase = dapple.feedbase.class
-var feedbase
-
-function update() {
-  web3.setProvider(new Web3.providers.HttpProvider(env.ETH_RPC_URL))
-  feedbase = new Feedbase(web3, env.ETH_ENV).objects.feedbase
-  console.log(web3.eth.coinbase)
-}
+var app = {}
 
 onload = () => {
   requestAnimationFrame(onload)
-  ReactDOM.render(React.createElement(Stablecoin), app)
+  ReactDOM.render(React.createElement(App), document.querySelector("#app"))
 }
 
 fetch("/env").then(response => {
-  response.json().then(json => {
-    env = json
+  response.json().then(env => {
+    var web3 = new Web3
+    web3.setProvider(new Web3.providers.HttpProvider(env.ETH_RPC_URL))
+
+    app.env = env
+    app.feedbase = object("feedbase")
+
     update()
+
+    function object(name, object_name) {
+      return new dapple[name].class(web3, env.ETH_ENV)
+        .objects[object_name || name]
+    }
   })
 })
 
-var stablecoin = null
-var Stablecoin = React.createClass({
+function update() {
+}
+
+var App = React.createClass({
   render: () => {
-    return React.DOM.div(null, `
-      ${JSON.stringify(stablecoin)}
-    `)
+    return React.DOM.pre(null, JSON.stringify(app.env, null, 2))
   }
 })
