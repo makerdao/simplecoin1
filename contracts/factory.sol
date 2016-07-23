@@ -1,8 +1,8 @@
 import 'ss.sol';
 
 contract SimpleStablecoinFactory {
-    function newSimpleStablecoin() returns (SimpleStablecoin) {
-        var ss = new SimpleStablecoin(0);
+    function newSimpleStablecoin(Feedbase fb, bytes32 rules) returns (SimpleStablecoin) {
+        var ss = new SimpleStablecoin(fb, rules);
         ss.updateOwner(msg.sender);
         return ss;
     }
