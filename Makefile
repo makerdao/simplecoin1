@@ -4,7 +4,9 @@ repo = makerdao
 image = $(repo)/$(name)
 image:; docker build -t $(image) .
 
-run = docker run --rm -it --net=host
+volumes = -v $(shell pwd):/usr/local:ro
+
+run = docker run --rm -it --net=host $(volumes)
 run:; $(run) --name=$(name) $(image)
 
 console:; $(run) $(image) bash
