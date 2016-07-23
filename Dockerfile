@@ -11,8 +11,8 @@ RUN add-apt-repository ppa:ethereum/ethereum
 RUN add-apt-repository ppa:ethereum/ethereum-qt
 RUN apt-get update && apt-get install -y cpp-ethereum
 
-RUN apt-get update && apt-get install -y python3
-WORKDIR /usr/local
-ENV PORT 8888
-CMD echo http://localhost:$PORT && python3 -m http.server $PORT
-COPY . /usr/local
+ENV NODE_PATH /usr/lib/node_modules
+RUN npm install -g express@4
+RUN npm install -g morgan@1
+
+CMD stablecoin-ui
