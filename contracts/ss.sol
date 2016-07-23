@@ -10,20 +10,11 @@ contract SimpleStablecoin is ERC20Base(0) {
     CollateralType[] _types;
     struct CollateralType {
         ERC20 token;
-        uint24 pricefeed; // Number of wei for each 10**18 of your token
+        uint24 feedID; // Number of wei for each 10**18 of your token
         address vault; // where locked tokens are held
         uint spread;
         uint current_debt;
         uint max_debt;
-    }
-
-    function SimpleStablecoin(Feedbase fb, bytes32 rules) {
-        _owner = msg.sender;
-        _rules = rules;
-        _feedbase = fb;
-    }
-    function() {
-        throw;
     }
 
     modifier noEther() {
@@ -32,19 +23,6 @@ contract SimpleStablecoin is ERC20Base(0) {
     modifier ownerOnly() {
         if(msg.sender == _owner) { _ } else { throw; }
     }
-
-    mapping(address => bool) _whitelist; // owner should know issuers/redeemers
-    modifier whitelisted(address who) {
-        if( _whitelist[who] ) { _ } else { throw; }
-    }
-
-    function setWhitelist(address who, bool what)
-        noEther
-        ownerOnly
-    {
-        _whitelist[who] = what;
-    }
-
 
     // WARNING: Must manually confirm that no function with a `mutex` modifier
     //          has a `return` statement, or else mutex gets stuck !!
@@ -59,12 +37,42 @@ contract SimpleStablecoin is ERC20Base(0) {
     function safeToAdd(uint a, uint b) internal returns (bool) {
         return (a + b >= a);
     }
+
+    function getPrice(uint24 feedID) internal returns (uint) {
+        var (price, ok) = _feedbase.get(feedID);
+        if(!ok) throw;
+        return uint(price);
+    }
+
+    mapping(address => bool) _whitelist; // owner should know issuers/redeemers
+    modifier whitelisted(address who) {
+        if( _whitelist[who] ) {
+            _
+        } else { 
+            throw;
+        }
+    }
+    function SimpleStablecoin(Feedbase feedbase, bytes32 rules) {
+        _owner = msg.sender;
+        _feedbase = feedbase;
+        _rules = rules;
+    }
+    function() {
+        throw;
+    }
+
     // For testing
     function getTime() internal returns (uint) {
         return block.timestamp;
     }
 
     /* == Owner Functions == */
+    function setWhitelist(address who, bool what)
+        noEther
+        ownerOnly
+    {
+        _whitelist[who] = what;
+    }
     function updateOwner(address new_owner)
         noEther
         ownerOnly
@@ -81,16 +89,16 @@ contract SimpleStablecoin is ERC20Base(0) {
         noEther
         ownerOnly
     {
-        _types[col_type].pricefeed = feed_id;
+        _types[col_type].feedID = feed_id;
     }
 
-    function registerCollateralType(ERC20 token, address vault, uint24 pricefeed, uint spread)
+    function registerCollateralType(ERC20 token, address vault, uint24 feedID, uint spread)
         returns (uint id)
     {
         return _types.push(CollateralType({
             token: token,
             vault: vault,
-            pricefeed: pricefeed,
+            feedID: feedID,
             spread: spread,
             current_debt: 0,
             max_debt: 0
@@ -117,9 +125,8 @@ contract SimpleStablecoin is ERC20Base(0) {
         if( !t.token.transferFrom(msg.sender, t.vault, pay_how_much) ) {
             throw;
         }
-        var (price, ok) = _feedbase.get(t.pricefeed);
-        if( !ok ) { throw; }
-        purchased_quantity = 10**18 * pay_how_much / (uint(price)+(uint(price)/t.spread));
+        var price = getPrice(t.feedID);
+        purchased_quantity = (10**18 * pay_how_much) / (price + (price/t.spread));
         if(!safeToAdd(_balances[msg.sender], purchased_quantity))
             throw;
         if(!safeToAdd(_supply, purchased_quantity))
@@ -139,14 +146,13 @@ contract SimpleStablecoin is ERC20Base(0) {
         if( t.token == address(0) ) { // deleted
             throw;
         }
-        var (price, ok) = _feedbase.get(t.pricefeed);
-        if( !ok ) { throw; }
+        var price = getPrice(t.feedID);
         if( _balances[msg.sender] < stablecoin_quantity )
             throw;
         _balances[msg.sender] -= stablecoin_quantity;
         _supply -= stablecoin_quantity;
         t.current_debt -= stablecoin_quantity;
-        returned_amount = (stablecoin_quantity * (uint(price)-(uint(price)/t.spread))) / (10**18);
+        returned_amount = (stablecoin_quantity * (price-(price/t.spread))) / (10**18);
         if( !t.token.transferFrom(t.vault, msg.sender, returned_amount) ) {
             throw;
         }
@@ -155,6 +161,4 @@ contract SimpleStablecoin is ERC20Base(0) {
 
     //== Getters
     function getOwner() constant returns (address) { return _owner; }
-
-
 }
