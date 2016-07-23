@@ -7,6 +7,9 @@ contract SimpleStablecoin is ERC20Base(0) {
     bytes32 _rules; // owner promises to follow these rules, or else suffer reddit flaming
     Feedbase _feedbase;
 
+    function owner() constant returns (address) { return _owner; }
+    function rules() constant returns (bytes32) { return _rules; }
+
     CollateralType[] _types;
     struct CollateralType {
         ERC20 token;
@@ -48,7 +51,7 @@ contract SimpleStablecoin is ERC20Base(0) {
     modifier whitelisted(address who) {
         if( _whitelist[who] ) {
             _
-        } else { 
+        } else {
             throw;
         }
     }
