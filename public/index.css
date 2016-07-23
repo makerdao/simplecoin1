@@ -11,3 +11,5 @@ h1 { color: #546979; letter-spacing: -0.05em; }
 h2 { color: #808080; font-weight: normal; }
 hgroup { background: #f8f8f8; }
 hgroup { border-bottom: 1px solid #ccc; }
+
+h1 { color: inherit; }
