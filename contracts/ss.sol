@@ -1,12 +1,12 @@
 import 'erc20/erc20.sol';
+import 'erc20/base.sol';
 
-contract SimpleStablecoin {
+contract SimpleStablecoin is ERC20Base(0) {
     address _owner;
     bytes32 _rules; // owner promises to follow these rules, or else suffer reddit flaming
 
     CollateralType[] _types;
-    TradeWindow[] _orders;
-
+    TradeWindow[] _windows;
     mapping(address => bool) _whitelist; // owner should know issuers/redeemers
     modifier whitelisted(address who) {
         if( _whitelist[who] ) { _ } else { throw; }
@@ -78,7 +78,7 @@ contract SimpleStablecoin {
         ownerOnly
         returns (uint window_id)
     {
-        return _orders.push(TradeWindow({
+        return _windows.push(TradeWindow({
             col_type: col_type,
             price: price,
             spread: spread,
@@ -89,7 +89,7 @@ contract SimpleStablecoin {
         noEther
         ownerOnly
     {
-        _orders[window_id].expiration = 0;
+        _windows[window_id].expiration = 0;
     }
 
 
@@ -119,7 +119,7 @@ contract SimpleStablecoin {
         mutex
         returns (uint purchased_quantity)
     {
-        var window = _orders[collateral_window];
+        var window = _windows[collateral_window];
         var t = _types[window.col_type];
         if( !t.token.transferFrom(msg.sender, t.vault, pay_how_much) ) {
             throw;
@@ -140,7 +140,7 @@ contract SimpleStablecoin {
         mutex
         returns (uint returned_amount)
     {
-        var window = _orders[collateral_window];
+        var window = _windows[collateral_window];
         var t = _types[window.col_type];
 
         if( _balances[msg.sender] < stablecoin_quantity )
@@ -159,58 +159,4 @@ contract SimpleStablecoin {
     function getOwner() constant returns (address) { return _owner; }
 
 
-    // ERC20 token implementation.
-    // Cross-reference other token implementations:
-    //   https://github.com/nexusdev/erc20/blob/master/contracts/base.sol
-    //   https://github.com/ConsenSys/Tokens/blob/master/Token_Contracts/contracts/StandardToken.sol
-    event Transfer(address indexed from, address indexed to, uint value);
-    event Approval(address indexed owner, address indexed spender, uint value);
-    mapping( address => uint ) _balances;
-    mapping( address => mapping( address => uint ) ) _approvals;
-    uint _supply;
-    function totalSupply() constant returns (uint supply) {
-        return _supply;
-    }
-    function balanceOf( address who ) constant returns (uint value) {
-        return _balances[who];
-    }
-    function transfer( address to, uint value) returns (bool ok) {
-        if( _balances[msg.sender] < value ) {
-            throw;
-        }
-        if( !safeToAdd(_balances[to], value) ) {
-            throw;
-        }
-        _balances[msg.sender] -= value;
-        _balances[to] += value;
-        Transfer( msg.sender, to, value );
-        return true;
-    }
-    function transferFrom( address from, address to, uint value) returns (bool ok) {
-        // if you don't have enough balance, throw
-        if( _balances[from] < value ) {
-            throw;
-        }
-        // if you don't have approval, throw
-        if( _approvals[from][msg.sender] < value ) {
-            throw;
-        }
-        if( !safeToAdd(_balances[to], value) ) {
-            throw;
-        }
-        // transfer and return true
-        _approvals[from][msg.sender] -= value;
-        _balances[from] -= value;
-        _balances[to] += value;
-        Transfer( from, to, value );
-        return true;
-    }
-    function approve(address spender, uint value) returns (bool ok) {
-        _approvals[msg.sender][spender] = value;
-        Approval( msg.sender, spender, value );
-        return true;
-    }
-    function allowance(address owner, address spender) constant returns (uint _allowance) {
-        return _approvals[owner][spender];
-    }
 }
