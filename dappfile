@@ -2,7 +2,7 @@ name: simple-stablecoin
 version: 0.0.1
 layout:
   sol_sources: contracts
-  build_dir: public
+  build_dir: build
 environments:
   morden:
     objects:

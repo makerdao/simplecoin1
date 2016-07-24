@@ -15,7 +15,7 @@ var PORT = getenv("PORT")
 var URL = `http://localhost:${PORT}`
 
 var app = express()
-app.use(express.static("public"))
+app.use(express.static("."))
 app.use(morgan("dev"))
 app.get("/ETH_RPC_URL", (req, res) => res.send(ETH_RPC_URL))
 
@@ -37,4 +37,5 @@ app.listen(PORT, () => {
   url = "https://github.com/makerdao/simple-stablecoin"
   console.log()
   console.log(`Report bugs to <${url}>.`)
+  console.log()
 })

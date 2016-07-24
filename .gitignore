@@ -1,4 +1,3 @@
-/public/classes.json
-/public/environments
-/public/__*__
-/.env.local
+/build/classes.json
+/build/environments
+/build/__*__
