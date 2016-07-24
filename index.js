@@ -2,13 +2,14 @@ var web3, feedbase, factory
 
 console.warn("Note: This app is only tested in the latest Chrome")
 
-var app = { coins: [], rules: "" }
+onload = render
+var app = { loaded: false, coins: [], rules: "" }
 
 if (web3) {
   console.log("Using injected web3 provider.")
   setup(web3.currentProvider)
 } else {
-  onload = () => fetch("/ETH_RPC_URL").then(response => {
+  fetch("/ETH_RPC_URL").then(response => {
     if (response.ok) {
       response.text().then(url => {
         console.log(`Found local web3 provider: ${url}`)
@@ -17,8 +18,8 @@ if (web3) {
     } else {
       console.error("No web3 provider found.")
       console.log()
-      console.log("Consider installing MetaMask:")
-      console.log("https://metamask.io")
+      console.log("Consider installing MetaMask <https://metamask.io>")
+      console.log("or cloning this repoistory and running it locally.")
     }
   })
 }
@@ -28,12 +29,14 @@ function load() {
   factory  = dapple_instance("simple-stablecoin", "factory")
 
   factory.count((error, result) => {
+    update({ loading: { $set: false } })
+
     var count = Number(result) || 0
 
     for (var i = 0; i < count; i++) {
       load_coin(i)
     }
-    
+
     if (app.reload) {
       setTimeout(load, app.reload)
     }
@@ -63,6 +66,7 @@ var Rules = app => React.DOM.div(null,
     id: "rules",
     maxLength: 32,
     value: app.rules,
+    disabled: app.loading,
     onChange: event => update({ rules: { $set: event.target.value } })
   })
 )
