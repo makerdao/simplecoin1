@@ -1,7 +1,5 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,500,700);
 
-body { visibility: hidden; }
-
 * { margin: 0; box-sizing: border-box; font-size: inherit; }
 html { font: 20px Roboto, sans-serif; color: #333; }
 body { max-width: 30rem; margin: 0 auto; }

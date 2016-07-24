@@ -102,7 +102,6 @@ function setup(provider) {
 }
 
 function render() {
-  document.body.style.visibility = "visible"
   forEach(document.querySelectorAll("[data-render]"), element => {
     var name = element.dataset.render
     if (!(name in window)) throw new Error(`No such element: ${name}`)
