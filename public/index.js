@@ -1,6 +1,11 @@
+var web3, feedbase, factory
+
 console.warn("Note: A recent Chrome may be needed to run this app")
 
-var web3
+var app = {
+  coins: [],
+  rules: "Only professionals",
+}
 
 if (web3) {
   setup(web3.currentProvider)
@@ -12,48 +17,39 @@ if (web3) {
   })
 }
 
-function setup(provider) {
-  web3 = new Web3(provider)
-  web3.version.getNetwork((error, result) => {
-    if (error) {
-      throw error
-    } else if (result == "1") {
-      app.env = "live"
-    } else if (result == "2") {
-      app.env = "morden"
-    } else {
-      alert(`Unknown network: ${JSON.stringify(result)}`)
-    }
-
-    load()
-  })
-}
-
-//----------------------------------------------------------
-
-var feedbase
-var factory
-
-var app = {
-  loading: true,
-  rules: "Only professionals",
-}
-
 function load() {
   feedbase = dapple_instance("feedbase")
   factory  = dapple_instance("simple-stablecoin", "factory")
 
   factory.count((error, result) => {
-    app.count = Number(result)
+    var count = Number(result) || 0
+
+    for (var i = 0; i < count; i++) {
+      load_coin(i)
+    }
     
-    delete app.loading
-    render()
-    if (app.reload) setTimeout(load, app.reload)
+    if (app.reload) {
+      setTimeout(load, app.reload)
+    }
+  })
+}
+
+function load_coin(i) {
+  factory.stablecoins(i, (error, result) => {
+    if (error) {
+      throw error
+    } else {
+      var patch ={ coins: {} }
+      patch.coins[i] = { $set: result }
+      update(patch)
+    }
   })
 }
 
 var Coins = app => React.DOM.div(null,
-  app.coins ? `${app.count}` : React.DOM.small(null, `(none)`)
+  app.coins.length
+    ? app.coins.map(coin => React.DOM.pre(null, coin))
+    : React.DOM.small(null, `(none)`)
 )
 
 var Rules = app => React.DOM.div(null,
@@ -81,6 +77,23 @@ function create_stablecoin() {
 }
 
 //----------------------------------------------------------
+
+function setup(provider) {
+  web3 = new Web3(provider)
+  web3.version.getNetwork((error, result) => {
+    if (error) {
+      throw error
+    } else if (result == "1") {
+      app.env = "live"
+    } else if (result == "2") {
+      app.env = "morden"
+    } else {
+      alert(`Unknown network: ${JSON.stringify(result)}`)
+    }
+
+    load()
+  })
+}
 
 function render() {
   document.body.style.visibility = "visible"
