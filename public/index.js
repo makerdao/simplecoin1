@@ -1,35 +1,56 @@
-var web3 = new Web3
-var HttpProvider = Web3.providers.HttpProvider
-
 console.warn("Note: A recent Chrome may be needed to run this app")
 
-var ENV, feedbase, factory
+var web3
+
+if (web3) {
+  setup(web3.currentProvider)
+} else {
+  onload = () => fetch("/env").then(response => {
+    response.json().then(env => {
+      setup(new Web3.providers.HttpProvider(env.ETH_RPC_URL))
+    })
+  })
+}
+
+function setup(provider) {
+  web3 = new Web3(provider)
+  web3.version.getNetwork((error, result) => {
+    if (error) {
+      throw error
+    } else if (result == "1") {
+      app.env = "live"
+    } else if (result == "2") {
+      app.env = "morden"
+    } else {
+      alert(`Unknown network: ${JSON.stringify(result)}`)
+    }
+
+    load()
+  })
+}
+
+//----------------------------------------------------------
+
+var feedbase
+var factory
+
 var app = {
   loading: true,
   rules: "Only professionals",
 }
 
-onload = () => fetch("/env").then(response => {
-  response.json().then(json => {
-    ENV = json
-    app.env = ENV.ETH_ENV
-    web3.setProvider(new HttpProvider(ENV.ETH_RPC_URL))
-    poke()
-  })
-})
-
-function poke() { init(); render(); loop() }
-function loop() { if (app.loop) setTimeout(poke, app.loop) }
-function init() {
-  delete app.loading
-
+function load() {
   feedbase = dapple_instance("feedbase")
   factory  = dapple_instance("simple-stablecoin", "factory")
 
-  app.count = Number(factory.count())
+  factory.count((error, result) => {
+    app.count = Number(result)
+    
+    delete app.loading
+    render()
+    if (app.reload) setTimeout(load, app.reload)
+  })
 }
-
-//----------------------------------------------------------
 
 var Coins = app => React.DOM.div(null,
   app.coins ? `${app.count}` : React.DOM.small(null, `(none)`)
