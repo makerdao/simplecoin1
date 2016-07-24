@@ -1,0 +1,49 @@
+#!/usr/bin/env node
+var express = require("express")
+var morgan = require("morgan")
+
+var PORT = process.env.PORT || 80
+var URL = `http://localhost:${PORT}`
+
+var env = {
+  ETH_ENV: "morden",
+  ETH_RPC_PORT: 8545,
+}
+
+for (var key in process.env) {
+  if (/^(APP|ETH)_(.*)/.test(key) || key == "PORT") {
+    env[key] = process.env[key]
+  }
+}
+
+if (!env.ETH_RPC_URL) {
+  env.ETH_RPC_URL = `http://localhost:${env.ETH_RPC_PORT}`
+}
+
+var geth = ["geth"]
+if (env.ETH_ENV == "morden") geth.push("--testnet")
+else if (env.ETH_ENV == "live") ;
+else console.warn(`Warning: unknown ETH_ENV: ${env.ETH_ENV}`)
+geth.push("--rpc")
+geth.push(`--rpcport=${env.ETH_RPC_PORT}`)
+geth.push(`\\\n     --rpccorsdomain=${URL}`)
+
+var app = express()
+app.use(express.static("public"))
+app.use(morgan("dev"))
+app.get("/env", (req, res) => res.json(env))
+
+app.listen(PORT, () => console.log(`
+>>>> Maker's simple stablecoin
+
+Serving stablecoin UI at <${URL}>.
+
+${Object.keys(env).sort().map(key => `   ${key}=${env[key]}`).join("\n")}
+n
+${/^http:\/\/localhost:/.test(env.ETH_RPC_URL) && `\
+Will look for a local Ethereum node such as this:
+
+   ${geth.join(" ")}`}
+
+Report bugs to <https://github.com/makerdao/stablecoin-ui>.
+`))
