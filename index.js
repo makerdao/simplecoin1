@@ -3,7 +3,7 @@ var web3, feedbase, factory
 console.warn("Note: This app is only tested in the latest Chrome")
 
 onload = render
-var app = { loaded: false, coins: [], rules: "" }
+var app = { coins: [], rules: "" }
 
 if (web3) {
   console.log("Using injected web3 provider.")
@@ -17,9 +17,7 @@ if (web3) {
       })
     } else {
       console.error("No web3 provider found.")
-      console.log()
-      console.log("Consider installing MetaMask <https://metamask.io>")
-      console.log("or cloning this repoistory and running it locally.")
+      document.body.classList.add("failed")
     }
   })
 }
@@ -29,7 +27,7 @@ function load() {
   factory  = dapple_instance("simple-stablecoin", "factory")
 
   factory.count((error, result) => {
-    update({ loading: { $set: false } })
+    document.body.classList.add("loaded")
 
     var count = Number(result) || 0
 
@@ -98,9 +96,9 @@ function setup(provider) {
     } else if (result == "2") {
       app.env = "morden"
     } else {
-      alert(`Unknown network: ${JSON.stringify(result)}`)
+      throw new Error(`Unknown network: ${JSON.stringify(result)}`)
     }
-
+    
     load()
   })
 }
