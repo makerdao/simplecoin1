@@ -25,6 +25,7 @@ label { display: block; }
 small { color: gray; }
 textarea { width: 100%; padding: 0.5rem; }
 textarea { border: 1px solid #ccc; }
+th { text-align: left; padding-right: 1rem; }
 
 .clutter { display: none; }
 @media (min-width: 640px) {

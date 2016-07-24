@@ -7,6 +7,7 @@ onload = render
 var app = {
   coins: [],
   rules: [],
+  owners: [],
   new_rules: "",
   reload: 5000,
 }
@@ -61,27 +62,48 @@ function load_coin(i) {
       )
 
       var coin = SimpleStablecoin.at(address)
+
       coin.rules((error, rules) => {
         var patch ={ rules: {} }
         patch.rules[i] = { $set: web3.toAscii(rules) }
+        update(patch)
+      })
+
+      coin.owner((error, owner) => {
+        var patch ={ owners: {} }
+        patch.owners[i] = { $set: owner }
         update(patch)
       })
     }
   })
 }
 
-var Coins = app => React.DOM.div(null,
-  app.coins.length
-    ? app.coins.map((coin, i) => React.DOM.div(
-      { key: i, style: { marginTop: "1rem" } },
-      React.DOM.pre(null, coin),
-      React.DOM.b({ style: { marginRight: ".5rem" } }, `Rules: `),
-      React.DOM.code(null, app.rules[i])
+var Coins = app => {
+  if (app.coins.length) {
+    return React.DOM.div({}, React.DOM.table(
+      { style: { marginTop: "1rem" }, },
+      app.coins.map((address, i) => React.DOM.tbody({ key: i },
+        React.DOM.tr({},
+          React.DOM.th({}, "Address"),
+          React.DOM.td({}, React.DOM.code({}, address))
+        ),
+        React.DOM.tr({},
+          React.DOM.th({}, "Owner"),
+          React.DOM.td({}, React.DOM.code({}, `${app.owners[i]}`))
+        ),
+        React.DOM.tr({},
+          React.DOM.th({}, "Rules"),
+          React.DOM.td({}, `${app.rules[i]}`)
+        ),
+        React.DOM.tr({ style: { height: "1rem" } })
+      ))
     ))
-    : React.DOM.small(null, `(none)`)
-)
+  } else {
+    React.DOM.div({}, React.DOM.small({}, `(none)`))
+  }
+}
 
-var Rules = app => React.DOM.div(null,
+var Rules = app => React.DOM.div({},
   React.DOM.textarea({
     id: "rules",
     maxLength: 32,
