@@ -3,7 +3,7 @@ var web3, feedbase, factory
 console.warn("Note: This app is only tested in the latest Chrome")
 
 onload = render
-var app = { coins: [], rules: "" }
+var app = { coins: [], rules: [], new_rules: "", reload: 5000 }
 
 if (web3) {
   console.log("Using injected web3 provider.")
@@ -23,7 +23,7 @@ if (web3) {
 }
 
 function load() {
-  feedbase = dapple_instance("feedbase")
+  feedbase = dapple_instance("feedbase", "feedbase")
   factory  = dapple_instance("simple-stablecoin", "factory")
 
   factory.count((error, result) => {
@@ -42,20 +42,36 @@ function load() {
 }
 
 function load_coin(i) {
-  factory.stablecoins(i, (error, result) => {
+  factory.stablecoins(i, (error, address) => {
     if (error) {
       throw error
     } else {
       var patch ={ coins: {} }
-      patch.coins[i] = { $set: result }
+      patch.coins[i] = { $set: address }
       update(patch)
+
+      var SimpleStablecoin = dapple_class(
+        "simple-stablecoin", "SimpleStablecoin"
+      )
+
+      var coin = SimpleStablecoin.at(address)
+      coin.rules((error, rules) => {
+        var patch ={ rules: {} }
+        patch.rules[i] = { $set: web3.toAscii(rules) }
+        update(patch)
+      })
     }
   })
 }
 
 var Coins = app => React.DOM.div(null,
   app.coins.length
-    ? app.coins.map(coin => React.DOM.pre({ key: coin }, coin))
+    ? app.coins.map((coin, i) => React.DOM.div(
+      { key: i, style: { marginTop: "1rem" } },
+      React.DOM.pre(null, coin),
+      React.DOM.b({ style: { marginRight: ".5rem" } }, `Rules: `),
+      React.DOM.code(null, app.rules[i])
+    ))
     : React.DOM.small(null, `(none)`)
 )
 
@@ -63,15 +79,15 @@ var Rules = app => React.DOM.div(null,
   React.DOM.textarea({
     id: "rules",
     maxLength: 32,
-    value: app.rules,
+    value: app.new_rules,
     disabled: app.loading,
-    onChange: event => update({ rules: { $set: event.target.value } })
+    onChange: event => update({ new_rules: { $set: event.target.value } })
   })
 )
 
 function create_stablecoin() {
   factory.newSimpleStablecoin(
-    feedbase.address, web3.toHex(app.rules), {
+    feedbase.address, web3.toHex(app.new_rules), {
       from: web3.eth.coinbase
     }, (error, tx) => {
       if (error) {
@@ -112,13 +128,15 @@ function render() {
 }
 
 function dapple_address(module, object) {
-  object = object || module
   return dapple[module].environments[app.env].objects[object].address
 }
 
-function dapple_instance(module, object) {
-  object = object || module
-  return new dapple[module].class(web3, app.env).objects[object]
+function dapple_class(module, name) {
+  return new dapple[module].class(web3, app.env).classes[name]
+}
+
+function dapple_instance(module, name) {
+  return new dapple[module].class(web3, app.env).objects[name]
 }
 
 function update(changes) {
