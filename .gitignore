@@ -1,3 +1,4 @@
 /public/classes.json
 /public/environments
+/public/__*__
 /.env.local

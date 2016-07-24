@@ -1,20 +1,16 @@
 var web3, feedbase, factory
 
-console.warn("Note: A recent Chrome may be needed to run this app")
+console.warn("Note: This app is only tested in the latest Chrome")
 
-var app = {
-  coins: [],
-  rules: "Only professionals",
-}
+var app = { coins: [], rules: "" }
 
 if (web3) {
   console.log("Using injected web3 provider.")
   setup(web3.currentProvider)
 } else {
-  onload = () => fetch("/env").then(response => {
+  onload = () => fetch("/ETH_RPC_URL").then(response => {
     if (response.ok) {
-      response.json().then(env => {
-        var url = env.ETH_RPC_URL
+      response.text().then(url => {
         console.log(`Found local web3 provider: ${url}`)
         setup(new Web3.providers.HttpProvider(url))
       })
