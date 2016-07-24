@@ -1,6 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,500,700);
 
-[data-app], [data-help] { display: none; }
+[data-app], [data-help], [data-loading] { display: none; }
+.loading [data-loading] { display: block; }
 .loaded [data-app] { display: block; }
 .failed [data-help] { display: block; }
 

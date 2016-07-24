@@ -3,7 +3,13 @@ var web3, feedbase, factory
 console.warn("Note: This app is only tested in the latest Chrome")
 
 onload = render
-var app = { coins: [], rules: [], new_rules: "", reload: 5000 }
+
+var app = {
+  coins: [],
+  rules: [],
+  new_rules: "",
+  reload: 5000,
+}
 
 if (web3) {
   console.log("Using injected web3 provider.")
@@ -17,7 +23,7 @@ if (web3) {
       })
     } else {
       console.error("No web3 provider found.")
-      document.body.classList.add("failed")
+      document.body.className = "failed"
     }
   })
 }
@@ -27,7 +33,7 @@ function load() {
   factory  = dapple_instance("simple-stablecoin", "factory")
 
   factory.count((error, result) => {
-    document.body.classList.add("loaded")
+    document.body.className = "loaded"
 
     var count = Number(result) || 0
 
@@ -103,6 +109,7 @@ function create_stablecoin() {
 //----------------------------------------------------------
 
 function setup(provider) {
+  document.body.className = "loading"
   web3 = new Web3(provider)
   web3.version.getNetwork((error, result) => {
     if (error) {
@@ -114,7 +121,7 @@ function setup(provider) {
     } else {
       throw new Error(`Unknown network: ${JSON.stringify(result)}`)
     }
-    
+
     load()
   })
 }

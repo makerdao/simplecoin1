@@ -12,7 +12,7 @@ js:; dapple build -e $(ETH_ENV)
 deploy:; dapple run deploy/$(ETH_ENV).ds
 
 run: kill image; $(run) --name=$(name) $(image) stablecoin-ui
-kill:; docker kill $(name)
+kill:; docker kill $(name) || true
 
 run = docker run --rm -it --net=host \
   -e PORT -e ETH_RPC_URL \
