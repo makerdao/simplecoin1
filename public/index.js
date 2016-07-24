@@ -1,39 +1,52 @@
+var web3 = new Web3
+var HttpProvider = Web3.providers.HttpProvider
+
 console.warn("Note: A recent Chrome may be needed to run this app")
 
-function poke() { load(); render(); loop() }
-function loop() { if (app.loop) setTimeout(poke, app.loop) }
-
-onload = () => fetch("/env").then(response => {
-  response.json().then(json => { app.env = json; poke() })
-})
-
+var ENV, feedbase, factory
 var app = {
   loading: true,
-  loop: false,
   rules: "Only professionals",
 }
 
-var web3 = new Web3
-var feedbase
-var stablecoin_factory
+onload = () => fetch("/env").then(response => {
+  response.json().then(json => {
+    ENV = json
+    app.env = ENV.ETH_ENV
+    web3.setProvider(new HttpProvider(ENV.ETH_RPC_URL))
+    poke()
+  })
+})
 
-function load() {
+function poke() { init(); render(); loop() }
+function loop() { if (app.loop) setTimeout(poke, app.loop) }
+function init() {
   delete app.loading
-  web3.setProvider(new Web3.providers.HttpProvider(app.env.ETH_RPC_URL))
 
-  feedbase           = find_dapple_object("feedbase")
-  stablecoin_factory = find_dapple_object("factory", "simple-stablecoin")
+  feedbase = dapple_instance("feedbase")
+  factory  = dapple_instance("simple-stablecoin", "factory")
 
-  app.coin_count = Number(stablecoin_factory.count())
+  app.count = Number(factory.count())
 }
 
+//----------------------------------------------------------
+
 var Coins = app => React.DOM.div(null,
-  app.coins ? `${app.coins}` : React.DOM.small(null, `(none)`)
+  app.coins ? `${app.count}` : React.DOM.small(null, `(none)`)
+)
+
+var Rules = app => React.DOM.div(null,
+  React.DOM.textarea({
+    id: "rules",
+    maxLength: 32,
+    value: app.rules,
+    onChange: event => update({ rules: { $set: event.target.value } })
+  })
 )
 
 function create_stablecoin() {
-  stablecoin_factory.newSimpleStablecoin(
-    feedbase.address, web3.toHex(rules.value), {
+  factory.newSimpleStablecoin(
+    feedbase.address, web3.toHex(app.rules), {
       from: web3.eth.coinbase
     }, (error, tx) => {
       if (error) {
@@ -46,14 +59,7 @@ function create_stablecoin() {
   )
 }
 
-var Rules = app => React.DOM.div(null,
-  React.DOM.textarea({
-    id: "rules",
-    maxLength: 32,
-    value: app.rules,
-    onChange: event => update({ rules: { $set: event.target.value } })
-  })
-)
+//----------------------------------------------------------
 
 function render() {
   document.body.style.visibility = "visible"
@@ -64,20 +70,14 @@ function render() {
   })
 }
 
-function find_dapple_object(name, module, object) {
-  module = module || name
-  object = object || name
+function dapple_address(module, object) {
+  object = object || module
+  return dapple[module].environments[app.env].objects[object].address
+}
 
-  if (!(module in dapple)) {
-    throw new Error(`Not found: dapple["${module}"]`)
-  }
-
-  var environment = dapple[module].environments[app.env.APP_ENV]
-  var instance = new dapple[module].class(web3, app.env.APP_ENV)
-
-  app.env[name] = environment.objects[object].address
-
-  return instance.objects[object]
+function dapple_instance(module, object) {
+  object = object || module
+  return new dapple[module].class(web3, app.env).objects[object]
 }
 
 function update(changes) {

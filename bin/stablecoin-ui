@@ -5,25 +5,23 @@ var morgan = require("morgan")
 var PORT = process.env.PORT || 80
 var URL = `http://localhost:${PORT}`
 
-var env = {}
+var env = {
+  ETH_ENV: "morden",
+  ETH_RPC_PORT: 8545,
+}
+
 for (var key in process.env) {
-  if (/^APP_/.test(key) || key == "PORT") {
+  if (/^(APP|ETH)_(.*)/.test(key) || key == "PORT") {
     env[key] = process.env[key]
   }
 }
 
-function getenv(name) {
-  if (name in env) return env[name]
-  console.error(`Missing environment variable: ${name}`)
-  process.exit(1)
-}
-
 var geth = ["geth"]
-if (getenv("APP_ENV") == "morden") geth.push("--testnet")
-else if (env.APP_ENV == "live") ;
-else console.warn(`Warning: don't recognize APP_ENV=${env.APP_ENV}`)
+if (env.ETH_ENV == "morden") geth.push("--testnet")
+else if (env.ETH_ENV == "live") ;
+else console.warn(`Warning: unknown ETH_ENV: ${env.ETH_ENV}`)
 geth.push("--rpc")
-geth.push(`--rpcport=${getenv("APP_RPC_PORT")}`)
+geth.push(`--rpcport=${env.ETH_RPC_PORT}`)
 geth.push(`\\\n     --rpccorsdomain=${URL}`)
 
 var app = express()
@@ -38,7 +36,7 @@ Serving stablecoin UI at <${URL}>.
 
 ${Object.keys(env).sort().map(key => `   ${key}=${env[key]}`).join("\n")}
 
-Expecting the equivalent of this at port ${env.APP_RPC_PORT}:
+Expecting the equivalent of this at port ${env.ETH_RPC_PORT}:
 
    ${geth.join(" ")}
 
