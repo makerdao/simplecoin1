@@ -1,16 +1,31 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,500,700);
 
-* { margin: 0; box-sizing: border-box; }
+body { visibility: hidden; }
 
+* { margin: 0; box-sizing: border-box; font-size: inherit; }
 html { font: 20px Roboto, sans-serif; color: #333; }
-body > * { padding: 1rem; }
-hgroup { padding: 0.5rem 1rem; }
-h1 { line-height: 2rem; font-size: 1.3rem; }
-h2 { line-height: 1rem; font-size: 0.7rem; }
+body { max-width: 30rem; margin: 0 auto; }
+body { line-height: 1rem; font-size: 0.7rem; }
+body > * { padding: 1rem 1rem; }
 
+header { border: none; }
+header img { width: 4rem; float: right; display: none; }
+hgroup { margin-bottom: 1rem; }
+
+p + p { margin-top: 1rem; }
+small { font-size: .7rem; font-weight: normal; }
+h1 { line-height: 2rem; font-size: 1.3rem; }
 h1 { color: #546979; letter-spacing: -0.05em; }
 h2 { color: #808080; font-weight: normal; }
-hgroup { background: #f8f8f8; }
-hgroup { border-bottom: 1px solid #ccc; }
+h3 { font-size: 0.8rem; margin-bottom: 0.5rem; }
+label { display: block; }
+small { color: gray; }
+textarea { width: 100%; padding: 0.5rem; }
+textarea { border: 1px solid #ccc; }
 
-pre { line-height: 1rem; font-size: 0.7rem; }
+.clutter { display: none; }
+@media (min-width: 640px) {
+  .clutter { display: block; }
+  html { font-size: 32px; }
+  body { margin: 2rem auto; }
+}

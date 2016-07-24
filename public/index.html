@@ -5,15 +5,54 @@
 
 <title>Simple stablecoin</title>
 
-<hgroup>
-<h1>Simple stablecoin</h1>
-<h2>Something to play with while we wait</h2>
-</hgroup>
+<header>
+  <img class=clutter src=https://makerdao.com/splash/images/logo.svg>
+  <hgroup>
+    <h1>Simple stablecoin</h1>
+    <h2>Something to play with while we wait...</h2>
+  </hgroup>
+  Stablecoins are all the rage.  We decided it was time to
+  put together an easy-to-use factory for a relatively simple kind.
+  Now, you too can have your own. (See also:
+  <a target=_blank href=https://ryepdx.github.io/the-tao/>The TAO</a>)
+</header>
 
-<div id=app></div>
+<section>
+  <h3>Your stablecoins</h3>
+  <div data-view=Stablecoins></div>
+</section>
 
-<script src=https://fb.me/react-15.2.1.js></script>
+<form onsubmit="event.preventDefault()">
+  <h3>
+  Create stablecoin
+  <small class=clutter style="float: right">
+    Source code:
+    <a target=_blank href=https://github.com/makerdao/simple-stablecoin/blob/nikolai/contracts/ss.sol>
+      SimpleStablecoin.sol
+    </a>
+  </small>
+  </h3>
+  <label for=rules>
+    Stablecoin rules
+    <small>(max 32 characters)</small>:
+  </label>
+  <div data-view=RulesTextarea></div>
+  <div style="text-align: right">
+    <small style="margin-right: .5rem">
+      Estimated gas cost: 0.0234 ETH
+    </small>
+    <button onclick="create()">Create stablecoin</button>
+  </div>
+</form>
+
+<section>
+  <h3>Browse stablecoins</h3>
+  <div data-view=Stablecoins></div>
+</section>
+
+<script src=https://fb.me/react-with-addons-15.2.1.js></script>
 <script src=https://fb.me/react-dom-15.2.1.js></script>
 <script src=vendor/web3.min.js></script>
 <script src=vendor/feedbase.js></script>
+<script src=vendor/stablecoin.js></script>
 <script src=index.js></script>

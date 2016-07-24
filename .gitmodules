@@ -1,0 +1,3 @@
+[submodule "simple-stablecoin"]
+	path = simple-stablecoin
+	url = git@github.com:makerdao/simple-stablecoin
