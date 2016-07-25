@@ -2,40 +2,24 @@
 var express = require("express")
 var morgan = require("morgan")
 
-function getenv(name) {
-  if (name in process.env) {
-    return process.env[name]
-  } else {
-    console.error(`Missing environment variable: ${name}`)
-  }
-}
+var PORT = process.env.PORT || 3000
 
-var ETH_RPC_URL = getenv("ETH_RPC_URL")
-var PORT = getenv("PORT")
-var URL = `http://localhost:${PORT}`
+var APP_URL = `http://localhost:${PORT}`
+var ETH_RPC_URL = "http://localhost:8545"
+var GITHUB_URL = "https://github.com/makerdao/simple-stablecoin"
+
+var HELP = `
+  >>>>> Serving simple stablecoin UI at <${APP_URL}>...
+
+  Unless you're using a Web3 provider like MetaMask (<https://metamask.io>), 
+  please make sure that you're starting your local Ethereum node like this:
+  
+     geth --rpc --rpcport=8545 --rpccorsdomain=${APP_URL}
+
+  Report bugs to <${GITHUB_URL}>.
+`
 
 var app = express()
 app.use(express.static("."))
 app.use(morgan("dev"))
-app.get("/ETH_RPC_URL", (req, res) => res.send(ETH_RPC_URL))
-
-console.log()
-console.log(">>>> Maker's simple stablecoin")
-
-app.listen(PORT, () => {
-  console.log()
-  console.log(`Serving stablecoin UI at <${URL}>.`)
-
-  var match
-  if (match = ETH_RPC_URL.match(/^http:\/\/localhost:(\d+)$/)) {
-    console.log()
-    console.log("Will look for a local Ethereum node like this:")
-    console.log()
-    console.log(`   geth --rpc --rpcport=${match[1]} --rpccorsdomain=${URL}`)
-  }
-
-  url = "https://github.com/makerdao/simple-stablecoin"
-  console.log()
-  console.log(`Report bugs to <${url}>.`)
-  console.log()
-})
+app.listen(PORT, () => console.log(HELP))

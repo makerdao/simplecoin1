@@ -80,7 +80,7 @@
     Stablecoin rules
     <small>(max 32 characters)</small>:
   </label>
-  <div data-render=Rules></div>
+  <div data-view=textarea></div>
   <div style="text-align: right">
     <small style="margin-right: .5rem">
       Estimated gas cost: 0.0234 ETH
@@ -91,12 +91,14 @@
 
 <section data-app>
   <h3>List of stablecoins created by this factory:</h3>
-  <div data-render=Coins></div>
+  <div data-view=stablecoins></div>
 </section>
 
 <script src=https://fb.me/react-with-addons-15.2.1.js></script>
 <script src=https://fb.me/react-dom-15.2.1.js></script>
 <script src=vendor/web3-0.16.js></script>
 <script src=vendor/feedbase-0.6.js></script>
+<script src=vendor/async-2.0.1.js></script>
 <script src=build/js_module.js></script>
+<script src=util.js></script>
 <script src=index.js></script>
