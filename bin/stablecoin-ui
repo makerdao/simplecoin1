@@ -1,25 +1,16 @@
 #!/usr/bin/env node
 var express = require("express")
-var morgan = require("morgan")
 
 var PORT = process.env.PORT || 3000
+var URL = `http://localhost:${PORT}`
 
-var APP_URL = `http://localhost:${PORT}`
-var ETH_RPC_URL = "http://localhost:8545"
-var GITHUB_URL = "https://github.com/makerdao/simple-stablecoin"
+express().use(express.static(".")).listen(PORT, () => console.log(`
+  >>>>> Serving UI at <${URL}>...
 
-var HELP = `
-  >>>>> Serving simple stablecoin UI at <${APP_URL}>...
-
-  Unless you're using a Web3 provider like MetaMask (<https://metamask.io>), 
-  please make sure that you're starting your local Ethereum node like this:
+  Unless you're using MetaMask (<https://metamask.io>) or some other
+  similar Web3 provider, you'll want to start your node like this:
   
-     geth --rpc --rpcport=8545 --rpccorsdomain=${APP_URL}
+     geth --rpc --rpcport=8545 --rpccorsdomain=${URL}
 
-  Report bugs to <${GITHUB_URL}>.
-`
-
-var app = express()
-app.use(express.static("."))
-app.use(morgan("dev"))
-app.listen(PORT, () => console.log(HELP))
+  Report bugs to <https://github.com/makerdao/simple-stablecoin>.
+`))

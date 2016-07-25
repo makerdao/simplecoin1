@@ -1,6 +1,5 @@
-export ETH_ENV ?= morden
-export ETH_RPC_URL ?= http://localhost:8545
-export PORT ?= 3000
+cmd ?= stablecoin-ui
+env ?= morden
 
 name = simple-stablecoin
 repo = makerdao
@@ -8,14 +7,15 @@ repo = makerdao
 all: image test
 test:; dapple test --report
 
-js:; dapple build -e $(ETH_ENV)
-deploy:; dapple run deploy/$(ETH_ENV).ds
+deploy:; dapple run deploy/$(env).ds
+js:; dapple build -e $(env)
 
-run: kill image; $(run) --name=$(name) $(image) stablecoin-ui
-kill:; docker kill $(name) || true
+ui: kill image; $(run) --name=$(cmd) $(image) $(cmd)
+kill:; docker kill $(cmd) || true
 
-run = docker run --rm -it --net=host \
-  -e PORT -e ETH_RPC_URL \
+console: image; $(run) $(image) bash
+
+run = docker run --rm -it --net=host -e PORT \
   -w /usr/local -v $(shell pwd):/usr/local:ro
 
 image = $(repo)/$(name)

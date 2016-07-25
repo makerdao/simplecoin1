@@ -33,7 +33,7 @@ function reload_application_state($) {
 
 function get_contract_props(type, address, $) {
   let contract = type.at(address)
-  let is_property = x => x.constant && x.inputs.length == 0
+  let is_property = x => x.constant && !x.inputs.length
   let properties = contract.abi.filter(is_property)
   let extra_props = { address: async.constant(address) }
   async.parallel(properties.reduce(function(requests, { name }) {
