@@ -1,35 +1,32 @@
 state.stablecoins = []
-fetch.stablecoins = $ => async.waterfall([
-  chain.factory.count, (n, $) => async.times(n, (i, $) => async.waterfall([
-    async.apply(chain.factory.stablecoins, i),
-    async.apply(get_contract_props, chain.SimpleStablecoin),
+fetch.stablecoins = $ => begin([
+  chain.factory.count, (n, $) => incrementally(n, (i, $) => begin([
+    bind(chain.factory.stablecoins, i),
+    bind(extract_contract_props, chain.SimpleStablecoin),
   ], $), $),
 ], $)
 
 views.stablecoins = ({ stablecoins }) => {
-  if (!stablecoins.length) {
-    return tag("div", {}, [tag("small", {}, ["(none)"])])
-  } else {
-    return tag("div", null, [tag("table", {
-      style: { marginTop: "1rem" }
-    }, stablecoins.map((x, i) => tag("tbody", { key: i }, [
-      row("Address", tag("code", {}, [`${x.address}`])),
-      row("Owner", tag("code", {}, [`${x.owner}`])),
-      row("Rules", `${web3.toAscii(x.rules)}`),
-      tag("tr", { style: { height: "1rem" } }),
-    ])))])
+  return !stablecoins.length ? small("(none)") : table_list(stablecoins, {
+    Contract: x => code(x.address),
+    Owner: x => code(x.owner),
+    Rules: x => ascii(x.rules),
+  })
+}
 
-    function row(label, content) {
-      return tag("tr", {}, [
+function table_list(entries, fields) {
+  return tag("table", {}, entries.map((entry, i) => {
+    return tag("tbody", { key: i }, keys(fields).map((label, i) => {
+      return tag("tr", { key: i }, [
         tag("th", {}, [label]),
-        tag("td", {}, [content]),
+        tag("td", {}, [fields[label](entry)]),
       ])
-    }
-  }
+    }))
+  }))
 }
 
 views.textarea = ({ rules }) => tag("textarea", {
-  onChange: event => change({ rules: event.target.value }),
+  onChange: event => save({ rules: event.target.value }),
   value: rules, maxLength: 32,
 })
 
