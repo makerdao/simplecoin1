@@ -1,13 +1,3 @@
-let hide_message = () => persist({ hide_message: true })
-
-views.message = () => state.hide_message ? tag("div", {}, [
-  tag("a", {
-    href: "#", onClick: () => persist({ hide_message: false })
-  }, ["Show introductory message"])
-]) : tag("div", {
-  dangerouslySetInnerHTML: { __html: message.innerHTML },
-})
-
 state.stablecoins = []
 fetch.stablecoins = $ => begin([
   chain.factory.count, (n, $) => incrementally(n, (i, $) => begin([
@@ -22,17 +12,6 @@ views.stablecoins = ({ stablecoins }) => {
     Owner: x => code(x.owner),
     Rules: x => ascii(x.rules),
   })
-}
-
-function table_list(entries, fields) {
-  return tag("table", {}, entries.map((entry, i) => {
-    return tag("tbody", { key: i }, keys(fields).map((label, i) => {
-      return tag("tr", { key: i }, [
-        tag("th", {}, [label]),
-        tag("td", {}, [fields[label](entry)]),
-      ])
-    }))
-  }))
 }
 
 views.textarea = ({ rules }) => tag("textarea", {

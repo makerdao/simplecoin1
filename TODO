@@ -1,0 +1,21 @@
+display feedbase address
+display whitelist... somehow?
+display collateral types
+- token
+- feedID
+- vault
+- spread
+- current_debt
+- max_debt
+
+admin entrypoints
+- set whitelisted
+- set owner
+- set max debt
+- set feed
+- register collateral type
+- cancel collateral type
+
+user entrypoints
+- purchase
+- redeem

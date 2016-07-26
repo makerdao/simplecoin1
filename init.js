@@ -10,10 +10,10 @@ let map = (s, f) => fold(keys(s), {}, (t, k) => both(t, kv(k, f(s[k]))))
 let select = (s, ks) => fold(ks, {}, (t, k) => both(t, pick(s, k)))
 
 let state = {}, save = (changes, $) => render(assign(state, changes), $)
-let render = (props=state, $) => async.each(view_nodes, renderer(props), $)
+let render = (props=state, $) => async.each(view_nodes(), renderer(props), $)
 let renderer = props => (x, $) => ReactDOM.render(view_tag(x, props), x, $)
 let view_tag = (node, props) => tag(views[node.dataset.view], props)
-let views = {}, view_nodes = document.querySelectorAll("[data-view]")
+let views = {}, view_nodes = () => document.querySelectorAll("[data-view]")
 let tag = (name, props, xs=[]) => React.createElement(name, props, ...xs)
 
 let chain = {}, infer_chain_environment = x => [, "live", "morden"][x]
@@ -56,4 +56,43 @@ function extract_contract_props(type, address, $) {
   let fetch_props = select(contract, names)
   let add_extra_props = map({ address }, always)
   simultaneously(both(fetch_props, add_extra_props), $)
+}
+
+function table_list(entries, fields) {
+  return tag("table", {}, entries.map((entry, i) => {
+    return tag("tbody", { key: i }, keys(fields).map((label, i) => {
+      return tag("tr", { key: i }, [
+        tag("th", {}, [label]),
+        tag("td", {}, [fields[label](entry)]),
+      ])
+    }))
+  }))
+}
+
+let hide_message = () => persist({ hide_message: true })
+// views.message = () => state.hide_message ? tag("div", {}, [
+//   tag("a", {
+//     href: "#", onClick: () => persist({ hide_message: false })
+//   }, ["Show introductory message"])
+// ]) : tag("div", {
+//   dangerouslySetInnerHTML: {
+//     __html: document.querySelector("[rel=import]").import
+//       .querySelector("#message").innerHTML
+//   },
+// })
+
+let subdoc = document.querySelector("[rel=import]").import
+
+onload = () => {
+  document.registerElement("stablecoin-header", {
+    prototype: Object.create(HTMLElement.prototype, {
+      createdCallback: {
+        value: function() {
+          this.appendChild(document.importNode(
+            subdoc.querySelector("header"), true
+          ))
+        }
+      }
+    })
+  })
 }

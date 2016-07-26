@@ -9,7 +9,7 @@
 html { font: 20px Roboto, sans-serif; color: #333; }
 body { max-width: 30rem; margin: 0 auto; }
 body { line-height: 1rem; font-size: 0.7rem; }
-body > * { padding: 1rem 1rem; }
+header, section { padding: 1rem 1rem; }
 
 header { border: none; }
 header img { width: 4rem; float: right; display: none; }
