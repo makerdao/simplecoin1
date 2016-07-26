@@ -1,3 +1,13 @@
+let hide_message = () => persist({ hide_message: true })
+
+views.message = () => state.hide_message ? tag("div", {}, [
+  tag("a", {
+    href: "#", onClick: () => persist({ hide_message: false })
+  }, ["Show introductory message"])
+]) : tag("div", {
+  dangerouslySetInnerHTML: { __html: message.innerHTML },
+})
+
 state.stablecoins = []
 fetch.stablecoins = $ => begin([
   chain.factory.count, (n, $) => incrementally(n, (i, $) => begin([

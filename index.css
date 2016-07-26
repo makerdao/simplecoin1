@@ -29,6 +29,8 @@ th { text-align: left; padding-right: 1rem; }
 table { border-collapse: collapse; }
 tbody { border-top: 1rem solid transparent; }
 
+header small.link { display: inline-block; }
+
 .clutter { display: none; }
 @media (min-width: 640px) {
   .clutter { display: block; }

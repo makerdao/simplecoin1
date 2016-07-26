@@ -1,11 +1,10 @@
 let sequentially = async.waterfall, begin = sequentially
-let incrementally = async.times
-let simultaneously = async.parallel, both = Object.assign, assign = both
+let simultaneously = async.parallel, incrementally = async.times
 let always = async.constant, bind = async.apply, keys = Object.keys
 let hopefully = $ => (error, result) => error ? fail(error) : $(result)
 let fail = msg => { throw msg instanceof Error ? msg : new Error(msg) }
 
-let fold = (xs, z, f) => xs.reduce(f, z)
+let both = Object.assign, assign = both, fold = (xs, z, f) => xs.reduce(f, z)
 let pick = (s, k) => kv(k, s[k]), kv = (k, v) => ({ [k]: v })
 let map = (s, f) => fold(keys(s), {}, (t, k) => both(t, kv(k, f(s[k]))))
 let select = (s, ks) => fold(ks, {}, (t, k) => both(t, pick(s, k)))
@@ -26,6 +25,15 @@ let geth = () => new Web3.providers.HttpProvider("http://localhost:8545")
 let code = x => tag("code", {}, [x])
 let small = x => tag("small", {}, [x])
 let ascii = x => web3.toAscii(x)
+
+let persist = changes => {
+  assign(localStorage, map(changes, x => JSON.stringify(x)))
+  save(changes)
+}
+
+assign(state, map(localStorage, x => {
+  try { return JSON.parse(x) } catch (e) { return null }
+}))
 
 web3.version.getNetwork(hopefully(network => {
   chain.environment = infer_chain_environment(network)
