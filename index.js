@@ -33,14 +33,15 @@ fetch.stablecoins = $ => begin([
   ], $), $),
 ], $)
 
-let own = x => x.owner == coinbase()
+let owner    = x => x == coinbase() ? "You" : code({}, [x])
+let feedbase = x => x == chain.feedbase.address ? "Standard" : code({}, [x])
 
 views.stablecoins = ({ stablecoins=[] }) => {
   return table_list(stablecoins, {
     "Address":          x => strong({}, [code({}, [x.address])]),
-    "Owner":            x => own(x) ? "You" : code({}, [x.owner]),
+    "Owner":            x => owner(x.owner),
+    "Feedbase":         x => feedbase(x.feedbase),
     "Rules":            x => ascii(x.rules),
-    "Feedbase":         x => code({}, [x.feedbase]),
     "Total supply":     x => Number(x.totalSupply),
     "Collateral types": x => Number(x.type_count) && [
       Number(x.type_count), table_list(x.types, {
