@@ -1,12 +1,11 @@
 /// index.js -- UI components, application-specific logic
 
 init()
-setInterval(reload, 5000)
+setInterval(reload, 3000)
 
 let Stablecoin = x => chain.SimpleStablecoin.at(x)
 let feedbase = x => x == chain.feedbase.address ? "Standard" : code({}, [x])
 let own = x => x.owner == coinbase()
-let owner = x => x == coinbase() ? "You" : code({}, [x])
 
 fetch.stablecoins = $ => begin([
   chain.factory.count, (n, $) => times(n, (i, $) => begin([
@@ -27,28 +26,49 @@ function extract_contract_props(type, address, $) {
   parallel(assign(select(contract, names), convert({ address }, always)), $)
 }
 
-let collateral_type_id_view = ({ address }, { id, token }) => div({}, [
+let owner_view = ({ address, owner }) => div({}, [
+  owner == coinbase() ? "You" : code({}, [owner]),
+  span({ style: { float: "right" } }, [owner == coinbase() && a({
+    onClick: () => change_owner(address),
+  }, ["Transfer"])])
+])
+
+let type_id_view = ({ address }, { id, token }) => div({}, [
   Number(id), span({ style: { float: "right" } }, [Number(token) ? a({
     onClick: () => cancel_collateral_type(address, id),
   }, ["Cancel collateral type"]) : small({}, ["(canceled)"])])
 ])
 
+let feed_view = ({ address }, { id, token, feed }) => div({}, [
+  Number(feed), Number(token) && a({
+    style: { float: "right" },
+    onClick: () => change_price_feed(address, id),
+  }, ["Change feed"])
+])
+
+let max_debt_view = ({ address }, { id, token, max_debt }) => div({}, [
+  Number(max_debt), Number(token) && a({
+    style: { float: "right" },
+    onClick: () => change_max_debt(address, id),
+  }, ["Change max debt"])
+])
+
 views.stablecoins = ({ stablecoins=[] }) => {
   return table_list(stablecoins, {
     "Stablecoin":       x => strong({}, [code({}, [x.address])]),
-    "Owner":            x => owner(x.owner),
+    "Owner":            x => owner_view(x),
     "Feedbase":         x => feedbase(x.feedbase),
     "Rules":            x => ascii(x.rules),
     "Total supply":     x => Number(x.totalSupply),
     "Collateral types": x => [
       Number(x.type_count), table_list(x.types, {
-        "Collateral type":  y => collateral_type_id_view(x, y),
+        "Collateral type":  y => type_id_view(x, y),
         "Token":            y => code({}, [y.token]),
         "Vault":            y => code({}, [y.vault]),
-        "Feed":             y => Number(y.feed),
+        "Price feed":       y => feed_view(x, y),
+        "Max debt":         y => max_debt_view(x, y),
         "Spread":           y => Number(y.spread),
         "Current debt":     y => Number(y.current_debt),
-        "Max debt":         y => Number(y.max_debt),
       }), own(x) && form({
         onSubmit: event => {
           event.preventDefault()
@@ -70,7 +90,7 @@ views.stablecoins = ({ stablecoins=[] }) => {
             [`new_vault_${x.address}`]: event.target.value,
           }),
         })]),
-        label({}, ["Feed ID", input({
+        label({}, ["Price feed", input({
           value: state[`new_feed_${x.address}`],
           onChange: event => update({
             [`new_feed_${x.address}`]: event.target.value,
@@ -119,9 +139,36 @@ function create_stablecoin() {
   ], hopefully(tx => alert(`Transaction created: ${tx}`)))
 }
 
+function change_owner(address) {
+  let new_value = prompt(`New owner for stablecoin ${address}:`)
+  if (new_value) {
+    send(Stablecoin(address).updateOwner, [new_value], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
 function cancel_collateral_type(address, id) {
   if (confirm(`Cancel collateral type ${id} of stablecoin ${address}?`)) {
     send(Stablecoin(address).cancelCollateralType, [id], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+function change_price_feed(address, id) {
+  let new_value = prompt(`New price feed for collateral type ${id}:`)
+  if (Number(new_value)) {
+    send(Stablecoin(address).setFeed, [id, new_value], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+function change_max_debt(address, id) {
+  let new_value = prompt(`New max debt for collateral type ${id}:`)
+  if (Number(new_value)) {
+    send(Stablecoin(address).setMaxDebt, [id, new_value], hopefully(tx => {
       alert(`Transaction created: ${tx}`)
     }))
   }
