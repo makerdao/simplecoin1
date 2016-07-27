@@ -1,13 +1,13 @@
 <!doctype html>
 <meta charset=utf-8>
 <meta name=viewport content=width=device-width>
-<title>Simple stablecoins</title>
+<title>Simple stablecoin</title>
 <link rel=stylesheet href=index.css>
 
 <header>
   <hgroup>
     <img src=https://makerdao.com/splash/images/logo.svg>
-    <h1>Simple stablecoins</h1>
+    <h1>Simple stablecoin</h1>
     <h2>Something to play with while we wait</h2>
   </hgroup>
 </header>
@@ -43,11 +43,11 @@
   href=https://github.com/makerdao/maker-market-matcher>makers</a> something
   to do while Maker’s stablecoin engine undergoes refinement.
 
-  <p> <a onclick=hide_explanation()>Hide this message</a>
+  <p> <a onclick="persist({ quiet: true })">Hide explanation</a>
 </section>
 
 <section id=show-explanation>
-  <p> <a onclick=show_explanation()>Show introductory message</a>
+  <p> <a onclick="persist({ quiet: false })">Show explanation</a>
 </section>
 
 <section data-when=loading>

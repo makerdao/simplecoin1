@@ -1,6 +1,4 @@
-//----------------------------------------------------------
-// init.js -- global variables, initialization logic
-//----------------------------------------------------------
+/// init.js -- global variables, generic initialization logic
 
 let views = {} // Holds view components (named by `<div data-view=foo>')
 let redraw = $ => async.each(all("[data-view]"), (node, $) => {
@@ -57,12 +55,3 @@ function State(x) {
     },
   }), x)
 }
-
-function extract_contract_props(type, address, $) {
-  let contract = type.at(address)
-  let is_property = abi => abi.constant && !abi.inputs.length
-  let names = contract.abi.filter(is_property).map(abi => abi.name)
-  parallel(assign(select(contract, names), convert({ address }, always)), $)
-}
-
-init()

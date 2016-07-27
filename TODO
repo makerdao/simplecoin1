@@ -1,7 +1,6 @@
-- register collateral type
 - cancel collateral type
-- set whitelisted
 - display whitelist?
+- set whitelisted
 - set owner
 - set max debt
 - set feed

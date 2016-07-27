@@ -19,12 +19,19 @@ let div       = Tag("div")
 let each      = (a, f) => [].forEach.call(a, f)
 let fail      = x => { throw x instanceof Error ? x : new Error(x) }
 let fold      = (xs, z, f) => xs.reduce(f, z)
+let form      = Tag("form")
+let h1        = Tag("h1")
+let h2        = Tag("h2")
+let h3        = Tag("h3")
+let h4        = Tag("h4")
 let hex       = x => web3.toHex(x)
 let hopefully = $ => (e, x) => e ? fail(e) : $(x)
+let input     = Tag("input")
 let json      = x => JSON.stringify(x)
 let keys      = Object.keys
 let ks        = Object.keys
 let kv        = (k, v) => ({ [k]: v })
+let label     = Tag("label")
 let map       = (a, f) => [].map.call(a, f)
 let mapkv     = (o, f) => fold(keys(o), {}, (r, k) => assign(r, f(k, o[k])))
 let maybe     = f => { try { return f() } catch (err) {} }
