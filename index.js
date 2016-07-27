@@ -1,5 +1,13 @@
-let hide_explanation = () => save({ quiet: true })
-let show_explanation = () => save({ quiet: false })
+//----------------------------------------------------------
+// index.js -- UI components, application-specific code
+//----------------------------------------------------------
+
+let stablecoin = x => chain.SimpleStablecoin.at(x)
+
+let hide_explanation = () => persist({ quiet: true })
+let show_explanation = () => persist({ quiet: false })
+
+//----------------------------------------------------------
 
 views.textarea = ({ rules }) => textarea({
   value: rules, maxLength: 32,
@@ -12,14 +20,14 @@ function create_stablecoin() {
   ], hopefully(tx => alert(`Transaction created: ${tx}`)))
 }
 
-let stablecoin = x => chain.SimpleStablecoin.at(x)
-
 function register_collateral_type(address, params) {
   let { token, vault, feed, spread } = params
   send(stablecoin(address).registerCollateralType, [
     token, vault, feed, spread
   ], hopefully(tx => alert(`Transaction created: ${tx}`)))
 }
+
+//----------------------------------------------------------
 
 fetch.stablecoins = $ => begin([
   chain.factory.count, (n, $) => times(n, (i, $) => begin([
@@ -32,6 +40,8 @@ fetch.stablecoins = $ => begin([
     })), $), hopefully(types => $(null, assign(x, { types }))))
   ], $), $),
 ], $)
+
+//----------------------------------------------------------
 
 let owner    = x => x == coinbase() ? "You" : code({}, [x])
 let feedbase = x => x == chain.feedbase.address ? "Standard" : code({}, [x])
@@ -55,4 +65,21 @@ views.stablecoins = ({ stablecoins=[] }) => {
       })
     ]
   })
+}
+
+//----------------------------------------------------------
+
+function table_list(xs, fields) {
+  return xs.length ? table({}, xs.map((x, i) => {
+    return tbody({ key: i }, concat(keys(fields).map((name, i) => {
+      let values = fields[name](x)
+      let value = values instanceof Array ? values[0] : values
+      let extra = values instanceof Array ? values[1] : null
+      return [
+        tr({ key: i }, [th({}, [name]), td({}, [value])])
+      ].concat(
+        extra ? [tr({ key: `${i}+` }, [td({ colSpan: 2 }, [extra])])] : []
+      )
+    })))
+  })) : small({}, ["(none)"])
 }
