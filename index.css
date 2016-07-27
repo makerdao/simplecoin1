@@ -33,6 +33,7 @@ a:not([href]) { color: blue; text-decoration: underline; cursor: pointer; }
 table { border-collapse: collapse; }
 tbody { border-top: 1rem solid transparent; }
 tbody { border-bottom: 2rem solid transparent; }
+td tbody { border-bottom: none; }
 th { text-align: left; padding-right: 1rem; vertical-align: top; }
-td table, td form { margin: 1rem; }
+td table, td form { margin: 1rem; margin-right: 0; }
 td tbody:first-child { border-top: none; }

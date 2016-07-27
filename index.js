@@ -12,15 +12,20 @@ fetch.stablecoins = $ => begin([
     bind(chain.factory.stablecoins, i),
     (address, $) => parallel({
       props: bind(extract_contract_props, chain.SimpleStablecoin, address),
+      balance: $ => Stablecoin(address).balanceOf(coinbase(), $),
       whitelisted: $ => Stablecoin(address).whitelist(coinbase(), $),
-    }, hopefully(({ props, whitelisted }) => {
-      $(null, assign(props, { whitelisted }))
+    }, hopefully(({ props, whitelisted, balance }) => {
+      $(null, assign(props, { whitelisted, balance }))
     })),
     (x, $) => times(Number(x.type_count), (i, $) => parallel(fold(words(`
       token feed vault spread current_debt max_debt
     `), { id: always(i) }, (result, name) => assign(result, {
       [name]: bind(Stablecoin(x.address)[name], i)
-    })), $), hopefully(types => $(null, assign(x, { types }))))
+    })), hopefully(props => {
+      Stablecoin(props.token).balanceOf(coinbase(), hopefully(balance => {
+        $(null, assign(props, { balance }))
+      }))
+    })), hopefully(types => $(null, assign(x, { types }))))
   ], $), $),
 ], $)
 
@@ -52,6 +57,16 @@ let whitelist_view = ({ address, owner, whitelisted }) => div({}, [
   }, ["Remove"])] : [])
 ])
 
+let balance_view = ({ address, balance }) => div({}, [
+  Number(balance),
+  div({ style: { float: "right" } }, [a({
+    onClick: () => purchase(address),
+  }, ["Purchase"]), " ", a({
+    style: { marginLeft: ".25rem" },
+    onClick: () => redeem(address),
+  }, ["Redeem"])])
+])
+
 let type_id_view = ({ address }, { id, token }) => div({}, [
   Number(id), span({ style: { float: "right" } }, [Number(token) ? a({
     onClick: () => cancel_collateral_type(address, id),
@@ -72,6 +87,17 @@ let max_debt_view = ({ address }, { id, token, max_debt }) => div({}, [
   }, ["Change max debt"])
 ])
 
+let collateral_balance_view = (
+  { address }, { id, token, balance }
+) => div({}, [
+  Number(balance), div({ style: { float: "right" } }, [a({
+    onClick: () => purchase(address, id),
+  }, ["Purchase"]), " ", a({
+    style: { marginLeft: ".25rem" },
+    onClick: () => redeem(address, id),
+  }, ["Redeem"])])
+])
+
 views.stablecoins = ({ stablecoins=[] }) => {
   return stablecoins.length ? table_list(stablecoins, {
     "Stablecoin":       x => strong({}, [code({}, [x.address])]),
@@ -80,6 +106,7 @@ views.stablecoins = ({ stablecoins=[] }) => {
     "Rules":            x => ascii(x.rules),
     "Whitelisted":      x => whitelist_view(x),
     "Total supply":     x => Number(x.totalSupply),
+    "Your balance":     x => Number(x.balance),
     "Collateral types": x => [
       Number(x.type_count), table_list(x.types, {
         "Collateral type":  y => type_id_view(x, y),
@@ -89,6 +116,7 @@ views.stablecoins = ({ stablecoins=[] }) => {
         "Max debt":         y => max_debt_view(x, y),
         "Spread":           y => Number(y.spread),
         "Current debt":     y => Number(y.current_debt),
+        "Your balance":     y => collateral_balance_view(x, y),
       }), own(x) && (state[`new_${x.address}`] ? form({
         onSubmit: event => {
           event.preventDefault()
@@ -99,25 +127,25 @@ views.stablecoins = ({ stablecoins=[] }) => {
       }, [
         h4({}, "Register collateral type"),
         label({}, ["Token address", input({
-          value: state[`new_token_${x.address}`],
+          value: state[`new_token_${x.address}`] || "",
           onChange: event => update({
             [`new_token_${x.address}`]: event.target.value,
           }),
         })]),
         label({}, ["Vault address", input({
-          value: state[`new_vault_${x.address}`],
+          value: state[`new_vault_${x.address}`] || "",
           onChange: event => update({
             [`new_vault_${x.address}`]: event.target.value,
           }),
         })]),
         label({}, ["Price feed", input({
-          value: state[`new_feed_${x.address}`],
+          value: state[`new_feed_${x.address}`] || "",
           onChange: event => update({
             [`new_feed_${x.address}`]: event.target.value,
           }),
         })]),
         label({}, ["Spread", input({
-          value: state[`new_spread_${x.address}`],
+          value: state[`new_spread_${x.address}`] || "",
           onChange: event => update({
             [`new_spread_${x.address}`]: event.target.value,
           }),
@@ -214,6 +242,24 @@ function remove_whitelist(address) {
   let x = prompt(`Remove which address from whitelist for ${address}?`)
   if (x) {
     send(Stablecoin(address).setWhitelist, [x, false], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+function purchase(address, id) {
+  let x = prompt(`Buy stablecoins for how many of these collateral tokens?`)
+  if (Number(x)) {
+    send(Stablecoin(address).purchase, [id, Number(x)], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+function redeem(address, id) {
+  let x = prompt(`Redeem how many stablecoins for this collateral type?`)
+  if (Number(x)) {
+    send(Stablecoin(address).redeem, [id, Number(x)], hopefully(tx => {
       alert(`Transaction created: ${tx}`)
     }))
   }
