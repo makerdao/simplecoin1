@@ -1,7 +1,7 @@
 /// index.js -- UI components, application-specific logic
 
 init()
-setInterval(reload, 3000)
+setInterval(() => chain.env && reload(), 3000)
 
 let Stablecoin = x => chain.SimpleStablecoin.at(x)
 let feedbase = x => x == chain.feedbase.address ? "Standard" : code({}, [x])
@@ -10,7 +10,12 @@ let own = x => x.owner == coinbase()
 fetch.stablecoins = $ => begin([
   chain.factory.count, (n, $) => times(n, (i, $) => begin([
     bind(chain.factory.stablecoins, i),
-    bind(extract_contract_props, chain.SimpleStablecoin),
+    (address, $) => parallel({
+      props: bind(extract_contract_props, chain.SimpleStablecoin, address),
+      whitelisted: $ => Stablecoin(address).whitelist(coinbase(), $),
+    }, hopefully(({ props, whitelisted }) => {
+      $(null, assign(props, { whitelisted }))
+    })),
     (x, $) => times(Number(x.type_count), (i, $) => parallel(fold(words(`
       token feed vault spread current_debt max_debt
     `), { id: always(i) }, (result, name) => assign(result, {
@@ -28,9 +33,23 @@ function extract_contract_props(type, address, $) {
 
 let owner_view = ({ address, owner }) => div({}, [
   owner == coinbase() ? "You" : code({}, [owner]),
-  span({ style: { float: "right" } }, [owner == coinbase() && a({
+  owner == coinbase() && a({
+    style: { float: "right" },
     onClick: () => change_owner(address),
-  }, ["Transfer"])])
+  }, ["Transfer"]),
+])
+
+let whitelist_view = ({ address, owner, whitelisted }) => div({}, [
+  whitelisted ? "Yes" : "No",
+  small({ style: { marginLeft: ".5rem" } }, [
+    " (cannot display whole whitelist)"
+  ]),
+  div({ style: { float: "right" } }, owner == coinbase() ? [a({
+    onClick: () => add_whitelist(address),
+  }, ["Add"]), " ", a({
+    style: { marginLeft: ".25rem" },
+    onClick: () => remove_whitelist(address),
+  }, ["Remove"])] : [])
 ])
 
 let type_id_view = ({ address }, { id, token }) => div({}, [
@@ -43,7 +62,7 @@ let feed_view = ({ address }, { id, token, feed }) => div({}, [
   Number(feed), !!Number(token) && a({
     style: { float: "right" },
     onClick: () => change_price_feed(address, id),
-  }, ["Change feed"])
+  }, ["Change price feed"])
 ])
 
 let max_debt_view = ({ address }, { id, token, max_debt }) => div({}, [
@@ -54,11 +73,12 @@ let max_debt_view = ({ address }, { id, token, max_debt }) => div({}, [
 ])
 
 views.stablecoins = ({ stablecoins=[] }) => {
-  return table_list(stablecoins, {
+  return stablecoins.length ? table_list(stablecoins, {
     "Stablecoin":       x => strong({}, [code({}, [x.address])]),
-    "Owner":            x => owner_view(x),
     "Feedbase":         x => feedbase(x.feedbase),
+    "Owner":            x => owner_view(x),
     "Rules":            x => ascii(x.rules),
+    "Whitelisted":      x => whitelist_view(x),
     "Total supply":     x => Number(x.totalSupply),
     "Collateral types": x => [
       Number(x.type_count), table_list(x.types, {
@@ -111,7 +131,7 @@ views.stablecoins = ({ stablecoins=[] }) => {
         onClick: () => update({ [`new_${x.address}`]: true }),
       }, ["Register collateral type"])]))
     ]
-  })
+  }) : small({}, ["(none)"])
 }
 
 function table_list(xs, fields) {
@@ -140,7 +160,10 @@ views.textarea = ({ rules }) => textarea({
 function create_stablecoin() {
   send(chain.factory.newSimpleStablecoin, [
     chain.feedbase.address, hex(state.rules),
-  ], hopefully(tx => alert(`Transaction created: ${tx}`)))
+  ], hopefully(tx => {
+    alert(`Transaction created: ${tx}`)
+    update({ rules: "" })
+  }))
 }
 
 function change_owner(address) {
@@ -173,6 +196,24 @@ function change_max_debt(address, id) {
   let new_value = prompt(`New max debt for collateral type ${id}:`)
   if (Number(new_value)) {
     send(Stablecoin(address).setMaxDebt, [id, new_value], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+function add_whitelist(address) {
+  let x = prompt(`Add which address to whitelist for ${address}?`)
+  if (x) {
+    send(Stablecoin(address).setWhitelist, [x, true], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+function remove_whitelist(address) {
+  let x = prompt(`Remove which address from whitelist for ${address}?`)
+  if (x) {
+    send(Stablecoin(address).setWhitelist, [x, false], hopefully(tx => {
       alert(`Transaction created: ${tx}`)
     }))
   }

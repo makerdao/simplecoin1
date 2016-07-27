@@ -1,5 +1,5 @@
-- input validation
-- display whitelist?
-- set whitelisted
 - purchase
 - redeem
+- input validation
+- better progress indicators
+- display user address

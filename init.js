@@ -27,12 +27,14 @@ function init() {
   // Load persistent state (from local storage)
   assign(state, convert(storage, unjson))
   // Determine network version (in order to infer `chain.env')
+  console.log("Inferring blockchain environment...")
   web3.version.getNetwork(timeout(300, () => {
     // Show `loading' message after a few hundred milliseconds
     state.phase = "loading"
   }, hopefully(network => {
     // Proceed to initialize the application
     chain.env = [, "live", "morden"][network]
+    console.log(`Environment: ${chain.env}`)
     each(dapple_packages(), dapple_import)
     reload(() => update({ phase: "loaded" }))
   })))

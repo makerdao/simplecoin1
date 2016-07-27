@@ -4,9 +4,11 @@ env ?= morden
 name = simple-stablecoin
 repo = makerdao
 
-default: test build/js_module.js run
+default: test run
 test:; dapple test --report
-build/js_module.js: dappfile; dapple build -e $(env)
+
+.PHONY: build deploy
+build:; dapple build -e $(env)
 deploy:; dapple run deploy/$(env).ds -e $(env)
 
 run: kill image; $(run) --name=$(cmd) $(image) $(cmd)

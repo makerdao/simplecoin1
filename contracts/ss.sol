@@ -4,8 +4,9 @@ import 'feedbase/feedbase.sol';
 
 contract SimpleStablecoin is ERC20Base(0) {
     address _owner;
-    bytes32 _rules; // owner promises to follow these rules, or else suffer reddit flaming
+    bytes32 _rules;
     Feedbase _feedbase;
+    mapping (address => bool) public whitelist;
 
     function owner() constant returns (address) { return _owner; }
     function rules() constant returns (bytes32) { return _rules; }
@@ -45,7 +46,7 @@ contract SimpleStablecoin is ERC20Base(0) {
     function max_debt(uint type_id) constant returns (uint) {
        return _types[type_id].max_debt;
     }
-    
+
     modifier noEther() {
         if(msg.value == 0) { _ } else { throw; }
     }
@@ -73,9 +74,8 @@ contract SimpleStablecoin is ERC20Base(0) {
         return uint(price);
     }
 
-    mapping(address => bool) _whitelist; // owner should know issuers/redeemers
     modifier whitelisted(address who) {
-        if( _whitelist[who] ) {
+        if( whitelist[who] ) {
             _
         } else {
             throw;
@@ -100,7 +100,7 @@ contract SimpleStablecoin is ERC20Base(0) {
         noEther
         ownerOnly
     {
-        _whitelist[who] = what;
+        whitelist[who] = what;
     }
     function updateOwner(address new_owner)
         noEther

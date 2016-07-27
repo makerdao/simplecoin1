@@ -5,7 +5,7 @@ var PORT = process.env.PORT || 3000
 var URL = `http://localhost:${PORT}`
 
 express().use(express.static(".")).listen(PORT, () => console.log(`
-  >>>>> Serving UI at <${URL}>...
+  >>>>> Serving simple stablecoin UI at <${URL}>...
 
   Unless you're using MetaMask (<https://metamask.io>) or some other
   similar Web3 provider, you'll want to start your node like this:
