@@ -15,13 +15,19 @@ function extract_contract_props(type, address, $) {
   parallel(assign(select(contract, names), convert({ address }, always)), $)
 }
 
+let none = small({}, ["(none)"])
+
 function table_list(xs, fields) {
-  return table({}, xs.map((x, i) => {
-    return tbody({ key: i }, keys(fields).map((name, i) => {
-      return tr({ key: i }, [
-        th({}, [name]),
-        td({}, [fields[name](x)]),
-      ])
-    }))
-  }))
+  return xs.length ? table({}, xs.map((x, i) => {
+    return tbody({ key: i }, concat(keys(fields).map((name, i) => {
+      let values = fields[name](x)
+      let value = values instanceof Array ? values[0] : values
+      let extra = values instanceof Array ? values[1] : null
+      return [
+        tr({ key: i }, [th({}, [name]), td({}, [value])])
+      ].concat(
+        extra ? [tr({ key: `${i}+` }, [td({ colSpan: 2 }, [extra])])] : []
+      )
+    })))
+  })) : none
 }

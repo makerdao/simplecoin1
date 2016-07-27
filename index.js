@@ -7,31 +7,51 @@ views.textarea = ({ rules }) => textarea({
 })
 
 function create_stablecoin() {
-  chain.factory.newSimpleStablecoin(
+  send(chain.factory.newSimpleStablecoin, [
     chain.feedbase.address, hex(state.rules),
-    { from: web3.eth.coinbase },
-    (error, tx) => alert(error || `Transaction created: ${tx}`)
-  )
+  ], hopefully(tx => alert(`Transaction created: ${tx}`)))
+}
+
+let stablecoin = x => chain.SimpleStablecoin.at(x)
+
+function register_collateral_type(address, params) {
+  let { token, vault, feed, spread } = params
+  send(stablecoin(address).registerCollateralType, [
+    token, vault, feed, spread
+  ], hopefully(tx => alert(`Transaction created: ${tx}`)))
 }
 
 fetch.stablecoins = $ => begin([
   chain.factory.count, (n, $) => times(n, (i, $) => begin([
     bind(chain.factory.stablecoins, i),
     bind(extract_contract_props, chain.SimpleStablecoin),
-    (x, $) => times(Number(x.type_count), (i, $) => parallel(fold([
-      "token", "feed", "vault", "spread", "current_debt", "max_debt",
-    ], {}, (result, name) => assign(result, {
-      [name]: bind(chain.SimpleStablecoin.at(x.address)[name], i)
+    (x, $) => times(Number(x.type_count), (i, $) => parallel(fold(words(`
+      token feed vault spread current_debt max_debt
+    `), { id: always(i) }, (result, name) => assign(result, {
+      [name]: bind(stablecoin(x.address)[name], i)
     })), $), hopefully(types => $(null, assign(x, { types }))))
   ], $), $),
 ], $)
 
+let own = x => x.owner == coinbase()
+
 views.stablecoins = ({ stablecoins=[] }) => {
-  return stablecoins.length ? table_list(stablecoins, {
-    "Stablecoin": x => code({}, [x.address]),
-    "Feedbase":   x => code({}, [x.feedbase]),
-    "Owner":      x => code({}, [x.owner]),
-    "Rules":      x => ascii(x.rules),
-    "Supply":     x => Number(x.totalSupply),
-  }) : small({}, ["(none)"])
+  return table_list(stablecoins, {
+    "Address":          x => strong({}, [code({}, [x.address])]),
+    "Owner":            x => own(x) ? "You" : code({}, [x.owner]),
+    "Rules":            x => ascii(x.rules),
+    "Feedbase":         x => code({}, [x.feedbase]),
+    "Total supply":     x => Number(x.totalSupply),
+    "Collateral types": x => Number(x.type_count) && [
+      Number(x.type_count), table_list(x.types, {
+        "ID":               x => Number(x.id),
+        "Token":            x => code({}, [x.token]),
+        "Feed":             x => Number(x.feed),
+        "Vault":            x => code({}, [x.vault]),
+        "Spread":           x => Number(x.spread),
+        "Current debt":     x => Number(x.current_debt),
+        "Max debt":         x => Number(x.max_debt),
+      })
+    ]
+  })
 }

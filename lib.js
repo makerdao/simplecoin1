@@ -10,6 +10,8 @@ let bind      = async.apply
 let body      = document.body
 let button    = Tag("button")
 let code      = Tag("code")
+let coinbase  = () => web3.eth.coinbase
+let concat    = xs => [].concat(...xs)
 let convert   = (o, f) => mapkv(o, (k, v) => kv(k, f(v)))
 let create    = Object.create
 let define    = Object.defineProperties
@@ -31,9 +33,11 @@ let parallel  = async.parallel
 let pick      = (o, k) => kv(k, o[k])
 let render    = ReactDOM.render
 let select    = (o, ks) => fold(ks, {}, (r, k) => assign(r, pick(o, k)))
+let send      = (f, xs, $) => f(...xs.concat([{ from: coinbase() }, $]))
 let sheet     = document.styleSheets[0]
 let small     = Tag("small")
 let storage   = localStorage
+let strong    = Tag("strong")
 let style     = x => sheet.insertRule(x, sheet.cssRules.length)
 let table     = Tag("table")
 let tag       = (name, o, xs=[]) => React.createElement(name, o, ...xs)
@@ -45,3 +49,4 @@ let times     = async.times
 let tr        = Tag("tr")
 let uniq      = x => keys(select({}, x))
 let unjson    = x => maybe(() => JSON.parse(x))
+let words     = x => x ? x.replace(/^\s+|\s+$/g, "").split(" ") : []

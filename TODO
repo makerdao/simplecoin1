@@ -1,15 +1,9 @@
 - register collateral type
-- display token
-- display feed
-- display vault
-- display spread
-- display current debt
-- display max debt
 - cancel collateral type
 - set whitelisted
+- display whitelist?
 - set owner
 - set max debt
 - set feed
 - purchase
 - redeem
-- display whitelist?

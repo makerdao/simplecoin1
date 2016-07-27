@@ -6,7 +6,7 @@
 
 <header>
   <hgroup>
-    <img class=clutter src=https://makerdao.com/splash/images/logo.svg>
+    <img src=https://makerdao.com/splash/images/logo.svg>
     <h1>Simple stablecoins</h1>
     <h2>Something to play with while we wait</h2>
   </hgroup>
@@ -70,29 +70,19 @@
 
 <section data-when=loaded>
   <form onsubmit="event.preventDefault()">
-    <h3>
-    Create simple stablecoin
-    <small class=clutter style="float: right">
-      Source code: <a target=_blank href=https://github.com/makerdao/simple-stablecoin/blob/gh-pages/contracts/ss.sol> ss.sol </a>,
-      <a target=_blank href=https://github.com/makerdao/simple-stablecoin/blob/gh-pages/contracts/factory.sol> factory.sol </a>
-    </small>
-    </h3>
-    <label for=rules>
-      Stablecoin rules
-      <small>(max 32 characters)</small>:
+    <h3>Create simple stablecoin</h3>
+    <label>
+      Stablecoin rules <small>(max 32 characters)</small>:
+      <div data-view=textarea></div>
     </label>
-    <div data-view=textarea></div>
     <div style="text-align: right">
-      <small style="margin-right: .5rem">
-        Estimated gas cost: 0.0234 ETH
-      </small>
       <button onclick="create_stablecoin()">Create stablecoin</button>
     </div>
   </form>
 </section>
     
 <section data-when=loaded>
-  <h3>List of stablecoins created by this factory:</h3>
+  <h3>List of stablecoins created by this factory</h3>
   <div data-view=stablecoins></div>
 </section>
 
