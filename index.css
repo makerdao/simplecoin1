@@ -1,39 +1,40 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,500,700);
 
-[data-app], [data-help], [data-loading] { display: none; }
-.loading [data-loading] { display: block; }
-.loaded [data-app] { display: block; }
-.failed [data-help] { display: block; }
+body:not([data-phase]) { display: none; }
+[data-when] { display: none; }
 
 * { margin: 0; box-sizing: border-box; font-size: inherit; }
 html { font: 20px Roboto, sans-serif; color: #333; }
 body { max-width: 30rem; margin: 0 auto; }
-body { line-height: 1rem; font-size: 0.7rem; }
-header, section { padding: 1rem 1rem; }
+body { line-height: 1rem; font-size: .7rem; }
+header { padding: 0 1rem; }
+section { padding: 1rem 1rem; }
+.clutter { display: none; }
 
-header { border: none; }
-header img { width: 4rem; float: right; display: none; }
-hgroup { margin-bottom: 1rem; }
-
-p + p { margin-top: 1rem; }
-small { font-size: .7rem; font-weight: normal; }
+hgroup img { width: 4rem; float: right; }
 h1 { line-height: 2rem; font-size: 1.3rem; }
-h1 { color: #546979; letter-spacing: -0.05em; }
+h1 { color: #546979; letter-spacing: -.05em; }
 h2 { color: #808080; font-weight: normal; }
-h3 { font-size: 0.8rem; margin-bottom: 0.5rem; }
+
+#show-explanation { display: none; }
+.quiet #explanation { display: none; }
+.quiet #show-explanation { display: block; }
+
+h3 { font-size: .8rem; margin-bottom: .5rem; }
+* + p { margin-top: 1rem; }
+small { font-size: .7rem; font-weight: normal; color: gray; }
+
 label { display: block; }
-small { color: gray; }
-textarea { width: 100%; padding: 0.5rem; }
+textarea { width: 100%; padding: .5rem; }
 textarea { border: 1px solid #ccc; }
-th { text-align: left; padding-right: 1rem; }
+a:not([href]) { color: blue; text-decoration: underline; cursor: pointer; }
+
 table { border-collapse: collapse; }
 tbody { border-top: 1rem solid transparent; }
+th { text-align: left; padding-right: 1rem; }
 
-header small.link { display: inline-block; }
-
-.clutter { display: none; }
 @media (min-width: 640px) {
-  .clutter { display: block; }
   html { font-size: 24px; }
   body { margin: 2rem auto; }
+  .clutter { display: block; }
 }
