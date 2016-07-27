@@ -43,6 +43,7 @@ let select    = (o, ks) => fold(ks, {}, (r, k) => assign(r, pick(o, k)))
 let send      = (f, xs, $) => f(...xs.concat([{ from: coinbase() }, $]))
 let sheet     = document.styleSheets[0]
 let small     = Tag("small")
+let span      = Tag("span")
 let storage   = localStorage
 let strong    = Tag("strong")
 let style     = x => sheet.insertRule(x, sheet.cssRules.length)

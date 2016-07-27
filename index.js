@@ -1,6 +1,7 @@
 /// index.js -- UI components, application-specific logic
 
 init()
+setInterval(reload, 5000)
 
 let Stablecoin = x => chain.SimpleStablecoin.at(x)
 let feedbase = x => x == chain.feedbase.address ? "Standard" : code({}, [x])
@@ -26,6 +27,12 @@ function extract_contract_props(type, address, $) {
   parallel(assign(select(contract, names), convert({ address }, always)), $)
 }
 
+let collateral_type_id_view = ({ address }, { id, token }) => div({}, [
+  Number(id), span({ style: { float: "right" } }, [Number(token) ? a({
+    onClick: () => cancel_collateral_type(address, id),
+  }, ["Cancel collateral type"]) : small({}, ["(canceled)"])])
+])
+
 views.stablecoins = ({ stablecoins=[] }) => {
   return table_list(stablecoins, {
     "Stablecoin":       x => strong({}, [code({}, [x.address])]),
@@ -35,15 +42,20 @@ views.stablecoins = ({ stablecoins=[] }) => {
     "Total supply":     x => Number(x.totalSupply),
     "Collateral types": x => [
       Number(x.type_count), table_list(x.types, {
-        "ID":               x => Number(x.id),
-        "Token":            x => code({}, [x.token]),
-        "Feed":             x => Number(x.feed),
-        "Vault":            x => code({}, [x.vault]),
-        "Spread":           x => Number(x.spread),
-        "Current debt":     x => Number(x.current_debt),
-        "Max debt":         x => Number(x.max_debt),
+        "Collateral type":  y => collateral_type_id_view(x, y),
+        "Token":            y => code({}, [y.token]),
+        "Vault":            y => code({}, [y.vault]),
+        "Feed":             y => Number(y.feed),
+        "Spread":           y => Number(y.spread),
+        "Current debt":     y => Number(y.current_debt),
+        "Max debt":         y => Number(y.max_debt),
       }), own(x) && form({
-        onSubmit: () => register_collateral_type(x.address),
+        onSubmit: event => {
+          event.preventDefault()
+          if (confirm(`Register new collateral type?`)) {
+            register_collateral_type(x.address)
+          }
+        }
       }, [
         h4({}, "Register collateral type"),
         label({}, ["Token address", input({
@@ -105,6 +117,14 @@ function create_stablecoin() {
   send(chain.factory.newSimpleStablecoin, [
     chain.feedbase.address, hex(state.rules),
   ], hopefully(tx => alert(`Transaction created: ${tx}`)))
+}
+
+function cancel_collateral_type(address, id) {
+  if (confirm(`Cancel collateral type ${id} of stablecoin ${address}?`)) {
+    send(Stablecoin(address).cancelCollateralType, [id], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
 }
 
 function register_collateral_type(address) {
