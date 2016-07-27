@@ -9,6 +9,8 @@ contract SimpleStablecoin is ERC20Base(0) {
 
     function owner() constant returns (address) { return _owner; }
     function rules() constant returns (bytes32) { return _rules; }
+    function feedbase() constant returns (address) { return _feedbase; }
+    function type_count() constant returns (uint) { return _types.length; }
 
     CollateralType[] _types;
     struct CollateralType {
@@ -20,6 +22,30 @@ contract SimpleStablecoin is ERC20Base(0) {
         uint max_debt;
     }
 
+    function token(uint type_id) constant returns (ERC20) {
+       return _types[type_id].token;
+    }
+
+    function feed(uint type_id) constant returns (uint24) {
+       return _types[type_id].feedID;
+    }
+
+    function vault(uint type_id) constant returns (address) {
+       return _types[type_id].vault;
+    }
+
+    function spread(uint type_id) constant returns (uint) {
+       return _types[type_id].spread;
+    }
+
+    function current_debt(uint type_id) constant returns (uint) {
+       return _types[type_id].current_debt;
+    }
+
+    function max_debt(uint type_id) constant returns (uint) {
+       return _types[type_id].max_debt;
+    }
+    
     modifier noEther() {
         if(msg.value == 0) { _ } else { throw; }
     }

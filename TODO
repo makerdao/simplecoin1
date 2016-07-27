@@ -1,21 +1,15 @@
-display feedbase address
-display whitelist... somehow?
-display collateral types
-- token
-- feedID
-- vault
-- spread
-- current_debt
-- max_debt
-
-admin entrypoints
+- register collateral type
+- display token
+- display feed
+- display vault
+- display spread
+- display current debt
+- display max debt
+- cancel collateral type
 - set whitelisted
 - set owner
 - set max debt
 - set feed
-- register collateral type
-- cancel collateral type
-
-user entrypoints
 - purchase
 - redeem
+- display whitelist?

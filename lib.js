@@ -25,7 +25,7 @@ let ks        = Object.keys
 let kv        = (k, v) => ({ [k]: v })
 let map       = (a, f) => [].map.call(a, f)
 let mapkv     = (o, f) => fold(keys(o), {}, (r, k) => assign(r, f(k, o[k])))
-let maybe     = f => (...xs) => { try { return f(...xs) } catch (err) {} }
+let maybe     = f => { try { return f() } catch (err) {} }
 let noop      = () => void 0
 let parallel  = async.parallel
 let pick      = (o, k) => kv(k, o[k])
@@ -44,4 +44,4 @@ let th        = Tag("th")
 let times     = async.times
 let tr        = Tag("tr")
 let uniq      = x => keys(select({}, x))
-let unjson    = maybe(JSON.parse)
+let unjson    = x => maybe(() => JSON.parse(x))

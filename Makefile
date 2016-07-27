@@ -7,7 +7,7 @@ repo = makerdao
 all: image test
 test:; dapple test --report
 
-deploy:; dapple run deploy/$(env).ds
+deploy:; dapple run deploy/$(env).ds -e $(env)
 js:; dapple build -e $(env)
 
 ui: kill image; $(run) --name=$(cmd) $(image) $(cmd)
