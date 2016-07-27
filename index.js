@@ -40,14 +40,14 @@ let type_id_view = ({ address }, { id, token }) => div({}, [
 ])
 
 let feed_view = ({ address }, { id, token, feed }) => div({}, [
-  Number(feed), Number(token) && a({
+  Number(feed), !!Number(token) && a({
     style: { float: "right" },
     onClick: () => change_price_feed(address, id),
   }, ["Change feed"])
 ])
 
 let max_debt_view = ({ address }, { id, token, max_debt }) => div({}, [
-  Number(max_debt), Number(token) && a({
+  Number(max_debt), !!Number(token) && a({
     style: { float: "right" },
     onClick: () => change_max_debt(address, id),
   }, ["Change max debt"])
@@ -69,7 +69,7 @@ views.stablecoins = ({ stablecoins=[] }) => {
         "Max debt":         y => max_debt_view(x, y),
         "Spread":           y => Number(y.spread),
         "Current debt":     y => Number(y.current_debt),
-      }), own(x) && form({
+      }), own(x) && (state[`new_${x.address}`] ? form({
         onSubmit: event => {
           event.preventDefault()
           if (confirm(`Register new collateral type?`)) {
@@ -105,13 +105,17 @@ views.stablecoins = ({ stablecoins=[] }) => {
         div({ style: { textAlign: "right" } }, [
           button({}, ["Register collateral type"])
         ]),
-      ])
+      ]) : div({
+        style: { marginLeft: "1rem", marginTop: "1rem" },
+      }, [a({
+        onClick: () => update({ [`new_${x.address}`]: true }),
+      }, ["Register collateral type"])]))
     ]
   })
 }
 
 function table_list(xs, fields) {
-  return table({}, xs.map((x, i) => {
+  return !!xs.length && table({}, xs.map((x, i) => {
     return tbody({ key: i }, concat(keys(fields).map((name, i) => {
       let values = (x => x instanceof Array ? x : [x])(fields[name](x))
       return [
