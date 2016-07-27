@@ -88,14 +88,15 @@ let max_debt_view = ({ address }, { id, token, max_debt }) => div({}, [
 ])
 
 let collateral_balance_view = (
-  { address }, { id, token, balance }
+  { address, whitelisted }, { id, token, balance }
 ) => div({}, [
-  Number(balance), div({ style: { float: "right" } }, [a({
+  Number(balance),
+  div({ style: { float: "right" } }, whitelisted ? [a({
     onClick: () => purchase(address, id),
   }, ["Purchase"]), " ", a({
     style: { marginLeft: ".25rem" },
     onClick: () => redeem(address, id),
-  }, ["Redeem"])])
+  }, ["Redeem"])] : [small({}, ["(not whitelisted)"])])
 ])
 
 views.stablecoins = ({ stablecoins=[] }) => {
