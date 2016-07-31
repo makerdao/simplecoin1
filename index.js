@@ -70,7 +70,7 @@ let balance_view = ({ address, balance }) => div({}, [
 let type_id_view = ({ address }, { id, token }) => div({}, [
   Number(id), span({ style: { float: "right" } }, [Number(token) ? a({
     onClick: () => cancel_collateral_type(address, id),
-  }, ["Cancel collateral type"]) : small({}, ["(canceled)"])])
+  }, ["Cancel collateral type"]) : small({}, ["(cancelled)"])])
 ])
 
 let feed_view = ({ address }, { id, token, feed }) => div({}, [
@@ -158,7 +158,7 @@ views.stablecoins = ({ stablecoins=[] }) => {
         style: { marginLeft: "1rem", marginTop: "1rem" },
       }, [a({
         onClick: () => update({ [`new_${x.address}`]: true }),
-      }, ["Register collateral type"])]))
+      }, ["Register new collateral type"])]))
     ]
   }) : small({}, ["(none)"])
 }

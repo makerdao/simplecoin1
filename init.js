@@ -31,13 +31,17 @@ function init() {
   web3.version.getNetwork(timeout(300, () => {
     // Show `loading' message after a few hundred milliseconds
     state.phase = "loading"
-  }, hopefully(network => {
-    // Proceed to initialize the application
-    chain.env = [, "live", "morden"][network]
-    console.log(`Environment: ${chain.env}`)
-    each(dapple_packages(), dapple_import)
-    reload(() => update({ phase: "loaded" }))
-  })))
+  }, (error, network) => {
+    if (error) {
+      state.phase = "failed"
+    } else {
+      // Proceed to initialize the application
+      chain.env = [, "live", "morden"][network]
+      console.log(`Environment: ${chain.env}`)
+      each(dapple_packages(), dapple_import)
+      reload(() => update({ phase: "loaded" }))
+    }
+  }))
 }
 
 function timeout(ms, callback, $) {
