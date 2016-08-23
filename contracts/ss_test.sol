@@ -3,6 +3,8 @@ import 'factory.sol';
 import 'ss.sol';
 
 contract TestableSimpleStablecoin is SimpleStablecoin {
+    function TestableSimpleStablecoin(Whitelist w1, Whitelist w2)
+             SimpleStablecoin(w1, w2) {}
     uint _time;
     function getTime() internal returns (uint) { return _time; }
     function setTime(uint time) { _time = time; }
@@ -11,11 +13,11 @@ contract TestableSimpleStablecoin is SimpleStablecoin {
 contract SimpleStablecoinTest is Test {
     TestableSimpleStablecoin ss;
     function setUp() {
-        ss = new TestableSimpleStablecoin();
+        ss = new TestableSimpleStablecoin(new Whitelist(), new Whitelist());
     }
     function testFactoryBuildsNonTestableVersionToo() {
         var factory = new SimpleStablecoinFactory();
-        var coin = factory.newSimpleStablecoin();
+        var coin = factory.newSimpleStablecoin(new Whitelist(), new Whitelist());
         assertEq(this, coin.getOwner());
     }
     function testCreatorIsOwner() {

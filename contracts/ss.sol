@@ -1,14 +1,27 @@
-contract SimpleStablecoin {
+import 'erc20/erc20.sol';
+import 'ds-whitelist/whitelist.sol';
+
+contract SimpleStablecoin is ERC20
+                           , DSAuth
+{
     bool _mutex; // manual, use caution
     address _owner;
+
+    // uses two whitelists instead of a GroupAuthority... for now
+    Whitelist _issuer_whitelist;
+    Whitelist _transfer_whitelist;
 
     uint _exchange_price; // Number of wei for each 10**18 of your token
     uint _exchange_spread; // +- on price
     uint64 _exchange_expires; // don't trade when price info is stale
     uint _max_supply; // don't create more than this many stablecoins
 
-    function SimpleStablecoin() {
+    function SimpleStablecoin( Whitelist issuer_whitelist
+                             , Whitelist transfer_whitelist)
+    {
         _owner = msg.sender;
+        _issuer_whitelist = issuer_whitelist;
+        _transfer_whitelist = transfer_whitelist;
     }
     function() {
         throw;
