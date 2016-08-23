@@ -1,0 +1,97 @@
+<!doctype html>
+<meta charset=utf-8>
+<meta name=viewport content=width=device-width>
+<title>Simple stablecoin</title>
+<link rel=stylesheet href=index.css>
+
+<header>
+  <hgroup>
+    <img src=https://makerdao.com/splash/images/logo.svg>
+    <h1>Simple stablecoin</h1>
+    <h2>Something to play with while we wait</h2>
+  </hgroup>
+</header>
+
+<section id=explanation>
+  <p> A “simple stablecoin” (see <a target=_blank
+  href=https://github.com/makerdao/simple-stablecoin>makerdao/simple-stablecoin</a>)
+  is one type of stablecoin which can be run by an individual, organization,
+  or even a <a target=_blank href=https://ryepdx.github.io/the-tao/>The
+  TAO</a>.
+
+  <p> It uses a reduced ETH collateral model controlled by an owner address.
+  In the simplest case, stablecoin holders have no protections against the
+  owner, but constraints can be encoded in the owner as a contract.
+
+  <p> Some example failure modes: never refreshing the price (getting locked
+  out of the contract, losing the key, etc.); setting a bad a price (or
+  “insider trading”); withdrawing too much ETH.  There are many different
+  ways to handle these failure modes, but this code must be decided on and
+  written by each contract owner.  Or, <a target=_blank
+  href=http://intheoreum.org>just trust Bob</a>.
+
+  <p> The code is as simple as possible to reduce the cost of independent
+  verification.  It is just a building block that needs to be carefully
+  constrained.  It is also completely unsuitable for maintaining price
+  stability at scale, besides also being unsuitable for any purpose
+  in general.
+
+  <p> The idea is to give potential <a target=_blank
+  href=http://feedbase.io>oracles</a>, <a target=_blank
+  href=https://github.com/nexusdev/keeper>keepers</a> and <a target=_blank
+  href=https://github.com/makerdao/maker-market>market</a> <a target=_blank
+  href=https://github.com/makerdao/maker-market-matcher>makers</a> something
+  to do while Maker’s stablecoin engine undergoes refinement.
+
+  <p> <a onclick="persist({ quiet: true })">Hide explanation</a>
+</section>
+
+<section id=show-explanation>
+  <p> <a onclick="persist({ quiet: false })">Show explanation</a>
+</section>
+
+<section data-when=loading>
+  <div style="border: 1px solid #ccc; padding: 1rem">
+    <h3>Initializing web3 provider...</h3>
+    This should not take long.  If you see this message, something is
+    probably wrong.
+  </div>
+</section>
+
+<section data-when=failed>
+  <div style="border: 1px solid #ccc; padding: 1rem">
+    <h3>No web3 provider found</h3>
+    Consider installing <a target=_blank
+    href=https://metamask.io>MetaMask</a>, or cloning <a target=_blank
+    href=https://github.com/makerdao/simple-stablecoin>this
+    repository</a> and running a local server.
+  </div>
+</section>
+
+<section data-when=loaded>
+  <form onsubmit="event.preventDefault()">
+    <h3>Create simple stablecoin</h3>
+    <label>
+      Stablecoin rules <small>(max 32 characters)</small>:
+      <div data-view=textarea></div>
+    </label>
+    <div style="text-align: right">
+      <button onclick="create_stablecoin()">Create stablecoin</button>
+    </div>
+  </form>
+</section>
+    
+<section data-when=loaded>
+  <h3>List of stablecoins created by this factory</h3>
+  <div data-view=stablecoins></div>
+</section>
+
+<script src=https://fb.me/react-with-addons-15.2.1.js></script>
+<script src=https://fb.me/react-dom-15.2.1.js></script>
+<script src=vendor/async-2.0.1.js></script>
+<script src=vendor/web3-0.16.js></script>
+<script src=vendor/feedbase-0.6.js></script>
+<script src=build/js_module.js></script>
+<script src=lib.js></script>
+<script src=init.js></script>
+<script src=index.js></script>

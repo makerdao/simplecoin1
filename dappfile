@@ -1,8 +1,11 @@
 name: simple-stablecoin
 version: 0.0.1
-tags: []
 layout:
   sol_sources: contracts
   build_dir: build
-dependencies: {}
-ignore: []
+environments:
+  morden:
+    objects:
+      factory:
+        class: SimpleStablecoinFactory
+        address: '0x358a4a3eae2220a76afc37cd9be8ca5da6dc1179'
