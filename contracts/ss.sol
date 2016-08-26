@@ -2,7 +2,31 @@ import 'erc20/erc20.sol';
 import 'erc20/base.sol';
 import 'feedbase/feedbase.sol';
 
-contract SimpleStablecoin is ERC20Base(0) {
+contract Sensible {
+    function() {
+        throw;
+    }
+
+    modifier noEther() {
+        if(msg.value == 0) { _ } else { throw; }
+    }
+
+    // WARNING: Must manually confirm that no function with a `mutex` modifier
+    //          has a `return` statement, or else mutex gets stuck !!
+    bool _mutex;
+    modifier mutex() {
+         if( _mutex ) { throw; }
+        _mutex = true;
+        _
+        _mutex = false;
+    }
+
+    function safeToAdd(uint a, uint b) internal returns (bool) {
+        return (a + b >= a);
+    }
+}
+
+contract SimpleStablecoin is Sensible, ERC20Base(0) {
     address _owner;
     bytes32 _rules;
     Feedbase _feedbase;
@@ -47,31 +71,14 @@ contract SimpleStablecoin is ERC20Base(0) {
        return _types[type_id].max_debt;
     }
 
-    modifier noEther() {
-        if(msg.value == 0) { _ } else { throw; }
-    }
-    modifier ownerOnly() {
-        if(msg.sender == _owner) { _ } else { throw; }
-    }
-
-    // WARNING: Must manually confirm that no function with a `mutex` modifier
-    //          has a `return` statement, or else mutex gets stuck !!
-    bool _mutex;
-    modifier mutex() {
-         if( _mutex ) { throw; }
-        _mutex = true;
-        _
-        _mutex = false;
-    }
-
-    function safeToAdd(uint a, uint b) internal returns (bool) {
-        return (a + b >= a);
-    }
-
     function getPrice(uint24 feedID) internal returns (uint) {
         var (price, ok) = _feedbase.get(feedID);
         if(!ok) throw;
         return uint(price);
+    }
+
+    modifier ownerOnly() {
+        if(msg.sender == _owner) { _ } else { throw; }
     }
 
     modifier whitelisted(address who) {
@@ -81,13 +88,11 @@ contract SimpleStablecoin is ERC20Base(0) {
             throw;
         }
     }
+
     function SimpleStablecoin(Feedbase feedbase, bytes32 rules) {
         _owner = msg.sender;
         _feedbase = feedbase;
         _rules = rules;
-    }
-    function() {
-        throw;
     }
 
     // For testing
