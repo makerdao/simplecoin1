@@ -29,6 +29,10 @@ contract Sensible {
     function safeToAdd(uint a, uint b) internal returns (bool) {
         return (a + b >= a);
     }
+
+    function safeToSub(uint a, uint b) internal returns (bool) {
+        return (a >= b);
+    }
 }
 
 contract SimpleStablecoin is Sensible, ERC20Base(0) {
@@ -171,7 +175,9 @@ contract SimpleStablecoin is Sensible, ERC20Base(0) {
         assert(safeToAdd(_supply, purchased_quantity));
         _supply += purchased_quantity;
 
+        assert(safeToAdd(t.current_debt, purchased_quantity));
         t.current_debt += purchased_quantity;
+
         assert(t.current_debt <= t.max_debt);
     }
     function redeem(uint collateral_type, uint stablecoin_quantity)
@@ -183,11 +189,16 @@ contract SimpleStablecoin is Sensible, ERC20Base(0) {
         var t = _types[collateral_type];
         assert(t.token != address(0));  // deleted
 
-        var price = getPrice(t.feedID);
-        assert( _balances[msg.sender] >= stablecoin_quantity );
+        assert(safeToSub(_balances[msg.sender], stablecoin_quantity));
         _balances[msg.sender] -= stablecoin_quantity;
+
+        assert(safeToSub(_supply, stablecoin_quantity));
         _supply -= stablecoin_quantity;
+
+        assert(safeToSub(t.current_debt, stablecoin_quantity));
         t.current_debt -= stablecoin_quantity;
+
+        var price = getPrice(t.feedID);
         returned_amount = (stablecoin_quantity * (price-(price/t.spread))) / (10**18);
 
         assert(t.token.transferFrom(t.vault, msg.sender, returned_amount));
