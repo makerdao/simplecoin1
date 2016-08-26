@@ -46,10 +46,12 @@ contract SimpleStablecoin is Sensible, ERC20Base(0) {
     function feedbase() constant returns (address) { return _feedbase; }
     function type_count() constant returns (uint) { return _types.length; }
 
+    uint public constant UNIT = 10 ** 18;
+
     CollateralType[] _types;
     struct CollateralType {
         ERC20 token;
-        uint24 feedID; // Number of wei for each 10**18 of your token
+        uint24 feedID; // Number of tokens for each UNIT of stablecoin
         address vault; // where locked tokens are held
         uint spread;
         uint current_debt;
@@ -167,7 +169,8 @@ contract SimpleStablecoin is Sensible, ERC20Base(0) {
         assert(t.token.transferFrom(msg.sender, t.vault, pay_how_much));
 
         var price = getPrice(t.feedID);
-        purchased_quantity = (10**18 * pay_how_much) / (price + (price/t.spread));
+        var mark_price = price + price / t.spread;
+        purchased_quantity = (UNIT * pay_how_much) / mark_price;
 
         assert(safeToAdd(_balances[msg.sender], purchased_quantity));
         _balances[msg.sender] += purchased_quantity;
@@ -199,7 +202,8 @@ contract SimpleStablecoin is Sensible, ERC20Base(0) {
         t.current_debt -= stablecoin_quantity;
 
         var price = getPrice(t.feedID);
-        returned_amount = (stablecoin_quantity * (price-(price/t.spread))) / (10**18);
+        var mark_price = price - price / t.spread;
+        returned_amount = (stablecoin_quantity * mark_price) / UNIT;
 
         assert(t.token.transferFrom(t.vault, msg.sender, returned_amount));
     }
