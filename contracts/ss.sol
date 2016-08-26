@@ -33,6 +33,11 @@ contract Sensible {
     function safeToSub(uint a, uint b) internal returns (bool) {
         return (a >= b);
     }
+
+    function safeToMul(uint a, uint b) internal returns (bool) {
+        var c = a * b;
+        return (a == 0 || c / a == b);
+    }
 }
 
 contract SimpleStablecoin is Sensible, ERC20Base(0) {
@@ -170,6 +175,7 @@ contract SimpleStablecoin is Sensible, ERC20Base(0) {
 
         var price = getPrice(t.feedID);
         var mark_price = price + price / t.spread;
+        assert(safeToMul(UNIT, pay_how_much));
         purchased_quantity = (UNIT * pay_how_much) / mark_price;
 
         assert(safeToAdd(_balances[msg.sender], purchased_quantity));
@@ -203,6 +209,7 @@ contract SimpleStablecoin is Sensible, ERC20Base(0) {
 
         var price = getPrice(t.feedID);
         var mark_price = price - price / t.spread;
+        assert(safeToMul(stablecoin_quantity, mark_price));
         returned_amount = (stablecoin_quantity * mark_price) / UNIT;
 
         assert(t.token.transferFrom(t.vault, msg.sender, returned_amount));
