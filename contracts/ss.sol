@@ -188,6 +188,7 @@ contract SimpleStablecoin is Sensible, ERC20Base(0) {
         t.current_debt += purchased_quantity;
 
         assert(t.current_debt <= t.max_debt);
+        assert(_balances[msg.sender] <= _supply);
     }
     function redeem(uint collateral_type, uint stablecoin_quantity)
         whitelisted(msg.sender)
@@ -213,5 +214,8 @@ contract SimpleStablecoin is Sensible, ERC20Base(0) {
         returned_amount = (stablecoin_quantity * mark_price) / UNIT;
 
         assert(t.token.transferFrom(t.vault, msg.sender, returned_amount));
+
+        assert(t.current_debt <= t.max_debt);
+        assert(_balances[msg.sender] <= _supply);
     }
 }
