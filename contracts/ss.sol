@@ -7,15 +7,20 @@ contract Sensible {
         throw;
     }
 
+    function assert(bool condition) internal {
+        if (!condition) throw;
+    }
+
     modifier noEther() {
-        if(msg.value == 0) { _ } else { throw; }
+        assert(msg.value == 0);
+        _
     }
 
     // WARNING: Must manually confirm that no function with a `mutex` modifier
     //          has a `return` statement, or else mutex gets stuck !!
     bool _mutex;
     modifier mutex() {
-         if( _mutex ) { throw; }
+        assert(!_mutex);
         _mutex = true;
         _
         _mutex = false;
@@ -73,20 +78,18 @@ contract SimpleStablecoin is Sensible, ERC20Base(0) {
 
     function getPrice(uint24 feedID) internal returns (uint) {
         var (price, ok) = _feedbase.get(feedID);
-        if(!ok) throw;
+        assert(ok);
         return uint(price);
     }
 
     modifier ownerOnly() {
-        if(msg.sender == _owner) { _ } else { throw; }
+        assert(msg.sender == _owner);
+        _
     }
 
     modifier whitelisted(address who) {
-        if( whitelist[who] ) {
-            _
-        } else {
-            throw;
-        }
+        assert(whitelist[who]);
+        _
     }
 
     function SimpleStablecoin(Feedbase feedbase, bytes32 rules) {
@@ -153,22 +156,21 @@ contract SimpleStablecoin is Sensible, ERC20Base(0) {
         returns (uint purchased_quantity)
     {
         var t = _types[collateral_type];
-        if( t.token == address(0) ) { // deleted
-            throw;
-        }
-        if( !t.token.transferFrom(msg.sender, t.vault, pay_how_much) ) {
-            throw;
-        }
+        assert(t.token != address(0));  // deleted
+
+        assert(t.token.transferFrom(msg.sender, t.vault, pay_how_much));
+
         var price = getPrice(t.feedID);
         purchased_quantity = (10**18 * pay_how_much) / (price + (price/t.spread));
-        if(!safeToAdd(_balances[msg.sender], purchased_quantity))
-            throw;
-        if(!safeToAdd(_supply, purchased_quantity))
-            throw;
+
+        assert(safeToAdd(_balances[msg.sender], purchased_quantity));
         _balances[msg.sender] += purchased_quantity;
+
+        assert(safeToAdd(_supply, purchased_quantity));
         _supply += purchased_quantity;
+
         t.current_debt += purchased_quantity;
-        if( t.current_debt > t.max_debt ) { throw; }
+        assert(t.current_debt <= t.max_debt);
     }
     function redeem(uint collateral_type, uint stablecoin_quantity)
         whitelisted(msg.sender)
@@ -177,18 +179,15 @@ contract SimpleStablecoin is Sensible, ERC20Base(0) {
         returns (uint returned_amount)
     {
         var t = _types[collateral_type];
-        if( t.token == address(0) ) { // deleted
-            throw;
-        }
+        assert(t.token != address(0));  // deleted
+
         var price = getPrice(t.feedID);
-        if( _balances[msg.sender] < stablecoin_quantity )
-            throw;
+        assert( _balances[msg.sender] >= stablecoin_quantity );
         _balances[msg.sender] -= stablecoin_quantity;
         _supply -= stablecoin_quantity;
         t.current_debt -= stablecoin_quantity;
         returned_amount = (stablecoin_quantity * (price-(price/t.spread))) / (10**18);
-        if( !t.token.transferFrom(t.vault, msg.sender, returned_amount) ) {
-            throw;
-        }
+
+        assert(t.token.transferFrom(t.vault, msg.sender, returned_amount));
     }
 }
