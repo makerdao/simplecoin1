@@ -130,6 +130,8 @@ contract SimpleStablecoin is Sensible, ERC20Base(0) {
     }
 
     function registerCollateralType(ERC20 token, address vault, uint24 feedID, uint spread)
+        noEther
+        ownerOnly
         returns (uint id)
     {
         return _types.push(CollateralType({
