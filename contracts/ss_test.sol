@@ -32,10 +32,10 @@ contract SimpleStablecoinTest is Test {
     function testFactoryBuildsNonTestableVersionToo() {
         var factory = new SimpleStablecoinFactory();
         var coin = factory.newSimpleStablecoin(fb, "some rules");
-        assertEq(this, coin.getOwner());
+        assertEq(this, coin.owner());
     }
     function testCreatorIsOwner() {
-        assertEq(this, ss.getOwner());
+        assertEq(this, ss.owner());
     }
     function testBasics() {
         ss.setMaxDebt(col1, 100 * 10**18);

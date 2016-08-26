@@ -186,8 +186,4 @@ contract SimpleStablecoin is ERC20Base(0) {
             throw;
         }
     }
-
-
-    //== Getters
-    function getOwner() constant returns (address) { return _owner; }
 }
