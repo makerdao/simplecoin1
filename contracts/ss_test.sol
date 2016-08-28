@@ -45,7 +45,7 @@ contract SimpleStablecoinTest is Test {
         assertEq(this, coin.getOwner());
     }
     function testCreatorIsOwner() {
-        assertEq(this, ss.getOwner());
+        assertEq(this, ss.owner());
     }
     function testBasics() {
         ss.setMaxDebt(col1, 100 * 10**18);

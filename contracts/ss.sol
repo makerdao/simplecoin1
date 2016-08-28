@@ -3,9 +3,47 @@ import 'erc20/base.sol';
 import 'feedbase/feedbase.sol';
 import 'ds-whitelist/whitelist.sol';
 
+contract Sensible {
+    function() {
+        throw;
+    }
+
+    function assert(bool condition) internal {
+        if (!condition) throw;
+    }
+
+    modifier noEther() {
+        assert(msg.value == 0);
+        _
+    }
+
+    // WARNING: Must manually confirm that no function with a `mutex` modifier
+    //          has a `return` statement, or else mutex gets stuck !!
+    bool _mutex;
+    modifier mutex() {
+        assert(!_mutex);
+        _mutex = true;
+        _
+        _mutex = false;
+    }
+
+    function safeToAdd(uint a, uint b) internal returns (bool) {
+        return (a + b >= a);
+    }
+
+    function safeToSub(uint a, uint b) internal returns (bool) {
+        return (a >= b);
+    }
+
+    function safeToMul(uint a, uint b) internal returns (bool) {
+        var c = a * b;
+        return (a == 0 || c / a == b);
+    }
+}
 
 contract SimpleStablecoin is ERC20Base(0)
                            , DSAuth
+                           , Sensible
 {
     address _owner;
     bytes32 _rules;
@@ -16,10 +54,12 @@ contract SimpleStablecoin is ERC20Base(0)
     Whitelist _issuer_whitelist;
     Whitelist _transfer_whitelist;
 
+    uint public constant UNIT = 10 ** 18;
+
     CollateralType[] _types;
     struct CollateralType {
         ERC20 token;
-        uint24 feedID; // Number of wei for each 10**18 of your token
+        uint24 feedID; // Number of tokens for each UNIT of stablecoin
         address vault; // where locked tokens are held
         uint spread;
         uint current_debt;
@@ -66,30 +106,9 @@ contract SimpleStablecoin is ERC20Base(0)
        return _types[type_id].max_debt;
     }
 
-    modifier noEther() {
-        if(msg.value == 0) { _ } else { throw; }
-    }
-    modifier ownerOnly() {
-        if(msg.sender == _owner) { _ } else { throw; }
-    }
-
-    // WARNING: Must manually confirm that no function with a `mutex` modifier
-    //          has a `return` statement, or else mutex gets stuck !!
-    bool _mutex;
-    modifier mutex() {
-         if( _mutex ) { throw; }
-        _mutex = true;
-        _
-        _mutex = false;
-    }
-
-    function safeToAdd(uint a, uint b) internal returns (bool) {
-        return (a + b >= a);
-    }
-
     function getPrice(uint24 feedID) internal returns (uint) {
         var (price, ok) = _feedbase.get(feedID);
-        if(!ok) throw;
+        assert(ok);
         return uint(price);
     }
 
@@ -129,6 +148,8 @@ contract SimpleStablecoin is ERC20Base(0)
     }
 
     function registerCollateralType(ERC20 token, address vault, uint24 feedID, uint spread)
+        noEther
+        ownerOnly
         returns (uint id)
     {
         return _types.push(CollateralType({
@@ -187,22 +208,26 @@ contract SimpleStablecoin is ERC20Base(0)
         returns (uint purchased_quantity)
     {
         var t = _types[collateral_type];
-        if( t.token == address(0) ) { // deleted
-            throw;
-        }
-        if( !t.token.transferFrom(msg.sender, t.vault, pay_how_much) ) {
-            throw;
-        }
+        assert(t.token != address(0));  // deleted
+
+        assert(t.token.transferFrom(msg.sender, t.vault, pay_how_much));
+
         var price = getPrice(t.feedID);
-        purchased_quantity = (10**18 * pay_how_much) / (price + (price/t.spread));
-        if(!safeToAdd(_balances[msg.sender], purchased_quantity))
-            throw;
-        if(!safeToAdd(_supply, purchased_quantity))
-            throw;
+        var mark_price = price + price / t.spread;
+        assert(safeToMul(UNIT, pay_how_much));
+        purchased_quantity = (UNIT * pay_how_much) / mark_price;
+
+        assert(safeToAdd(_balances[msg.sender], purchased_quantity));
         _balances[msg.sender] += purchased_quantity;
+
+        assert(safeToAdd(_supply, purchased_quantity));
         _supply += purchased_quantity;
+
+        assert(safeToAdd(t.current_debt, purchased_quantity));
         t.current_debt += purchased_quantity;
-        if( t.current_debt > t.max_debt ) { throw; }
+
+        assert(t.current_debt <= t.max_debt);
+        assert(_balances[msg.sender] <= _supply);
     }
     function redeem(uint collateral_type, uint stablecoin_quantity)
         issuers_only
@@ -211,22 +236,25 @@ contract SimpleStablecoin is ERC20Base(0)
         returns (uint returned_amount)
     {
         var t = _types[collateral_type];
-        if( t.token == address(0) ) { // deleted
-            throw;
-        }
-        var price = getPrice(t.feedID);
-        if( _balances[msg.sender] < stablecoin_quantity )
-            throw;
+        assert(t.token != address(0));  // deleted
+
+        assert(safeToSub(_balances[msg.sender], stablecoin_quantity));
         _balances[msg.sender] -= stablecoin_quantity;
+
+        assert(safeToSub(_supply, stablecoin_quantity));
         _supply -= stablecoin_quantity;
+
+        assert(safeToSub(t.current_debt, stablecoin_quantity));
         t.current_debt -= stablecoin_quantity;
-        returned_amount = (stablecoin_quantity * (price-(price/t.spread))) / (10**18);
-        if( !t.token.transferFrom(t.vault, msg.sender, returned_amount) ) {
-            throw;
-        }
+
+        var price = getPrice(t.feedID);
+        var mark_price = price - price / t.spread;
+        assert(safeToMul(stablecoin_quantity, mark_price));
+        returned_amount = (stablecoin_quantity * mark_price) / UNIT;
+
+        assert(t.token.transferFrom(t.vault, msg.sender, returned_amount));
+
+        assert(t.current_debt <= t.max_debt);
+        assert(_balances[msg.sender] <= _supply);
     }
-
-
-    //== Getters
-    function getOwner() constant returns (address) { return _owner; }
 }
