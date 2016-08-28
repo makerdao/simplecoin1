@@ -16,10 +16,6 @@ contract SimpleStablecoin is ERC20Base(0)
     Whitelist _issuer_whitelist;
     Whitelist _transfer_whitelist;
 
-    uint _exchange_price; // Number of wei for each 10**18 of your token
-    uint _exchange_spread; // +- on price
-    uint64 _exchange_expires; // don't trade when price info is stale
-    uint _max_supply; // don't create more than this many stablecoins
     CollateralType[] _types;
     struct CollateralType {
         ERC20 token;
@@ -160,7 +156,7 @@ contract SimpleStablecoin is ERC20Base(0)
     }
 
     modifier transfer_whitelist(address who) {
-        if( _transfer_whitelist.isWhitelisted(msg.sender) ) {
+        if( _transfer_whitelist.isWhitelisted(who) ) {
             _
         } else {
             throw;
