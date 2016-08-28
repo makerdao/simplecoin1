@@ -124,32 +124,32 @@ contract SimpleStablecoin is ERC20Base(0)
     /* == Owner Functions == */
     function setWhitelist(address who, bool what)
         noEther
-        ownerOnly
+        auth
     {
         whitelist[who] = what;
     }
     function updateOwner(address new_owner)
         noEther
-        ownerOnly
+        auth
     {
         _owner = new_owner;
     }
     function setMaxDebt(uint collateral_type, uint max_debt)
         noEther
-        ownerOnly
+        auth
     {
         _types[collateral_type].max_debt = max_debt;
     }
     function setFeed(uint col_type, uint24 feed_id)
         noEther
-        ownerOnly
+        auth
     {
         _types[col_type].feedID = feed_id;
     }
 
     function registerCollateralType(ERC20 token, address vault, uint24 feedID, uint spread)
         noEther
-        ownerOnly
+        auth
         returns (uint id)
     {
         return _types.push(CollateralType({
@@ -163,7 +163,7 @@ contract SimpleStablecoin is ERC20Base(0)
     }
     function cancelCollateralType(uint collateral_type)
         noEther
-        ownerOnly
+        auth
     {
         delete _types[collateral_type];
     }

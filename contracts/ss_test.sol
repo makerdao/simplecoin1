@@ -42,7 +42,7 @@ contract SimpleStablecoinTest is Test {
         var factory = new SimpleStablecoinFactory();
         var coin = factory.newSimpleStablecoin( fb, "some rules"
                                               , issuers, transferrers );
-        assertEq(this, coin.getOwner());
+        assertEq(this, coin._authority()); // TODO don't refer to auth internals
     }
     function testCreatorIsOwner() {
         assertEq(this, ss.owner());
