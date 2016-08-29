@@ -22,6 +22,8 @@ contract SimpleStablecoinTest is Test {
     ERC20 col;
     uint col1;
     uint24 feed1;
+    uint constant COL1 = 10 ** 18;
+
     function setUp() {
         issuers = new Whitelist();
         issuers.setWhitelisted(this, true);
@@ -44,7 +46,7 @@ contract SimpleStablecoinTest is Test {
         col.approve(ss, 10**24);
 
         feed1 = fb.claim();
-        fb.set(feed1, 10**17, uint40(block.timestamp + 10));
+        fb.set(feed1, COL1 / 10, uint40(block.timestamp + 10));
 
         col1 = ss.registerCollateralType(col, this, feed1, 1000);
     }
@@ -59,7 +61,7 @@ contract SimpleStablecoinTest is Test {
         assertEq(this, ss.owner());
     }
     function testBasics() {
-        ss.setMaxDebt(col1, 100 * 10**18);
+        ss.setMaxDebt(col1, 100 * COL1);
 
         var obtained = ss.purchase(col1, 100000);
 
