@@ -14,13 +14,20 @@ contract TestableSimpleStablecoin is SimpleStablecoin {
     function setTime(uint time) { _time = time; }
 }
 
+contract Vault {
+    function approve(ERC20 token, address who, uint how_much) {
+        token.approve(who, how_much);
+    }
+}
+
 contract SimpleStablecoinTest is Test {
     TestableSimpleStablecoin ss;
     Whitelist issuers;
     Whitelist transferrers;
     Feedbase fb;
-    ERC20 col;
-    uint col1;
+    Vault vault;
+    ERC20 col1;
+    uint icol1;
     uint24 feed1;
     uint constant COL1 = 10 ** 18;
 
@@ -42,18 +49,21 @@ contract SimpleStablecoinTest is Test {
         transferrers.setWhitelisted(ss, true);
         transferrers.setEnabled(true);
 
-        col = new ERC20Base(10**24);
-        col.approve(ss, 10**24);
+        col1 = new ERC20Base(10**24);
+        col1.approve(ss, 10**24);
 
         feed1 = fb.claim();
         // set price to 0.1 simplecoins per unit of col1
         fb.set(feed1, bytes32(COL1 / 10), uint40(block.timestamp + 10));
 
-        col1 = ss.registerCollateralType({token: col,
-                                          vault: this,
-                                          feedID: feed1,
-                                          spread: 1000  // 0.1% either way
-                                         });
+        vault = new Vault();
+        vault.approve(col1, ss, uint(-1));  // pragma: no audit
+
+        icol1 = ss.registerCollateralType({token: col1,
+                                           vault: vault,
+                                           feedID: feed1,
+                                           spread: 1000  // 0.1% either way
+                                          });
     }
     function testFactoryBuildsNonTestableVersionToo() {
         var factory = new SimpleStablecoinFactory();
@@ -66,18 +76,18 @@ contract SimpleStablecoinTest is Test {
         assertEq(this, ss.owner());
     }
     function testBasics() {
-        ss.setMaxDebt(col1, 100 * COL1);
+        ss.setMaxDebt(icol1, 100 * COL1);
 
-        var obtained = ss.purchase(col1, 100000);
+        var obtained = ss.purchase(icol1, 100000);
 
         assertEq(obtained, 999000);
         assertEq(obtained, ss.balanceOf(this));
 
-        var before = col.balanceOf(this);
-        var returned = ss.redeem(col1, ss.balanceOf(this));
-        var afterward = col.balanceOf(this);  // `after` is a keyword??
+        var before = col1.balanceOf(this);
+        var returned = ss.redeem(icol1, ss.balanceOf(this));
+        var afterward = col1.balanceOf(this);  // `after` is a keyword??
 
-        // assertEq(returned, afterward-before);  not true as `vault == this`
+        assertEq(returned, afterward - before);
         assertEq(returned, 99800); // minus 0.2%
     }
 }
