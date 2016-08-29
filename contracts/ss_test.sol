@@ -46,9 +46,14 @@ contract SimpleStablecoinTest is Test {
         col.approve(ss, 10**24);
 
         feed1 = fb.claim();
-        fb.set(feed1, COL1 / 10, uint40(block.timestamp + 10));
+        // set price to 0.1 simplecoins per unit of col1
+        fb.set(feed1, bytes32(COL1 / 10), uint40(block.timestamp + 10));
 
-        col1 = ss.registerCollateralType(col, this, feed1, 1000);
+        col1 = ss.registerCollateralType({token: col,
+                                          vault: this,
+                                          feedID: feed1,
+                                          spread: 1000  // 0.1% either way
+                                         });
     }
     function testFactoryBuildsNonTestableVersionToo() {
         var factory = new SimpleStablecoinFactory();
