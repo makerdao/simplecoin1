@@ -32,9 +32,13 @@ contract SimpleStablecoinTest is Test {
         fb = new Feedbase();
         ss = new TestableSimpleStablecoin(fb, 0, issuers, transferrers);
 
-        issuers.setWhitelisted(ss, true);
-        transferrers.setWhitelisted(ss, true);
         ss.setWhitelist(this, true);
+
+        issuers.setWhitelisted(ss, true);
+        issuers.setEnabled(true);
+
+        transferrers.setWhitelisted(ss, true);
+        transferrers.setEnabled(true);
 
         col = new ERC20Base(10**24);
         col.approve(ss, 10**24);
@@ -56,6 +60,7 @@ contract SimpleStablecoinTest is Test {
     }
     function testBasics() {
         ss.setMaxDebt(col1, 100 * 10**18);
+
         var obtained = ss.purchase(col1, 100000);
 
         assertEq(obtained, 999000);
@@ -63,8 +68,9 @@ contract SimpleStablecoinTest is Test {
 
         var before = col.balanceOf(this);
         var returned = ss.redeem(col1, ss.balanceOf(this));
-        var afterward = col.balanceOf(this); // `after` is a keyword??
-//        assertEq(returned, afterward-before);    not true while `this` is the vault
+        var afterward = col.balanceOf(this);  // `after` is a keyword??
+
+        // assertEq(returned, afterward-before);  not true as `vault == this`
         assertEq(returned, 99800); // minus 0.2%
     }
 }
