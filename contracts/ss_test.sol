@@ -60,7 +60,7 @@ contract SimpleStablecoinTest is Test {
         icol1 = ss.register({
             token: col1,
             vault: vault,
-            feedID: feed1,
+            feed: feed1,
             spread: 1000, // 0.1% either way
         });
     }

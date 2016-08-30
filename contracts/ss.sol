@@ -58,7 +58,7 @@ contract SimpleStablecoin is ERC20Base(0)
     CollateralType[] _types;
     struct CollateralType {
         ERC20 token;
-        uint24 feedID; // Number of tokens for each UNIT of stablecoin
+        uint24 feed; // Number of tokens for each UNIT of stablecoin
         address vault; // where locked tokens are held
         uint spread;
         uint current_debt;
@@ -85,7 +85,7 @@ contract SimpleStablecoin is ERC20Base(0)
     }
 
     function feed(uint type_id) constant returns (uint24) {
-       return _types[type_id].feedID;
+       return _types[type_id].feed;
     }
 
     function vault(uint type_id) constant returns (address) {
@@ -104,8 +104,8 @@ contract SimpleStablecoin is ERC20Base(0)
        return _types[type_id].max_debt;
     }
 
-    function getPrice(uint24 feedID) internal returns (uint) {
-        var (price, ok) = feedbase.get(feedID);
+    function getPrice(uint24 feed) internal returns (uint) {
+        var (price, ok) = feedbase.get(feed);
         assert(ok);
         return uint(price);
     }
@@ -132,7 +132,7 @@ contract SimpleStablecoin is ERC20Base(0)
         noEther
         auth
     {
-        _types[col_type].feedID = feed_id;
+        _types[col_type].feed = feed_id;
     }
     function setSpread(uint col_type, uint spread)
         noEther
@@ -141,7 +141,7 @@ contract SimpleStablecoin is ERC20Base(0)
         _types[col_type].spread = spread;
     }
 
-    function register(ERC20 token, address vault, uint24 feedID, uint spread)
+    function register(ERC20 token, address vault, uint24 feed, uint spread)
         noEther
         auth
         returns (uint id)
@@ -149,7 +149,7 @@ contract SimpleStablecoin is ERC20Base(0)
         return _types.push(CollateralType({
             token: token,
             vault: vault,
-            feedID: feedID,
+            feed: feed,
             spread: spread,
             current_debt: 0,
             max_debt: 0
@@ -206,7 +206,7 @@ contract SimpleStablecoin is ERC20Base(0)
 
         assert(t.token.transferFrom(msg.sender, t.vault, pay_how_much));
 
-        var price = getPrice(t.feedID);
+        var price = getPrice(t.feed);
         var mark_price = price + price / t.spread;
         assert(safeToMul(UNIT, pay_how_much));
         purchased_quantity = (UNIT * pay_how_much) / mark_price;
@@ -241,7 +241,7 @@ contract SimpleStablecoin is ERC20Base(0)
         assert(safeToSub(t.current_debt, stablecoin_quantity));
         t.current_debt -= stablecoin_quantity;
 
-        var price = getPrice(t.feedID);
+        var price = getPrice(t.feed);
         var mark_price = price - price / t.spread;
         assert(safeToMul(stablecoin_quantity, mark_price));
         returned_amount = (stablecoin_quantity * mark_price) / UNIT;
