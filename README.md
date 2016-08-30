@@ -1,9 +1,15 @@
-SimpleStablecoin
----
+Simplecoin
+==========
 
-A SimpleStablecoin is one type of stablecoin which can be run by an individual, organization, or even a ["The TAO"](https://ryepdx.github.io/the-tao/).
+See HACKING.md for pointers on how to work on the UI.
 
-It uses a reduced ETH collateral model controlled by an owner address. In the simplest case, stablecoin holders have no protections against the owner, but constraints can be encoded in the owner as a contract.
+A simplecoin is one type of stablecoin which can be run by an
+individual, organization, or even a
+["The TAO"](https://ryepdx.github.io/the-tao/).
+
+It uses a reduced ETH collateral model controlled by an owner address.
+In the simplest case, stablecoin holders have no protections against
+the owner, but constraints can be encoded in the owner as a contract.
 
 Some example failure modes are never refreshing the price (lost key / locked out contract), setting a bad a price (or "insider trading"), or withdrawing too much Ether. There are many different ways to handle these failure modes, which must be decided and written by each owner contract. Or, [just trust Bob](http://intheoreum.org).
 
