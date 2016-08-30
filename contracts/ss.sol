@@ -61,7 +61,7 @@ contract SimpleStablecoin is ERC20Base(0)
         uint24 feed; // Number of tokens for each UNIT of stablecoin
         address vault; // where locked tokens are held
         uint spread;
-        uint current_debt;
+        uint debt;
         uint max_debt;
     }
 
@@ -96,8 +96,8 @@ contract SimpleStablecoin is ERC20Base(0)
        return _types[type_id].spread;
     }
 
-    function current_debt(uint type_id) constant returns (uint) {
-       return _types[type_id].current_debt;
+    function debt(uint type_id) constant returns (uint) {
+       return _types[type_id].debt;
     }
 
     function max_debt(uint type_id) constant returns (uint) {
@@ -151,7 +151,7 @@ contract SimpleStablecoin is ERC20Base(0)
             vault: vault,
             feed: feed,
             spread: spread,
-            current_debt: 0,
+            debt: 0,
             max_debt: 0
         })) - 1;
     }
@@ -217,10 +217,10 @@ contract SimpleStablecoin is ERC20Base(0)
         assert(safeToAdd(_supply, purchased_quantity));
         _supply += purchased_quantity;
 
-        assert(safeToAdd(t.current_debt, purchased_quantity));
-        t.current_debt += purchased_quantity;
+        assert(safeToAdd(t.debt, purchased_quantity));
+        t.debt += purchased_quantity;
 
-        assert(t.current_debt <= t.max_debt);
+        assert(t.debt <= t.max_debt);
         assert(_balances[msg.sender] <= _supply);
     }
     function redeem(uint collateral_type, uint stablecoin_quantity)
@@ -238,8 +238,8 @@ contract SimpleStablecoin is ERC20Base(0)
         assert(safeToSub(_supply, stablecoin_quantity));
         _supply -= stablecoin_quantity;
 
-        assert(safeToSub(t.current_debt, stablecoin_quantity));
-        t.current_debt -= stablecoin_quantity;
+        assert(safeToSub(t.debt, stablecoin_quantity));
+        t.debt -= stablecoin_quantity;
 
         var price = getPrice(t.feed);
         var mark_price = price - price / t.spread;
@@ -248,7 +248,7 @@ contract SimpleStablecoin is ERC20Base(0)
 
         assert(t.token.transferFrom(t.vault, msg.sender, returned_amount));
 
-        assert(t.current_debt <= t.max_debt);
+        assert(t.debt <= t.max_debt);
         assert(_balances[msg.sender] <= _supply);
     }
 }

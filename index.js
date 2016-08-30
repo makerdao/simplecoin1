@@ -18,7 +18,7 @@ fetch.stablecoins = $ => begin([
       $(null, assign(props, { whitelisted, balance }))
     })),
     (x, $) => times(Number(x.nextType), (i, $) => parallel(fold(words(`
-      token feed vault spread current_debt max_debt
+      token feed vault spread debt max_debt
     `), { id: always(i) }, (result, name) => assign(result, {
       [name]: bind(Stablecoin(x.address)[name], i)
     })), hopefully(props => {
@@ -116,7 +116,7 @@ views.stablecoins = ({ stablecoins=[] }) => {
         "Price feed":       y => feed_view(x, y),
         "Max debt":         y => max_debt_view(x, y),
         "Spread":           y => Number(y.spread),
-        "Current debt":     y => Number(y.current_debt),
+        "Current debt":     y => Number(y.debt),
         "Your balance":     y => collateral_balance_view(x, y),
       }), own(x) && (state[`new_${x.address}`] ? form({
         onSubmit: event => {
