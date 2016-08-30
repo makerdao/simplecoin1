@@ -4,7 +4,7 @@ import "erc20/erc20.sol";
 import "feedbase/feedbase.sol";
 import "sensible.sol";
 
-contract SimpleStablecoin is ERC20Base(0), DSAuth, Sensible {
+contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
     uint public constant UNIT = 10**18;
 
     address    public  owner;
@@ -24,7 +24,7 @@ contract SimpleStablecoin is ERC20Base(0), DSAuth, Sensible {
         uint     ceiling;
     }
 
-    function SimpleStablecoin(
+    function Simplecoin(
         Feedbase   _feedbase,
         bytes32    _rules,
         Whitelist  _issuers,

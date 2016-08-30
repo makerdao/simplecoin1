@@ -3,26 +3,26 @@
 init()
 setInterval(() => chain.env && reload(), 3000)
 
-let Stablecoin = x => chain.SimpleStablecoin.at(x)
+let Simplecoin = x => chain.Simplecoin.at(x)
 let feedbase = x => x == chain.feedbase.address ? "Standard" : code({}, [x])
 let own = x => x.owner == coinbase()
 
-fetch.stablecoins = $ => begin([
+fetch.coins = $ => begin([
   chain.factory.count, (n, $) => times(n, (i, $) => begin([
-    bind(chain.factory.stablecoins, i),
+    bind(chain.factory.coins, i),
     (address, $) => parallel({
-      props: bind(extract_contract_props, chain.SimpleStablecoin, address),
-      balance: $ => Stablecoin(address).balanceOf(coinbase(), $),
-      whitelisted: $ => Stablecoin(address).whitelist(coinbase(), $),
+      props: bind(extract_contract_props, chain.Simplecoin, address),
+      balance: $ => Simplecoin(address).balanceOf(coinbase(), $),
+      whitelisted: $ => Simplecoin(address).whitelist(coinbase(), $),
     }, hopefully(({ props, whitelisted, balance }) => {
       $(null, assign(props, { whitelisted, balance }))
     })),
     (x, $) => times(Number(x.nextType), (i, $) => parallel(fold(words(`
       token feed vault spread debt ceiling
     `), { id: always(i) }, (result, name) => assign(result, {
-      [name]: bind(Stablecoin(x.address)[name], i)
+      [name]: bind(Simplecoin(x.address)[name], i)
     })), hopefully(props => {
-      Stablecoin(props.token).balanceOf(coinbase(), hopefully(balance => {
+      Simplecoin(props.token).balanceOf(coinbase(), hopefully(balance => {
         $(null, assign(props, { balance }))
       }))
     })), hopefully(types => $(null, assign(x, { types }))))
@@ -69,21 +69,21 @@ let balance_view = ({ address, balance }) => div({}, [
 
 let type_id_view = ({ address }, { id, token }) => div({}, [
   Number(id), span({ style: { float: "right" } }, [Number(token) ? a({
-    onClick: () => cancel_collateral_type(address, id),
+    onClick: () => unregister(address, id),
   }, ["Cancel collateral type"]) : small({}, ["(cancelled)"])])
 ])
 
 let feed_view = ({ address }, { id, token, feed }) => div({}, [
   Number(feed), !!Number(token) && a({
     style: { float: "right" },
-    onClick: () => change_price_feed(address, id),
+    onClick: () => set_feed(address, id),
   }, ["Change price feed"])
 ])
 
 let ceiling_view = ({ address }, { id, token, ceiling }) => div({}, [
   Number(ceiling), !!Number(token) && a({
     style: { float: "right" },
-    onClick: () => change_ceiling(address, id),
+    onClick: () => set_ceiling(address, id),
   }, ["Change debt ceiling"])
 ])
 
@@ -99,9 +99,9 @@ let collateral_balance_view = (
   }, ["Cover"])] : [small({}, ["(not whitelisted)"])])
 ])
 
-views.stablecoins = ({ stablecoins=[] }) => {
-  return stablecoins.length ? table_list(stablecoins, {
-    "Stablecoin":       x => strong({}, [code({}, [x.address])]),
+views.coins = ({ coins=[] }) => {
+  return coins.length ? table_list(coins, {
+    "Coin":       x => strong({}, [code({}, [x.address])]),
     "Feedbase":         x => feedbase(x.feedbase),
     "Owner":            x => owner_view(x),
     "Rules":            x => ascii(x.rules),
@@ -122,7 +122,7 @@ views.stablecoins = ({ stablecoins=[] }) => {
         onSubmit: event => {
           event.preventDefault()
           if (confirm(`Register new collateral type?`)) {
-            register_collateral_type(x.address)
+            register(x.address)
           }
         }
       }, [
@@ -168,9 +168,12 @@ views.textarea = ({ rules }) => textarea({
   onChange: event => update({ rules: event.target.value }),
 })
 
-function create_stablecoin() {
-  send(chain.factory.newSimpleStablecoin, [
-    chain.feedbase.address, hex(state.rules),
+function create_coin() {
+  send(chain.factory.create, [
+    chain.feedbase.address,
+    hex(state.rules),
+    // TODO: issuer whitelist
+    // TODO: holder whitelist
   ], hopefully(tx => {
     alert(`Transaction created: ${tx}`)
     update({ rules: "" })
@@ -178,78 +181,18 @@ function create_stablecoin() {
 }
 
 function set_owner(address) {
-  let new_value = prompt(`New owner for stablecoin ${address}:`)
+  let new_value = prompt(`New owner for coin ${address}:`)
   if (new_value) {
-    send(Stablecoin(address).setOwner, [new_value], hopefully(tx => {
+    send(Simplecoin(address).setOwner, [new_value], hopefully(tx => {
       alert(`Transaction created: ${tx}`)
     }))
   }
 }
 
-function cancel_collateral_type(address, id) {
-  if (confirm(`Cancel collateral type ${id} of stablecoin ${address}?`)) {
-    send(Stablecoin(address).cancelCollateralType, [id], hopefully(tx => {
-      alert(`Transaction created: ${tx}`)
-    }))
-  }
-}
+//----------------------------------------------------------
 
-function change_price_feed(address, id) {
-  let new_value = prompt(`New price feed for collateral type ${id}:`)
-  if (Number(new_value)) {
-    send(Stablecoin(address).setFeed, [id, new_value], hopefully(tx => {
-      alert(`Transaction created: ${tx}`)
-    }))
-  }
-}
-
-function change_ceiling(address, id) {
-  let new_value = prompt(`New debt ceiling for collateral type ${id}:`)
-  if (Number(new_value)) {
-    send(Stablecoin(address).setCeiling, [id, new_value], hopefully(tx => {
-      alert(`Transaction created: ${tx}`)
-    }))
-  }
-}
-
-function add_whitelist(address) {
-  let x = prompt(`Add which address to whitelist for ${address}?`)
-  if (x) {
-    send(Stablecoin(address).setWhitelist, [x, true], hopefully(tx => {
-      alert(`Transaction created: ${tx}`)
-    }))
-  }
-}
-
-function remove_whitelist(address) {
-  let x = prompt(`Remove which address from whitelist for ${address}?`)
-  if (x) {
-    send(Stablecoin(address).setWhitelist, [x, false], hopefully(tx => {
-      alert(`Transaction created: ${tx}`)
-    }))
-  }
-}
-
-function issue(address, id) {
-  let x = prompt(`Issue stablecoins with how many of these collateral tokens?`)
-  if (Number(x)) {
-    send(Stablecoin(address).issue, [id, Number(x)], hopefully(tx => {
-      alert(`Transaction created: ${tx}`)
-    }))
-  }
-}
-
-function cover(address, id) {
-  let x = prompt(`Cover how many stablecoins with this collateral type?`)
-  if (Number(x)) {
-    send(Stablecoin(address).cover, [id, Number(x)], hopefully(tx => {
-      alert(`Transaction created: ${tx}`)
-    }))
-  }
-}
-
-function register_collateral_type(address) {
-  send(Stablecoin(address).register, [
+function register(address) {
+  send(Simplecoin(address).register, [
     state[`new_token_${address}`],
   ], hopefully(tx => {
     alert(`Transaction created: ${tx}`)
@@ -259,4 +202,76 @@ function register_collateral_type(address) {
       }
     })
   }))
+}
+
+// TODO: set_vault
+
+function set_feed(address, id) {
+  let new_value = prompt(`New price feed for collateral type ${id}:`)
+  if (Number(new_value)) {
+    send(Simplecoin(address).setFeed, [id, new_value], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+// TODO: set_spread
+
+function set_ceiling(address, id) {
+  let new_value = prompt(`New debt ceiling for collateral type ${id}:`)
+  if (Number(new_value)) {
+    send(Simplecoin(address).setCeiling, [id, new_value], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+function unregister(address, id) {
+  if (confirm(`Cancel collateral type ${id} of coin ${address}?`)) {
+    send(Simplecoin(address).unregister, [id], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+//----------------------------------------------------------
+
+function issue(address, id) {
+  let x = prompt(`Issue coins with how many of these collateral tokens?`)
+  if (Number(x)) {
+    send(Simplecoin(address).issue, [id, Number(x)], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+function cover(address, id) {
+  let x = prompt(`Cover how many coins with this collateral type?`)
+  if (Number(x)) {
+    send(Simplecoin(address).cover, [id, Number(x)], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+//----------------------------------------------------------
+
+// TODO: deprecated
+function add_whitelist(address) {
+  let x = prompt(`Add which address to whitelist for ${address}?`)
+  if (x) {
+    send(Simplecoin(address).setWhitelist, [x, true], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+// TODO: deprecated
+function remove_whitelist(address) {
+  let x = prompt(`Remove which address from whitelist for ${address}?`)
+  if (x) {
+    send(Simplecoin(address).setWhitelist, [x, false], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
 }

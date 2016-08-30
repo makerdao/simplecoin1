@@ -1,2 +1,2 @@
-var factory = new SimpleStablecoinFactory()
+var factory = new SimplecoinFactory()
 export factory
