@@ -12,8 +12,8 @@ But the real interesting stuff happens in `index.html`, `index.css`,
 and of course `index.js`, which has most of the application logic.
 
 
-Runtime state management
-------------------------
+State management
+----------------
 
 The UI has one global variable, called `state`.  It can be changed by
 calling `update({ foo: 123 }, callback)`.  Obviously, it's easy to
@@ -22,6 +22,8 @@ inspect or change the `state` variable from the browser dev tools.
 When the application starts, the `state` variable is initialized from
 local storage.  The `persist({ foo: 123 }, callback)` function works
 like `update()` except it also saves the values into local storage.
+
+Every time `state` changes, all views are re-rendered using React.
 
 
 Blockchain data fetching 
