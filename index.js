@@ -40,7 +40,7 @@ let owner_view = ({ address, owner }) => div({}, [
   owner == coinbase() ? "You" : code({}, [owner]),
   owner == coinbase() && a({
     style: { float: "right" },
-    onClick: () => change_owner(address),
+    onClick: () => set_owner(address),
   }, ["Transfer"]),
 ])
 
@@ -195,10 +195,10 @@ function create_stablecoin() {
   }))
 }
 
-function change_owner(address) {
+function set_owner(address) {
   let new_value = prompt(`New owner for stablecoin ${address}:`)
   if (new_value) {
-    send(Stablecoin(address).updateOwner, [new_value], hopefully(tx => {
+    send(Stablecoin(address).setOwner, [new_value], hopefully(tx => {
       alert(`Transaction created: ${tx}`)
     }))
   }

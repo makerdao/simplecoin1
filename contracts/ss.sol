@@ -116,7 +116,7 @@ contract SimpleStablecoin is ERC20Base(0)
     }
 
     /* == Owner Functions == */
-    function updateOwner(address new_owner)
+    function setOwner(address new_owner)
         noEther
         auth
     {
