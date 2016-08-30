@@ -112,10 +112,6 @@ contract SimpleStablecoin is ERC20Base(0)
         return uint(price);
     }
 
-    function() {
-        throw;
-    }
-
     // For testing
     function getTime() internal returns (uint) {
         return block.timestamp;
