@@ -45,9 +45,9 @@ contract SimpleStablecoin is ERC20Base(0)
                            , DSAuth
                            , Sensible
 {
-    address _owner;
-    bytes32 _rules;
-    Feedbase _feedbase;
+    address  public owner;
+    bytes32  public rules;
+    Feedbase public feedbase;
 
     // uses two whitelists instead of a GroupAuthority... for now
     Whitelist _issuer_whitelist;
@@ -65,19 +65,16 @@ contract SimpleStablecoin is ERC20Base(0)
         uint max_debt;
     }
 
-    function SimpleStablecoin( Feedbase fb, bytes32 rules
+    function SimpleStablecoin( Feedbase _feedbase, bytes32 _rules
                              , Whitelist issuer_whitelist
                              , Whitelist transfer_whitelist )
     {
-        _owner = msg.sender;
-        _feedbase = fb;
-        _rules = rules;
+        owner = msg.sender;
+        feedbase = _feedbase;
+        rules = _rules;
         _issuer_whitelist = issuer_whitelist;
         _transfer_whitelist = transfer_whitelist;
     }
-    function owner() constant returns (address) { return _owner; }
-    function rules() constant returns (bytes32) { return _rules; }
-    function feedbase() constant returns (address) { return _feedbase; }
     function nextType() constant returns (uint) { return _types.length; }
 
     function token(uint type_id) constant returns (ERC20) {
@@ -105,7 +102,7 @@ contract SimpleStablecoin is ERC20Base(0)
     }
 
     function getPrice(uint24 feedID) internal returns (uint) {
-        var (price, ok) = _feedbase.get(feedID);
+        var (price, ok) = feedbase.get(feedID);
         assert(ok);
         return uint(price);
     }
@@ -120,7 +117,7 @@ contract SimpleStablecoin is ERC20Base(0)
         noEther
         auth
     {
-        _owner = new_owner;
+        owner = new_owner;
     }
     function setMaxDebt(uint collateral_type, uint max_debt)
         noEther

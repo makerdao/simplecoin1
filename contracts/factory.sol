@@ -12,7 +12,7 @@ contract SimpleStablecoinFactory {
     {
         var ss = new SimpleStablecoin( fb, rules
                                      , issuer_whitelist, transfer_whitelist);
-        ss.updateOwner(msg.sender);
+        ss.setOwner(msg.sender);
         stablecoins[count++] = ss;
         return ss;
     }
