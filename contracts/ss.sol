@@ -39,31 +39,31 @@ contract SimpleStablecoin is ERC20Base(0), DSAuth, Sensible {
         holders  = _holders;
     }
 
-    function nextType() constant returns (uint) {
-        return types.length;
+    function nextType() constant returns (uint48) {
+        return uint48(types.length);
     }
 
-    function token(uint type_id) constant returns (ERC20) {
+    function token(uint48 type_id) constant returns (ERC20) {
        return types[type_id].token;
     }
 
-    function feed(uint type_id) constant returns (uint24) {
+    function feed(uint48 type_id) constant returns (uint24) {
        return types[type_id].feed;
     }
 
-    function vault(uint type_id) constant returns (address) {
+    function vault(uint48 type_id) constant returns (address) {
        return types[type_id].vault;
     }
 
-    function spread(uint type_id) constant returns (uint) {
+    function spread(uint48 type_id) constant returns (uint) {
        return types[type_id].spread;
     }
 
-    function debt(uint type_id) constant returns (uint) {
+    function debt(uint48 type_id) constant returns (uint) {
        return types[type_id].debt;
     }
 
-    function ceiling(uint type_id) constant returns (uint) {
+    function ceiling(uint48 type_id) constant returns (uint) {
        return types[type_id].ceiling;
     }
 
@@ -81,32 +81,32 @@ contract SimpleStablecoin is ERC20Base(0), DSAuth, Sensible {
         owner = new_owner;
     }
 
-    function setCeiling(uint type_id, uint ceiling) noEther auth {
+    function setCeiling(uint48 type_id, uint ceiling) noEther auth {
         types[type_id].ceiling = ceiling;
     }
 
-    function setFeed(uint type_id, uint24 feed) noEther auth {
+    function setFeed(uint48 type_id, uint24 feed) noEther auth {
         types[type_id].feed = feed;
     }
 
-    function setSpread(uint type_id, uint spread) noEther auth {
+    function setSpread(uint48 type_id, uint spread) noEther auth {
         types[type_id].spread = spread;
     }
 
     function register(ERC20 token, address vault, uint24 feed, uint spread)
-        noEther auth returns (uint id)
+        noEther auth returns (uint48 id)
     {
-        return types.push(CollateralType({
+        return uint48(types.push(CollateralType({
             token:    token,
             vault:    vault,
             feed:     feed,
             spread:   spread,
             debt:     0,
             ceiling:  0
-        })) - 1;
+        })) - 1);
     }
 
-    function unregister(uint collateral_type) noEther auth {
+    function unregister(uint48 collateral_type) noEther auth {
         delete types[collateral_type];
     }
 
@@ -132,7 +132,7 @@ contract SimpleStablecoin is ERC20Base(0), DSAuth, Sensible {
         return super.transferFrom(from, to, amount);
     }
 
-    function issue(uint collateral_type, uint pay_how_much)
+    function issue(uint48 collateral_type, uint pay_how_much)
         auth_issuer noEther mutex returns (uint issued_quantity)
     {
         var t = types[collateral_type];
@@ -158,7 +158,7 @@ contract SimpleStablecoin is ERC20Base(0), DSAuth, Sensible {
         assert(_balances[msg.sender] <= _supply);
     }
 
-    function cover(uint collateral_type, uint stablecoin_quantity)
+    function cover(uint48 collateral_type, uint stablecoin_quantity)
         auth_issuer noEther mutex returns (uint returned_amount)
     {
         var t = types[collateral_type];

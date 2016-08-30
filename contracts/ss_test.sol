@@ -27,9 +27,9 @@ contract SimpleStablecoinTest is Test {
     Feedbase fb;
     Vault vault;
     ERC20 col1;
-    uint icol1;
+    uint48 icol1;
     uint24 feed1;
-    uint constant COL1 = 10 ** 18;
+    uint constant COL1 = 10**18;
 
     function setUp() {
         issuers = new Whitelist();
