@@ -133,24 +133,6 @@ views.stablecoins = ({ stablecoins=[] }) => {
             [`new_token_${x.address}`]: event.target.value,
           }),
         })]),
-        label({}, ["Vault address", input({
-          value: state[`new_vault_${x.address}`] || "",
-          onChange: event => update({
-            [`new_vault_${x.address}`]: event.target.value,
-          }),
-        })]),
-        label({}, ["Price feed", input({
-          value: state[`new_feed_${x.address}`] || "",
-          onChange: event => update({
-            [`new_feed_${x.address}`]: event.target.value,
-          }),
-        })]),
-        label({}, ["Spread", input({
-          value: state[`new_spread_${x.address}`] || "",
-          onChange: event => update({
-            [`new_spread_${x.address}`]: event.target.value,
-          }),
-        })]),
         div({ style: { textAlign: "right" } }, [
           button({}, ["Register collateral type"])
         ]),
@@ -269,9 +251,6 @@ function cover(address, id) {
 function register_collateral_type(address) {
   send(Stablecoin(address).register, [
     state[`new_token_${address}`],
-    state[`new_vault_${address}`],
-    state[`new_feed_${address}`],
-    state[`new_spread_${address}`],
   ], hopefully(tx => {
     alert(`Transaction created: ${tx}`)
     each(keys(state), x => {

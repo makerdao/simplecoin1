@@ -81,8 +81,21 @@ contract SimpleStablecoin is ERC20Base(0), DSAuth, Sensible {
         owner = new_owner;
     }
 
-    function setCeiling(uint48 type_id, uint ceiling) noEther auth {
-        types[type_id].ceiling = ceiling;
+    function register(ERC20 token)
+        noEther auth returns (uint48 id)
+    {
+        return uint48(types.push(CollateralType({
+            token:    token,
+            vault:    0,
+            feed:     0,
+            spread:   0,
+            debt:     0,
+            ceiling:  0,
+        })) - 1);
+    }
+
+    function setVault(uint48 type_id, address vault) noEther auth {
+        types[type_id].vault = vault;
     }
 
     function setFeed(uint48 type_id, uint24 feed) noEther auth {
@@ -93,17 +106,8 @@ contract SimpleStablecoin is ERC20Base(0), DSAuth, Sensible {
         types[type_id].spread = spread;
     }
 
-    function register(ERC20 token, address vault, uint24 feed, uint spread)
-        noEther auth returns (uint48 id)
-    {
-        return uint48(types.push(CollateralType({
-            token:    token,
-            vault:    vault,
-            feed:     feed,
-            spread:   spread,
-            debt:     0,
-            ceiling:  0
-        })) - 1);
+    function setCeiling(uint48 type_id, uint ceiling) noEther auth {
+        types[type_id].ceiling = ceiling;
     }
 
     function unregister(uint48 collateral_type) noEther auth {

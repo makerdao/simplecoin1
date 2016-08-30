@@ -57,12 +57,10 @@ contract SimpleStablecoinTest is Test {
         vault = new Vault();
         vault.approve(col1, ss, uint(-1));  // pragma: no audit
 
-        icol1 = ss.register({
-            token: col1,
-            vault: vault,
-            feed: feed1,
-            spread: 1000, // 0.1% either way
-        });
+        icol1 = ss.register(col1);
+        ss.setVault(icol1, vault);
+        ss.setFeed(icol1, feed1);
+        ss.setSpread(icol1, 1000); // 0.1% either way
     }
     function testFactoryBuildsNonTestableVersionToo() {
         var factory = new SimpleStablecoinFactory();
