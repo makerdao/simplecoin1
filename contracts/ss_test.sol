@@ -23,7 +23,7 @@ contract Vault {
 contract SimpleStablecoinTest is Test {
     TestableSimpleStablecoin ss;
     Whitelist issuers;
-    Whitelist transferrers;
+    Whitelist holders;
     Feedbase fb;
     Vault vault;
     ERC20 col1;
@@ -35,17 +35,17 @@ contract SimpleStablecoinTest is Test {
         issuers = new Whitelist();
         issuers.setWhitelisted(this, true);
 
-        transferrers = new Whitelist();
-        transferrers.setWhitelisted(this, true);
+        holders = new Whitelist();
+        holders.setWhitelisted(this, true);
 
         fb = new Feedbase();
-        ss = new TestableSimpleStablecoin(fb, 0, issuers, transferrers);
+        ss = new TestableSimpleStablecoin(fb, 0, issuers, holders);
 
         issuers.setWhitelisted(ss, true);
         issuers.setEnabled(true);
 
-        transferrers.setWhitelisted(ss, true);
-        transferrers.setEnabled(true);
+        holders.setWhitelisted(ss, true);
+        holders.setEnabled(true);
 
         col1 = new ERC20Base(10**24);
         col1.approve(ss, 10**24);
@@ -65,8 +65,9 @@ contract SimpleStablecoinTest is Test {
     }
     function testFactoryBuildsNonTestableVersionToo() {
         var factory = new SimpleStablecoinFactory();
-        var coin = factory.newSimpleStablecoin( fb, "some rules"
-                                              , issuers, transferrers );
+        var coin = factory.newSimpleStablecoin(
+            fb, "some rules", issuers, holders
+        );
         assertEq(this, coin.owner());
         // TODO: check authority setup
     }

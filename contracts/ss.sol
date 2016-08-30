@@ -45,13 +45,13 @@ contract SimpleStablecoin is ERC20Base(0)
                            , DSAuth
                            , Sensible
 {
-    address  public owner;
-    bytes32  public rules;
+    address public owner;
+    bytes32 public rules;
     Feedbase public feedbase;
 
     // uses two whitelists instead of a GroupAuthority... for now
-    Whitelist _issuer_whitelist;
-    Whitelist _transfer_whitelist;
+    Whitelist public issuers;
+    Whitelist public holders;
 
     uint public constant UNIT = 10 ** 18;
 
@@ -65,16 +65,19 @@ contract SimpleStablecoin is ERC20Base(0)
         uint max_debt;
     }
 
-    function SimpleStablecoin( Feedbase _feedbase, bytes32 _rules
-                             , Whitelist issuer_whitelist
-                             , Whitelist transfer_whitelist )
-    {
-        owner = msg.sender;
+    function SimpleStablecoin(
+        Feedbase _feedbase,
+        bytes32 _rules,
+        Whitelist _issuers,
+        Whitelist _holders
+    ) {
+        owner    = msg.sender;
         feedbase = _feedbase;
-        rules = _rules;
-        _issuer_whitelist = issuer_whitelist;
-        _transfer_whitelist = transfer_whitelist;
+        rules    = _rules;
+        issuers  = _issuers;
+        holders  = _holders;
     }
+
     function nextType() constant returns (uint) { return _types.length; }
 
     function token(uint type_id) constant returns (ERC20) {
@@ -160,7 +163,7 @@ contract SimpleStablecoin is ERC20Base(0)
     }
 
     modifier issuers_only() {
-        if( _issuer_whitelist.isWhitelisted(msg.sender) ) {
+        if( issuers.isWhitelisted(msg.sender) ) {
             _
         } else {
             throw;
@@ -168,7 +171,7 @@ contract SimpleStablecoin is ERC20Base(0)
     }
 
     modifier transfer_whitelist(address who) {
-        if( _transfer_whitelist.isWhitelisted(who) ) {
+        if( holders.isWhitelisted(who) ) {
             _
         } else {
             throw;
