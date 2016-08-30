@@ -7,5 +7,5 @@ environments:
   morden:
     objects:
       factory:
-        class: SimpleStablecoinFactory
-        address: '0x358a4a3eae2220a76afc37cd9be8ca5da6dc1179'
+        class: SimplecoinFactory
+        address: '0x76bf489ffbb49679531b0ab98b32009d7fd87178'
