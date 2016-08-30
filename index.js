@@ -18,7 +18,7 @@ fetch.stablecoins = $ => begin([
       $(null, assign(props, { whitelisted, balance }))
     })),
     (x, $) => times(Number(x.nextType), (i, $) => parallel(fold(words(`
-      token feed vault spread debt max_debt
+      token feed vault spread debt ceiling
     `), { id: always(i) }, (result, name) => assign(result, {
       [name]: bind(Stablecoin(x.address)[name], i)
     })), hopefully(props => {
@@ -80,11 +80,11 @@ let feed_view = ({ address }, { id, token, feed }) => div({}, [
   }, ["Change price feed"])
 ])
 
-let max_debt_view = ({ address }, { id, token, max_debt }) => div({}, [
-  Number(max_debt), !!Number(token) && a({
+let ceiling_view = ({ address }, { id, token, ceiling }) => div({}, [
+  Number(ceiling), !!Number(token) && a({
     style: { float: "right" },
-    onClick: () => change_max_debt(address, id),
-  }, ["Change max debt"])
+    onClick: () => change_ceiling(address, id),
+  }, ["Change debt ceiling"])
 ])
 
 let collateral_balance_view = (
@@ -114,9 +114,9 @@ views.stablecoins = ({ stablecoins=[] }) => {
         "Token":            y => code({}, [y.token]),
         "Vault":            y => code({}, [y.vault]),
         "Price feed":       y => feed_view(x, y),
-        "Max debt":         y => max_debt_view(x, y),
         "Spread":           y => Number(y.spread),
-        "Current debt":     y => Number(y.debt),
+        "Debt ceiling":     y => ceiling_view(x, y),
+        "Debt":             y => Number(y.debt),
         "Your balance":     y => collateral_balance_view(x, y),
       }), own(x) && (state[`new_${x.address}`] ? form({
         onSubmit: event => {
@@ -221,8 +221,8 @@ function change_price_feed(address, id) {
   }
 }
 
-function change_max_debt(address, id) {
-  let new_value = prompt(`New max debt for collateral type ${id}:`)
+function change_ceiling(address, id) {
+  let new_value = prompt(`New debt ceiling for collateral type ${id}:`)
   if (Number(new_value)) {
     send(Stablecoin(address).setCeiling, [id, new_value], hopefully(tx => {
       alert(`Transaction created: ${tx}`)

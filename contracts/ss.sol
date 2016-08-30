@@ -62,7 +62,7 @@ contract SimpleStablecoin is ERC20Base(0)
         address vault; // where locked tokens are held
         uint spread;
         uint debt;
-        uint max_debt;
+        uint ceiling;
     }
 
     function SimpleStablecoin(
@@ -100,8 +100,8 @@ contract SimpleStablecoin is ERC20Base(0)
        return _types[type_id].debt;
     }
 
-    function max_debt(uint type_id) constant returns (uint) {
-       return _types[type_id].max_debt;
+    function ceiling(uint type_id) constant returns (uint) {
+       return _types[type_id].ceiling;
     }
 
     function getPrice(uint24 feed) internal returns (uint) {
@@ -122,11 +122,11 @@ contract SimpleStablecoin is ERC20Base(0)
     {
         owner = new_owner;
     }
-    function setCeiling(uint collateral_type, uint max_debt)
+    function setCeiling(uint collateral_type, uint ceiling)
         noEther
         auth
     {
-        _types[collateral_type].max_debt = max_debt;
+        _types[collateral_type].ceiling = ceiling;
     }
     function setFeed(uint col_type, uint24 feed_id)
         noEther
@@ -152,7 +152,7 @@ contract SimpleStablecoin is ERC20Base(0)
             feed: feed,
             spread: spread,
             debt: 0,
-            max_debt: 0
+            ceiling: 0
         })) - 1;
     }
     function unregister(uint collateral_type)
@@ -220,7 +220,7 @@ contract SimpleStablecoin is ERC20Base(0)
         assert(safeToAdd(t.debt, purchased_quantity));
         t.debt += purchased_quantity;
 
-        assert(t.debt <= t.max_debt);
+        assert(t.debt <= t.ceiling);
         assert(_balances[msg.sender] <= _supply);
     }
     function redeem(uint collateral_type, uint stablecoin_quantity)
@@ -248,7 +248,7 @@ contract SimpleStablecoin is ERC20Base(0)
 
         assert(t.token.transferFrom(t.vault, msg.sender, returned_amount));
 
-        assert(t.debt <= t.max_debt);
+        assert(t.debt <= t.ceiling);
         assert(_balances[msg.sender] <= _supply);
     }
 }
