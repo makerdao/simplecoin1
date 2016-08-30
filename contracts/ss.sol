@@ -78,7 +78,9 @@ contract SimpleStablecoin is ERC20Base(0)
         holders  = _holders;
     }
 
-    function nextType() constant returns (uint) { return _types.length; }
+    function nextType() constant returns (uint) {
+        return _types.length;
+    }
 
     function token(uint type_id) constant returns (ERC20) {
        return _types[type_id].token;
@@ -110,41 +112,28 @@ contract SimpleStablecoin is ERC20Base(0)
         return uint(price);
     }
 
-    // For testing
     function getTime() internal returns (uint) {
         return block.timestamp;
     }
 
-    /* == Owner Functions == */
-    function setOwner(address new_owner)
-        noEther
-        auth
-    {
+    function setOwner(address new_owner) noEther auth {
         owner = new_owner;
     }
-    function setCeiling(uint collateral_type, uint ceiling)
-        noEther
-        auth
-    {
+
+    function setCeiling(uint collateral_type, uint ceiling) noEther auth {
         _types[collateral_type].ceiling = ceiling;
     }
-    function setFeed(uint col_type, uint24 feed_id)
-        noEther
-        auth
-    {
+
+    function setFeed(uint col_type, uint24 feed_id) noEther auth {
         _types[col_type].feed = feed_id;
     }
-    function setSpread(uint col_type, uint spread)
-        noEther
-        auth
-    {
+
+    function setSpread(uint col_type, uint spread) noEther auth {
         _types[col_type].spread = spread;
     }
 
     function register(ERC20 token, address vault, uint24 feed, uint spread)
-        noEther
-        auth
-        returns (uint id)
+        noEther auth returns (uint id)
     {
         return _types.push(CollateralType({
             token: token,
@@ -155,15 +144,13 @@ contract SimpleStablecoin is ERC20Base(0)
             ceiling: 0
         })) - 1;
     }
-    function unregister(uint collateral_type)
-        noEther
-        auth
-    {
+
+    function unregister(uint collateral_type) noEther auth {
         delete _types[collateral_type];
     }
 
     modifier auth_issuer() {
-        if( issuers.isWhitelisted(msg.sender) ) {
+        if (issuers.isWhitelisted(msg.sender)) {
             _
         } else {
             throw;
@@ -171,7 +158,7 @@ contract SimpleStablecoin is ERC20Base(0)
     }
 
     modifier auth_holder(address who) {
-        if( holders.isWhitelisted(who) ) {
+        if (holders.isWhitelisted(who)) {
             _
         } else {
             throw;
@@ -179,27 +166,19 @@ contract SimpleStablecoin is ERC20Base(0)
     }
 
     function transfer(address to, uint amount)
-        auth_holder(msg.sender)
-        auth_holder(to)
-        returns (bool)
+        auth_holder(msg.sender) auth_holder(to) returns (bool)
     {
         return super.transfer(to, amount);
     }
 
     function transferFrom(address from, address to, uint amount)
-        auth_holder(from)
-        auth_holder(to)
-        returns (bool)
+        auth_holder(from) auth_holder(to) returns (bool)
     {
         return super.transferFrom(from, to, amount);
     }
 
-    //== User functions: purchase/redeem stablecoin
-    function purchase(uint collateral_type, uint pay_how_much)
-        auth_issuer
-        noEther
-        mutex
-        returns (uint purchased_quantity)
+    function issue(uint collateral_type, uint pay_how_much)
+        auth_issuer noEther mutex returns (uint issued_quantity)
     {
         var t = _types[collateral_type];
         assert(t.token != address(0));  // deleted
@@ -209,25 +188,23 @@ contract SimpleStablecoin is ERC20Base(0)
         var price = getPrice(t.feed);
         var mark_price = price + price / t.spread;
         assert(safeToMul(UNIT, pay_how_much));
-        purchased_quantity = (UNIT * pay_how_much) / mark_price;
+        issued_quantity = (UNIT * pay_how_much) / mark_price;
 
-        assert(safeToAdd(_balances[msg.sender], purchased_quantity));
-        _balances[msg.sender] += purchased_quantity;
+        assert(safeToAdd(_balances[msg.sender], issued_quantity));
+        _balances[msg.sender] += issued_quantity;
 
-        assert(safeToAdd(_supply, purchased_quantity));
-        _supply += purchased_quantity;
+        assert(safeToAdd(_supply, issued_quantity));
+        _supply += issued_quantity;
 
-        assert(safeToAdd(t.debt, purchased_quantity));
-        t.debt += purchased_quantity;
+        assert(safeToAdd(t.debt, issued_quantity));
+        t.debt += issued_quantity;
 
         assert(t.debt <= t.ceiling);
         assert(_balances[msg.sender] <= _supply);
     }
-    function redeem(uint collateral_type, uint stablecoin_quantity)
-        auth_issuer
-        noEther
-        mutex
-        returns (uint returned_amount)
+
+    function cover(uint collateral_type, uint stablecoin_quantity)
+        auth_issuer noEther mutex returns (uint returned_amount)
     {
         var t = _types[collateral_type];
         assert(t.token != address(0));  // deleted

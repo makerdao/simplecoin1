@@ -60,11 +60,11 @@ let whitelist_view = ({ address, owner, whitelisted }) => div({}, [
 let balance_view = ({ address, balance }) => div({}, [
   Number(balance),
   div({ style: { float: "right" } }, [a({
-    onClick: () => purchase(address),
-  }, ["Purchase"]), " ", a({
+    onClick: () => issue(address),
+  }, ["Issue"]), " ", a({
     style: { marginLeft: ".25rem" },
-    onClick: () => redeem(address),
-  }, ["Redeem"])])
+    onClick: () => cover(address),
+  }, ["Cover"])])
 ])
 
 let type_id_view = ({ address }, { id, token }) => div({}, [
@@ -92,11 +92,11 @@ let collateral_balance_view = (
 ) => div({}, [
   Number(balance),
   div({ style: { float: "right" } }, whitelisted ? [a({
-    onClick: () => purchase(address, id),
-  }, ["Purchase"]), " ", a({
+    onClick: () => issue(address, id),
+  }, ["Issue"]), " ", a({
     style: { marginLeft: ".25rem" },
-    onClick: () => redeem(address, id),
-  }, ["Redeem"])] : [small({}, ["(not whitelisted)"])])
+    onClick: () => cover(address, id),
+  }, ["Cover"])] : [small({}, ["(not whitelisted)"])])
 ])
 
 views.stablecoins = ({ stablecoins=[] }) => {
@@ -248,19 +248,19 @@ function remove_whitelist(address) {
   }
 }
 
-function purchase(address, id) {
-  let x = prompt(`Buy stablecoins for how many of these collateral tokens?`)
+function issue(address, id) {
+  let x = prompt(`Issue stablecoins with how many of these collateral tokens?`)
   if (Number(x)) {
-    send(Stablecoin(address).purchase, [id, Number(x)], hopefully(tx => {
+    send(Stablecoin(address).issue, [id, Number(x)], hopefully(tx => {
       alert(`Transaction created: ${tx}`)
     }))
   }
 }
 
-function redeem(address, id) {
-  let x = prompt(`Redeem how many stablecoins for this collateral type?`)
+function cover(address, id) {
+  let x = prompt(`Cover how many stablecoins with this collateral type?`)
   if (Number(x)) {
-    send(Stablecoin(address).redeem, [id, Number(x)], hopefully(tx => {
+    send(Stablecoin(address).cover, [id, Number(x)], hopefully(tx => {
       alert(`Transaction created: ${tx}`)
     }))
   }

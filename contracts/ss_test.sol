@@ -78,97 +78,97 @@ contract SimpleStablecoinTest is Test {
     function testBasics() {
         ss.setCeiling(icol1, 100 * COL1);
 
-        var obtained = ss.purchase(icol1, 100000);
+        var obtained = ss.issue(icol1, 100000);
 
         assertEq(obtained, 999000);
         assertEq(obtained, ss.balanceOf(this));
 
         var before = col1.balanceOf(this);
-        var returned = ss.redeem(icol1, ss.balanceOf(this));
+        var returned = ss.cover(icol1, ss.balanceOf(this));
         var afterward = col1.balanceOf(this);  // `after` is a keyword??
 
         assertEq(returned, afterward - before);
         assertEq(returned, 99800); // minus 0.2%
     }
-    function testPurchaseTransferFromCaller() {
+    function testIssueTransferFromCaller() {
         ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
 
         var balance_before = col1.balanceOf(this);
-        var obtained = ss.purchase(icol1, collateral_spend);
+        var obtained = ss.issue(icol1, collateral_spend);
         assertEq(balance_before - col1.balanceOf(this), collateral_spend);
     }
-    function testPurchaseTransferToVault() {
+    function testIssueTransferToVault() {
         ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
 
         var balance_before = col1.balanceOf(vault);
-        var obtained = ss.purchase(icol1, collateral_spend);
+        var obtained = ss.issue(icol1, collateral_spend);
         assertEq(col1.balanceOf(vault) - balance_before, collateral_spend);
     }
-    function testPurchaseTransferToCaller() {
+    function testIssueTransferToCaller() {
         // stablecoin transferred from caller
         ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
 
         var balance_before = ss.balanceOf(this);
-        var obtained = ss.purchase(icol1, collateral_spend);
+        var obtained = ss.issue(icol1, collateral_spend);
         var balance_after = ss.balanceOf(this);
 
         assertEq(balance_after - balance_before, 999000);
     }
-    function testPurchaseCreatesCoin() {
+    function testIssueCreatesCoin() {
         ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
 
         var supply_before = ss.totalSupply();
-        var obtained = ss.purchase(icol1, collateral_spend);
+        var obtained = ss.issue(icol1, collateral_spend);
         var supply_after = ss.totalSupply();
 
         assertEq(supply_after - supply_before, 999000);
     }
-    function testRedeemTransferToCaller() {
+    function testCoverTransferToCaller() {
         ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
-        var obtained = ss.purchase(icol1, collateral_spend);
+        var obtained = ss.issue(icol1, collateral_spend);
 
         var balance_before = col1.balanceOf(this);
-        var returned = ss.redeem(icol1, obtained);
+        var returned = ss.cover(icol1, obtained);
         var balance_after = col1.balanceOf(this);
 
         assertEq(balance_after - balance_before, returned);
         assertEq(balance_after - balance_before, 99800);
     }
-    function testRedeemTransferFromVault() {
+    function testCoverTransferFromVault() {
         ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
-        var obtained = ss.purchase(icol1, collateral_spend);
+        var obtained = ss.issue(icol1, collateral_spend);
 
         var balance_before = col1.balanceOf(vault);
-        var returned = ss.redeem(icol1, obtained);
+        var returned = ss.cover(icol1, obtained);
         var balance_after = col1.balanceOf(vault);
 
         assertEq(balance_before - balance_after, 99800);
     }
-    function testRedeemTransferFromCaller() {
+    function testCoverTransferFromCaller() {
         // stablecoin transferred from caller
         ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
-        var obtained = ss.purchase(icol1, collateral_spend);
+        var obtained = ss.issue(icol1, collateral_spend);
 
         var balance_before = ss.balanceOf(this);
-        var returned = ss.redeem(icol1, obtained);
+        var returned = ss.cover(icol1, obtained);
         var balance_after = ss.balanceOf(this);
 
         assertEq(balance_before - balance_after, 999000);
     }
-    function testRedeemDestroysCoin() {
+    function testCoverDestroysCoin() {
         ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
-        var obtained = ss.purchase(icol1, collateral_spend);
+        var obtained = ss.issue(icol1, collateral_spend);
 
         var supply_before = ss.totalSupply();
-        var returned = ss.redeem(icol1, obtained);
+        var returned = ss.cover(icol1, obtained);
         var supply_after = ss.totalSupply();
 
         assertEq(supply_before - supply_after, 999000);
