@@ -76,7 +76,7 @@ contract SimpleStablecoinTest is Test {
         assertEq(this, ss.owner());
     }
     function testBasics() {
-        ss.setMaxDebt(icol1, 100 * COL1);
+        ss.setCeiling(icol1, 100 * COL1);
 
         var obtained = ss.purchase(icol1, 100000);
 
@@ -91,7 +91,7 @@ contract SimpleStablecoinTest is Test {
         assertEq(returned, 99800); // minus 0.2%
     }
     function testPurchaseTransferFromCaller() {
-        ss.setMaxDebt(icol1, 100 * COL1);
+        ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
 
         var balance_before = col1.balanceOf(this);
@@ -99,7 +99,7 @@ contract SimpleStablecoinTest is Test {
         assertEq(balance_before - col1.balanceOf(this), collateral_spend);
     }
     function testPurchaseTransferToVault() {
-        ss.setMaxDebt(icol1, 100 * COL1);
+        ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
 
         var balance_before = col1.balanceOf(vault);
@@ -108,7 +108,7 @@ contract SimpleStablecoinTest is Test {
     }
     function testPurchaseTransferToCaller() {
         // stablecoin transferred from caller
-        ss.setMaxDebt(icol1, 100 * COL1);
+        ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
 
         var balance_before = ss.balanceOf(this);
@@ -118,7 +118,7 @@ contract SimpleStablecoinTest is Test {
         assertEq(balance_after - balance_before, 999000);
     }
     function testPurchaseCreatesCoin() {
-        ss.setMaxDebt(icol1, 100 * COL1);
+        ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
 
         var supply_before = ss.totalSupply();
@@ -128,7 +128,7 @@ contract SimpleStablecoinTest is Test {
         assertEq(supply_after - supply_before, 999000);
     }
     function testRedeemTransferToCaller() {
-        ss.setMaxDebt(icol1, 100 * COL1);
+        ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
         var obtained = ss.purchase(icol1, collateral_spend);
 
@@ -140,7 +140,7 @@ contract SimpleStablecoinTest is Test {
         assertEq(balance_after - balance_before, 99800);
     }
     function testRedeemTransferFromVault() {
-        ss.setMaxDebt(icol1, 100 * COL1);
+        ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
         var obtained = ss.purchase(icol1, collateral_spend);
 
@@ -152,7 +152,7 @@ contract SimpleStablecoinTest is Test {
     }
     function testRedeemTransferFromCaller() {
         // stablecoin transferred from caller
-        ss.setMaxDebt(icol1, 100 * COL1);
+        ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
         var obtained = ss.purchase(icol1, collateral_spend);
 
@@ -163,7 +163,7 @@ contract SimpleStablecoinTest is Test {
         assertEq(balance_before - balance_after, 999000);
     }
     function testRedeemDestroysCoin() {
-        ss.setMaxDebt(icol1, 100 * COL1);
+        ss.setCeiling(icol1, 100 * COL1);
         var collateral_spend = 100000;
         var obtained = ss.purchase(icol1, collateral_spend);
 

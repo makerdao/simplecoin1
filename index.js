@@ -224,7 +224,7 @@ function change_price_feed(address, id) {
 function change_max_debt(address, id) {
   let new_value = prompt(`New max debt for collateral type ${id}:`)
   if (Number(new_value)) {
-    send(Stablecoin(address).setMaxDebt, [id, new_value], hopefully(tx => {
+    send(Stablecoin(address).setCeiling, [id, new_value], hopefully(tx => {
       alert(`Transaction created: ${tx}`)
     }))
   }

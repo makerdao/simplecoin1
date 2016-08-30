@@ -122,7 +122,7 @@ contract SimpleStablecoin is ERC20Base(0)
     {
         owner = new_owner;
     }
-    function setMaxDebt(uint collateral_type, uint max_debt)
+    function setCeiling(uint collateral_type, uint max_debt)
         noEther
         auth
     {
