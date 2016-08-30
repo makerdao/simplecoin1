@@ -48,7 +48,6 @@ contract SimpleStablecoin is ERC20Base(0)
     address _owner;
     bytes32 _rules;
     Feedbase _feedbase;
-    mapping (address => bool) public whitelist;
 
     // uses two whitelists instead of a GroupAuthority... for now
     Whitelist _issuer_whitelist;
@@ -118,12 +117,6 @@ contract SimpleStablecoin is ERC20Base(0)
     }
 
     /* == Owner Functions == */
-    function setWhitelist(address who, bool what)
-        noEther
-        auth
-    {
-        whitelist[who] = what;
-    }
     function updateOwner(address new_owner)
         noEther
         auth

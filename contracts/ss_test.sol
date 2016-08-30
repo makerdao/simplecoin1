@@ -41,8 +41,6 @@ contract SimpleStablecoinTest is Test {
         fb = new Feedbase();
         ss = new TestableSimpleStablecoin(fb, 0, issuers, transferrers);
 
-        ss.setWhitelist(this, true);
-
         issuers.setWhitelisted(ss, true);
         issuers.setEnabled(true);
 
