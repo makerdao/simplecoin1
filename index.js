@@ -267,7 +267,7 @@ function redeem(address, id) {
 }
 
 function register_collateral_type(address) {
-  send(Stablecoin(address).registerCollateralType, [
+  send(Stablecoin(address).register, [
     state[`new_token_${address}`],
     state[`new_vault_${address}`],
     state[`new_feed_${address}`],

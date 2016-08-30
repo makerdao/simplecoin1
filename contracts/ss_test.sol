@@ -57,11 +57,12 @@ contract SimpleStablecoinTest is Test {
         vault = new Vault();
         vault.approve(col1, ss, uint(-1));  // pragma: no audit
 
-        icol1 = ss.registerCollateralType({token: col1,
-                                           vault: vault,
-                                           feedID: feed1,
-                                           spread: 1000  // 0.1% either way
-                                          });
+        icol1 = ss.register({
+            token: col1,
+            vault: vault,
+            feedID: feed1,
+            spread: 1000, // 0.1% either way
+        });
     }
     function testFactoryBuildsNonTestableVersionToo() {
         var factory = new SimpleStablecoinFactory();

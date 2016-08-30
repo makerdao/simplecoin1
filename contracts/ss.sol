@@ -141,7 +141,7 @@ contract SimpleStablecoin is ERC20Base(0)
         _types[col_type].spread = spread;
     }
 
-    function registerCollateralType(ERC20 token, address vault, uint24 feedID, uint spread)
+    function register(ERC20 token, address vault, uint24 feedID, uint spread)
         noEther
         auth
         returns (uint id)
@@ -155,7 +155,7 @@ contract SimpleStablecoin is ERC20Base(0)
             max_debt: 0
         })) - 1;
     }
-    function cancelCollateralType(uint collateral_type)
+    function unregister(uint collateral_type)
         noEther
         auth
     {
