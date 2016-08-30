@@ -162,7 +162,7 @@ contract SimpleStablecoin is ERC20Base(0)
         delete _types[collateral_type];
     }
 
-    modifier issuers_only() {
+    modifier auth_issuer() {
         if( issuers.isWhitelisted(msg.sender) ) {
             _
         } else {
@@ -196,7 +196,7 @@ contract SimpleStablecoin is ERC20Base(0)
 
     //== User functions: purchase/redeem stablecoin
     function purchase(uint collateral_type, uint pay_how_much)
-        issuers_only
+        auth_issuer
         noEther
         mutex
         returns (uint purchased_quantity)
@@ -224,7 +224,7 @@ contract SimpleStablecoin is ERC20Base(0)
         assert(_balances[msg.sender] <= _supply);
     }
     function redeem(uint collateral_type, uint stablecoin_quantity)
-        issuers_only
+        auth_issuer
         noEther
         mutex
         returns (uint returned_amount)
