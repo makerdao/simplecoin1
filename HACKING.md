@@ -15,15 +15,16 @@ and of course `index.js`, which has most of the application logic.
 State management
 ----------------
 
-The UI has one global variable, called `state`.  It can be changed by
-calling `update({ foo: 123 }, callback)`.  Obviously, it's easy to
-inspect or change the `state` variable from the browser dev tools.
+The UI has one global variable, called `state`.  It's changed by
+calling the function `update({ foo: 123 })`.  Every time the state is
+changed, all the views are re-rendered (using React).
+
+Obviously, it's easy to inspect or change the `state` variable from
+the browser developer tools.
 
 When the application starts, the `state` variable is initialized from
-local storage.  The `persist({ foo: 123 }, callback)` function works
-like `update()` except it also saves the values into local storage.
-
-Every time `state` changes, all views are re-rendered using React.
+local storage.  The function `persist({ foo: 123 })` is like `update`
+except that it also saves the values into local storage.
 
 
 Blockchain data fetching 
