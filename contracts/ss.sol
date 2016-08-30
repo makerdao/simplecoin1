@@ -170,7 +170,7 @@ contract SimpleStablecoin is ERC20Base(0)
         }
     }
 
-    modifier transfer_whitelist(address who) {
+    modifier auth_holder(address who) {
         if( holders.isWhitelisted(who) ) {
             _
         } else {
@@ -179,16 +179,16 @@ contract SimpleStablecoin is ERC20Base(0)
     }
 
     function transfer(address to, uint amount)
-        transfer_whitelist(msg.sender)
-        transfer_whitelist(to)
+        auth_holder(msg.sender)
+        auth_holder(to)
         returns (bool)
     {
         return super.transfer(to, amount);
     }
 
     function transferFrom(address from, address to, uint amount)
-        transfer_whitelist(from)
-        transfer_whitelist(to)
+        auth_holder(from)
+        auth_holder(to)
         returns (bool)
     {
         return super.transferFrom(from, to, amount);
