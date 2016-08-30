@@ -146,6 +146,12 @@ contract SimpleStablecoin is ERC20Base(0)
     {
         _types[col_type].feedID = feed_id;
     }
+    function setSpread(uint col_type, uint spread)
+        noEther
+        auth
+    {
+        _types[col_type].spread = spread;
+    }
 
     function registerCollateralType(ERC20 token, address vault, uint24 feedID, uint spread)
         noEther
@@ -199,7 +205,7 @@ contract SimpleStablecoin is ERC20Base(0)
     {
         return super.transferFrom(from, to, amount);
     }
-    
+
     //== User functions: purchase/redeem stablecoin
     function purchase(uint collateral_type, uint pay_how_much)
         issuers_only
