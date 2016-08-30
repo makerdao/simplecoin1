@@ -1,25 +1,16 @@
 contract Sensible {
-    function() { throw; }
-
-    function assert(bool condition) internal {
-        if (!condition) throw;
-    }
-
-    modifier noEther() {
-        assert(msg.value == 0);
-        _
-    }
-
-    // WARNING:
-    // Must manually confirm that no function with a `mutex` modifier
-    // has a `return` statement, or else mutex gets stuck.
     bool locked;
-    modifier mutex() {
+
+    modifier synchronized() {
         assert(!locked);
         locked = true;
         _
         locked = false;
     }
+
+    function() { throw; }
+    function assert(bool x) internal { if (!x) throw; }
+    modifier noeth() { assert(msg.value == 0); _ }
 
     function safeToAdd(uint a, uint b) internal returns (bool) {
         return (a + b >= a);

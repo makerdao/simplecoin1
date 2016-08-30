@@ -5,21 +5,19 @@ import "feedbase/feedbase.sol";
 import "sensible.sol";
 
 contract SimpleStablecoin is ERC20Base(0), DSAuth, Sensible {
-    address    public  owner;
-    bytes32    public  rules;
-    Feedbase   public  feedbase;
+    uint public constant UNIT = 10**18;
 
-    // Uses two whitelists instead of a GroupAuthority... for now
+    address    public  owner;
+    Feedbase   public  feedbase;
+    bytes32    public  rules;
     Whitelist  public  issuers;
     Whitelist  public  holders;
-
-    uint public constant UNIT = 10**18;
 
     CollateralType[] types;
 
     struct CollateralType {
         ERC20    token;
-        uint24   feed;           // Tokens for each UNIT of stablecoin
+        uint24   feed;
         address  vault;
         uint     spread;
         uint     debt;
@@ -39,50 +37,18 @@ contract SimpleStablecoin is ERC20Base(0), DSAuth, Sensible {
         holders  = _holders;
     }
 
+    function setOwner(address new_owner) noeth auth {
+        owner = new_owner;
+    }
+
+    //------------------------------------------------------
+
     function nextType() constant returns (uint48) {
         return uint48(types.length);
     }
 
-    function token(uint48 type_id) constant returns (ERC20) {
-       return types[type_id].token;
-    }
-
-    function feed(uint48 type_id) constant returns (uint24) {
-       return types[type_id].feed;
-    }
-
-    function vault(uint48 type_id) constant returns (address) {
-       return types[type_id].vault;
-    }
-
-    function spread(uint48 type_id) constant returns (uint) {
-       return types[type_id].spread;
-    }
-
-    function debt(uint48 type_id) constant returns (uint) {
-       return types[type_id].debt;
-    }
-
-    function ceiling(uint48 type_id) constant returns (uint) {
-       return types[type_id].ceiling;
-    }
-
-    function getPrice(uint24 feed) internal returns (uint) {
-        var (price, ok) = feedbase.get(feed);
-        assert(ok);
-        return uint(price);
-    }
-
-    function getTime() internal returns (uint) {
-        return block.timestamp;
-    }
-
-    function setOwner(address new_owner) noEther auth {
-        owner = new_owner;
-    }
-
     function register(ERC20 token)
-        noEther auth returns (uint48 id)
+        noeth auth returns (uint48 id)
     {
         return uint48(types.push(CollateralType({
             token:    token,
@@ -94,30 +60,53 @@ contract SimpleStablecoin is ERC20Base(0), DSAuth, Sensible {
         })) - 1);
     }
 
-    function setVault(uint48 type_id, address vault) noEther auth {
+    function setVault(uint48 type_id, address vault) noeth auth {
         types[type_id].vault = vault;
     }
 
-    function setFeed(uint48 type_id, uint24 feed) noEther auth {
+    function setFeed(uint48 type_id, uint24 feed) noeth auth {
         types[type_id].feed = feed;
     }
 
-    function setSpread(uint48 type_id, uint spread) noEther auth {
+    function setSpread(uint48 type_id, uint spread) noeth auth {
         types[type_id].spread = spread;
     }
 
-    function setCeiling(uint48 type_id, uint ceiling) noEther auth {
+    function setCeiling(uint48 type_id, uint ceiling) noeth auth {
         types[type_id].ceiling = ceiling;
     }
 
-    function unregister(uint48 collateral_type) noEther auth {
+    function unregister(uint48 collateral_type) noeth auth {
         delete types[collateral_type];
     }
 
-    modifier auth_issuer() {
-        assert(issuers.isWhitelisted(msg.sender));
-        _
+    //------------------------------------------------------
+
+    function token(uint48 type_id) constant returns (ERC20) {
+       return types[type_id].token;
     }
+
+    function vault(uint48 type_id) constant returns (address) {
+       return types[type_id].vault;
+    }
+
+    function feed(uint48 type_id) constant returns (uint24) {
+       return types[type_id].feed;
+    }
+
+    function spread(uint48 type_id) constant returns (uint) {
+       return types[type_id].spread;
+    }
+
+    function ceiling(uint48 type_id) constant returns (uint) {
+       return types[type_id].ceiling;
+    }
+
+    function debt(uint48 type_id) constant returns (uint) {
+       return types[type_id].debt;
+    }
+
+    //------------------------------------------------------
 
     modifier auth_holder(address who) {
         assert(holders.isWhitelisted(who));
@@ -136,8 +125,15 @@ contract SimpleStablecoin is ERC20Base(0), DSAuth, Sensible {
         return super.transferFrom(from, to, amount);
     }
 
+    //------------------------------------------------------
+
+    modifier auth_issuer() {
+        assert(issuers.isWhitelisted(msg.sender));
+        _
+    }
+
     function issue(uint48 collateral_type, uint pay_how_much)
-        auth_issuer noEther mutex returns (uint issued_quantity)
+        auth_issuer noeth synchronized returns (uint issued_quantity)
     {
         var t = types[collateral_type];
         assert(t.token != address(0));  // deleted
@@ -163,7 +159,7 @@ contract SimpleStablecoin is ERC20Base(0), DSAuth, Sensible {
     }
 
     function cover(uint48 collateral_type, uint stablecoin_quantity)
-        auth_issuer noEther mutex returns (uint returned_amount)
+        auth_issuer noeth synchronized returns (uint returned_amount)
     {
         var t = types[collateral_type];
         assert(t.token != address(0));  // deleted
@@ -186,5 +182,11 @@ contract SimpleStablecoin is ERC20Base(0), DSAuth, Sensible {
 
         assert(t.debt <= t.ceiling);
         assert(_balances[msg.sender] <= _supply);
+    }
+
+    function getPrice(uint24 feed) internal returns (uint) {
+        var (price, ok) = feedbase.get(feed);
+        assert(ok);
+        return uint(price);
     }
 }
