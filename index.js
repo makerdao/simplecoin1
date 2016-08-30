@@ -17,7 +17,7 @@ fetch.stablecoins = $ => begin([
     }, hopefully(({ props, whitelisted, balance }) => {
       $(null, assign(props, { whitelisted, balance }))
     })),
-    (x, $) => times(Number(x.type_count), (i, $) => parallel(fold(words(`
+    (x, $) => times(Number(x.nextType), (i, $) => parallel(fold(words(`
       token feed vault spread current_debt max_debt
     `), { id: always(i) }, (result, name) => assign(result, {
       [name]: bind(Stablecoin(x.address)[name], i)

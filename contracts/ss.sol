@@ -78,8 +78,7 @@ contract SimpleStablecoin is ERC20Base(0)
     function owner() constant returns (address) { return _owner; }
     function rules() constant returns (bytes32) { return _rules; }
     function feedbase() constant returns (address) { return _feedbase; }
-    function type_count() constant returns (uint) { return _types.length; }
-
+    function nextType() constant returns (uint) { return _types.length; }
 
     function token(uint type_id) constant returns (ERC20) {
        return _types[type_id].token;
