@@ -1,75 +1,36 @@
-import 'erc20/erc20.sol';
-import 'erc20/base.sol';
-import 'feedbase/feedbase.sol';
-import 'ds-whitelist/whitelist.sol';
+import "ds-whitelist/whitelist.sol";
+import "erc20/base.sol";
+import "erc20/erc20.sol";
+import "feedbase/feedbase.sol";
+import "sensible.sol";
 
-contract Sensible {
-    function() {
-        throw;
-    }
+contract SimpleStablecoin is ERC20Base(0), DSAuth, Sensible {
+    address    public  owner;
+    bytes32    public  rules;
+    Feedbase   public  feedbase;
 
-    function assert(bool condition) internal {
-        if (!condition) throw;
-    }
+    // Uses two whitelists instead of a GroupAuthority... for now
+    Whitelist  public  issuers;
+    Whitelist  public  holders;
 
-    modifier noEther() {
-        assert(msg.value == 0);
-        _
-    }
+    uint public constant UNIT = 10**18;
 
-    // WARNING: Must manually confirm that no function with a `mutex` modifier
-    //          has a `return` statement, or else mutex gets stuck !!
-    bool _mutex;
-    modifier mutex() {
-        assert(!_mutex);
-        _mutex = true;
-        _
-        _mutex = false;
-    }
+    CollateralType[] types;
 
-    function safeToAdd(uint a, uint b) internal returns (bool) {
-        return (a + b >= a);
-    }
-
-    function safeToSub(uint a, uint b) internal returns (bool) {
-        return (a >= b);
-    }
-
-    function safeToMul(uint a, uint b) internal returns (bool) {
-        var c = a * b;
-        return (a == 0 || c / a == b);
-    }
-}
-
-contract SimpleStablecoin is ERC20Base(0)
-                           , DSAuth
-                           , Sensible
-{
-    address public owner;
-    bytes32 public rules;
-    Feedbase public feedbase;
-
-    // uses two whitelists instead of a GroupAuthority... for now
-    Whitelist public issuers;
-    Whitelist public holders;
-
-    uint public constant UNIT = 10 ** 18;
-
-    CollateralType[] _types;
     struct CollateralType {
-        ERC20 token;
-        uint24 feed; // Number of tokens for each UNIT of stablecoin
-        address vault; // where locked tokens are held
-        uint spread;
-        uint debt;
-        uint ceiling;
+        ERC20    token;
+        uint24   feed;           // Tokens for each UNIT of stablecoin
+        address  vault;
+        uint     spread;
+        uint     debt;
+        uint     ceiling;
     }
 
     function SimpleStablecoin(
-        Feedbase _feedbase,
-        bytes32 _rules,
-        Whitelist _issuers,
-        Whitelist _holders
+        Feedbase   _feedbase,
+        bytes32    _rules,
+        Whitelist  _issuers,
+        Whitelist  _holders
     ) {
         owner    = msg.sender;
         feedbase = _feedbase;
@@ -79,31 +40,31 @@ contract SimpleStablecoin is ERC20Base(0)
     }
 
     function nextType() constant returns (uint) {
-        return _types.length;
+        return types.length;
     }
 
     function token(uint type_id) constant returns (ERC20) {
-       return _types[type_id].token;
+       return types[type_id].token;
     }
 
     function feed(uint type_id) constant returns (uint24) {
-       return _types[type_id].feed;
+       return types[type_id].feed;
     }
 
     function vault(uint type_id) constant returns (address) {
-       return _types[type_id].vault;
+       return types[type_id].vault;
     }
 
     function spread(uint type_id) constant returns (uint) {
-       return _types[type_id].spread;
+       return types[type_id].spread;
     }
 
     function debt(uint type_id) constant returns (uint) {
-       return _types[type_id].debt;
+       return types[type_id].debt;
     }
 
     function ceiling(uint type_id) constant returns (uint) {
-       return _types[type_id].ceiling;
+       return types[type_id].ceiling;
     }
 
     function getPrice(uint24 feed) internal returns (uint) {
@@ -120,49 +81,43 @@ contract SimpleStablecoin is ERC20Base(0)
         owner = new_owner;
     }
 
-    function setCeiling(uint collateral_type, uint ceiling) noEther auth {
-        _types[collateral_type].ceiling = ceiling;
+    function setCeiling(uint type_id, uint ceiling) noEther auth {
+        types[type_id].ceiling = ceiling;
     }
 
-    function setFeed(uint col_type, uint24 feed_id) noEther auth {
-        _types[col_type].feed = feed_id;
+    function setFeed(uint type_id, uint24 feed) noEther auth {
+        types[type_id].feed = feed;
     }
 
-    function setSpread(uint col_type, uint spread) noEther auth {
-        _types[col_type].spread = spread;
+    function setSpread(uint type_id, uint spread) noEther auth {
+        types[type_id].spread = spread;
     }
 
     function register(ERC20 token, address vault, uint24 feed, uint spread)
         noEther auth returns (uint id)
     {
-        return _types.push(CollateralType({
-            token: token,
-            vault: vault,
-            feed: feed,
-            spread: spread,
-            debt: 0,
-            ceiling: 0
+        return types.push(CollateralType({
+            token:    token,
+            vault:    vault,
+            feed:     feed,
+            spread:   spread,
+            debt:     0,
+            ceiling:  0
         })) - 1;
     }
 
     function unregister(uint collateral_type) noEther auth {
-        delete _types[collateral_type];
+        delete types[collateral_type];
     }
 
     modifier auth_issuer() {
-        if (issuers.isWhitelisted(msg.sender)) {
-            _
-        } else {
-            throw;
-        }
+        assert(issuers.isWhitelisted(msg.sender));
+        _
     }
 
     modifier auth_holder(address who) {
-        if (holders.isWhitelisted(who)) {
-            _
-        } else {
-            throw;
-        }
+        assert(holders.isWhitelisted(who));
+        _
     }
 
     function transfer(address to, uint amount)
@@ -180,7 +135,7 @@ contract SimpleStablecoin is ERC20Base(0)
     function issue(uint collateral_type, uint pay_how_much)
         auth_issuer noEther mutex returns (uint issued_quantity)
     {
-        var t = _types[collateral_type];
+        var t = types[collateral_type];
         assert(t.token != address(0));  // deleted
 
         assert(t.token.transferFrom(msg.sender, t.vault, pay_how_much));
@@ -206,7 +161,7 @@ contract SimpleStablecoin is ERC20Base(0)
     function cover(uint collateral_type, uint stablecoin_quantity)
         auth_issuer noEther mutex returns (uint returned_amount)
     {
-        var t = _types[collateral_type];
+        var t = types[collateral_type];
         assert(t.token != address(0));  // deleted
 
         assert(safeToSub(_balances[msg.sender], stablecoin_quantity));
