@@ -90,4 +90,87 @@ contract SimpleStablecoinTest is Test {
         assertEq(returned, afterward - before);
         assertEq(returned, 99800); // minus 0.2%
     }
+    function testPurchaseTransferFromCaller() {
+        ss.setMaxDebt(icol1, 100 * COL1);
+        var collateral_spend = 100000;
+
+        var balance_before = col1.balanceOf(this);
+        var obtained = ss.purchase(icol1, collateral_spend);
+        assertEq(balance_before - col1.balanceOf(this), collateral_spend);
+    }
+    function testPurchaseTransferToVault() {
+        ss.setMaxDebt(icol1, 100 * COL1);
+        var collateral_spend = 100000;
+
+        var balance_before = col1.balanceOf(vault);
+        var obtained = ss.purchase(icol1, collateral_spend);
+        assertEq(col1.balanceOf(vault) - balance_before, collateral_spend);
+    }
+    function testPurchaseTransferToCaller() {
+        // stablecoin transferred from caller
+        ss.setMaxDebt(icol1, 100 * COL1);
+        var collateral_spend = 100000;
+
+        var balance_before = ss.balanceOf(this);
+        var obtained = ss.purchase(icol1, collateral_spend);
+        var balance_after = ss.balanceOf(this);
+
+        assertEq(balance_after - balance_before, 999000);
+    }
+    function testPurchaseCreatesCoin() {
+        ss.setMaxDebt(icol1, 100 * COL1);
+        var collateral_spend = 100000;
+
+        var supply_before = ss.totalSupply();
+        var obtained = ss.purchase(icol1, collateral_spend);
+        var supply_after = ss.totalSupply();
+
+        assertEq(supply_after - supply_before, 999000);
+    }
+    function testRedeemTransferToCaller() {
+        ss.setMaxDebt(icol1, 100 * COL1);
+        var collateral_spend = 100000;
+        var obtained = ss.purchase(icol1, collateral_spend);
+
+        var balance_before = col1.balanceOf(this);
+        var returned = ss.redeem(icol1, obtained);
+        var balance_after = col1.balanceOf(this);
+
+        assertEq(balance_after - balance_before, returned);
+        assertEq(balance_after - balance_before, 99800);
+    }
+    function testRedeemTransferFromVault() {
+        ss.setMaxDebt(icol1, 100 * COL1);
+        var collateral_spend = 100000;
+        var obtained = ss.purchase(icol1, collateral_spend);
+
+        var balance_before = col1.balanceOf(vault);
+        var returned = ss.redeem(icol1, obtained);
+        var balance_after = col1.balanceOf(vault);
+
+        assertEq(balance_before - balance_after, 99800);
+    }
+    function testRedeemTransferFromCaller() {
+        // stablecoin transferred from caller
+        ss.setMaxDebt(icol1, 100 * COL1);
+        var collateral_spend = 100000;
+        var obtained = ss.purchase(icol1, collateral_spend);
+
+        var balance_before = ss.balanceOf(this);
+        var returned = ss.redeem(icol1, obtained);
+        var balance_after = ss.balanceOf(this);
+
+        assertEq(balance_before - balance_after, 999000);
+    }
+    function testRedeemDestroysCoin() {
+        ss.setMaxDebt(icol1, 100 * COL1);
+        var collateral_spend = 100000;
+        var obtained = ss.purchase(icol1, collateral_spend);
+
+        var supply_before = ss.totalSupply();
+        var returned = ss.redeem(icol1, obtained);
+        var supply_after = ss.totalSupply();
+
+        assertEq(supply_before - supply_after, 999000);
+    }
 }
