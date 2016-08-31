@@ -5,7 +5,8 @@ import "feedbase/feedbase.sol";
 import "sensible.sol";
 
 contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
-    uint public constant UNIT = 10**18;
+    // precision of the price feed
+    uint public constant PRICE_UNIT = 10**18;
 
     address    public  owner;
     Feedbase   public  feedbase;
@@ -142,8 +143,8 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
 
         var price = getPrice(t.feed);
         var mark_price = price + price / t.spread;
-        assert(safeToMul(UNIT, pay_how_much));
-        issued_quantity = (UNIT * pay_how_much) / mark_price;
+        assert(safeToMul(PRICE_UNIT, pay_how_much));
+        issued_quantity = (PRICE_UNIT * pay_how_much) / mark_price;
 
         assert(safeToAdd(_balances[msg.sender], issued_quantity));
         _balances[msg.sender] += issued_quantity;
@@ -176,7 +177,7 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
         var price = getPrice(t.feed);
         var mark_price = price - price / t.spread;
         assert(safeToMul(stablecoin_quantity, mark_price));
-        returned_amount = (stablecoin_quantity * mark_price) / UNIT;
+        returned_amount = (stablecoin_quantity * mark_price) / PRICE_UNIT;
 
         assert(t.token.transferFrom(t.vault, msg.sender, returned_amount));
 
