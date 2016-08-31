@@ -16,6 +16,14 @@ withdrawing too much collateral. There are many different ways to handle
 these failure modes, which must be decided and written by each owner
 contract.
 
+This simplecoin has three permissioned user classes: "owner",
+"issuer" and "holder". The *owner* can manage collateral types,
+including registration, debt celings and price feeds. *Issuers* can
+exchange collateral for simplecoins and form the link with *holders*,
+who are able to use the simplecoin as an ERC20 token.  All questions
+of access and authentication are left up to the contract deployer,
+who can configure this as they wish.
+
 The code is as simple as possible to reduce the cost of independent
 verification. It is just a building block that needs to be carefully
 constrained. It is also completely unsuitable for maintaining price
