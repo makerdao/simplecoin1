@@ -4,9 +4,7 @@ Simplecoin
 See HACKING.md for pointers on how to work on the UI.
 
 A simplecoin is one type of stablecoin which can be run by an
-individual, organization, or even a ["The TAO"][the-tao].
-
-[the-tao]: https://ryepdx.github.io/the-tao/
+individual or organization.
 
 It uses a reduced Token collateral model controlled by an owner address.
 In the simplest case, stablecoin holders have no protections against
@@ -16,9 +14,7 @@ Some example failure modes are never refreshing the price (lost key /
 locked out contract), setting a bad a price (or "insider trading"), or
 withdrawing too much collateral. There are many different ways to handle
 these failure modes, which must be decided and written by each owner
-contract. Or, [just trust Bob][bob].
-
-[bob]: http://intheoreum.org
+contract.
 
 The code is as simple as possible to reduce the cost of independent
 verification. It is just a building block that needs to be carefully
