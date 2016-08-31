@@ -8,13 +8,13 @@ individual, organization, or even a ["The TAO"][the-tao].
 
 [the-tao]: https://ryepdx.github.io/the-tao/
 
-It uses a reduced ETH collateral model controlled by an owner address.
+It uses a reduced Token collateral model controlled by an owner address.
 In the simplest case, stablecoin holders have no protections against
 the owner, but constraints can be encoded in the owner as a contract.
 
 Some example failure modes are never refreshing the price (lost key /
 locked out contract), setting a bad a price (or "insider trading"), or
-withdrawing too much Ether. There are many different ways to handle
+withdrawing too much collateral. There are many different ways to handle
 these failure modes, which must be decided and written by each owner
 contract. Or, [just trust Bob][bob].
 
