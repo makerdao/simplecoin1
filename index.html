@@ -13,28 +13,31 @@
 </header>
 
 <section id=explanation>
-  <p> A “simple stablecoin” (see <a target=_blank
-  href=https://github.com/makerdao/simple-stablecoin>makerdao/simple-stablecoin</a>)
-  is one type of stablecoin which can be run by an individual, organization,
-  or even a <a target=_blank href=https://ryepdx.github.io/the-tao/>The
-  TAO</a>.
+  <p>A simplecoin is one type of stablecoin which can be run by an individual or
+  organization.
 
-  <p> It uses a reduced ETH collateral model controlled by an owner address.
-  In the simplest case, stablecoin holders have no protections against the
-  owner, but constraints can be encoded in the owner as a contract.
+  <p>It uses a reduced Token collateral model controlled by an owner address. In
+  the simplest case, stablecoin holders have no protections against the owner,
+  but constraints can be encoded in the owner as a contract.
 
   <p> Some example failure modes: never refreshing the price (getting locked
   out of the contract, losing the key, etc.); setting a bad a price (or
   “insider trading”); withdrawing too much ETH.  There are many different
   ways to handle these failure modes, but this code must be decided on and
-  written by each contract owner.  Or, <a target=_blank
-  href=http://intheoreum.org>just trust Bob</a>.
+  written by each contract owner.
 
-  <p> The code is as simple as possible to reduce the cost of independent
-  verification.  It is just a building block that needs to be carefully
-  constrained.  It is also completely unsuitable for maintaining price
-  stability at scale, besides also being unsuitable for any purpose
-  in general.
+  <p>This simplecoin has three permissioned user classes: ”owner”;, ”issuer”
+  and ”holder”. The <em>owner</em> can manage collateral types, including
+  registration, debt celings and price feeds.  <em>Issuers</em> can exchange
+  collateral for simplecoins and form the link with <em>holders</em>, who are
+  able to use the simplecoin as an ERC20 token.  All questions of access and
+  authentication are left up to the contract deployer, who can configure this
+  as they wish.
+
+  <p>The code is as simple as possible to reduce the cost of independent
+  verification. It is just a building block that needs to be carefully
+  constrained. It is also completely unsuitable for maintaining price stability
+  at scale, besides also being unsuitable for any purpose in general.
 
   <p> The idea is to give potential <a target=_blank
   href=http://feedbase.io>oracles</a>, <a target=_blank
@@ -80,7 +83,7 @@
     </div>
   </form>
 </section>
-    
+
 <section data-when=loaded>
   <h3>List of stablecoins created by this factory</h3>
   <div data-view=stablecoins></div>
