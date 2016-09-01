@@ -133,11 +133,22 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
         _
     }
 
+    modifier zeroguard(uint48 collateral_type) {
+        var t = types[collateral_type];
+        assert(t.token != address(0));
+        assert(t.vault != address(0));
+        assert(t.feed  != 0);
+        _
+    }
+
     function issue(uint48 collateral_type, uint pay_how_much)
-        auth_issuer noeth synchronized returns (uint issued_quantity)
+        auth_issuer
+        zeroguard(collateral_type)
+        noeth
+        synchronized
+        returns (uint issued_quantity)
     {
         var t = types[collateral_type];
-        assert(t.token != address(0));  // deleted
 
         assert(t.token.transferFrom(msg.sender, t.vault, pay_how_much));
 
@@ -160,7 +171,11 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
     }
 
     function cover(uint48 collateral_type, uint stablecoin_quantity)
-        auth_issuer noeth synchronized returns (uint returned_amount)
+        auth_issuer
+        zeroguard(collateral_type)
+        noeth
+        synchronized
+        returns (uint returned_amount)
     {
         var t = types[collateral_type];
         assert(t.token != address(0));  // deleted
