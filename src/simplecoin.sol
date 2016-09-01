@@ -178,7 +178,6 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
         returns (uint returned_amount)
     {
         var t = types[collateral_type];
-        assert(t.token != address(0));  // deleted
 
         assert(safeToSub(_balances[msg.sender], stablecoin_quantity));
         _balances[msg.sender] -= stablecoin_quantity;
