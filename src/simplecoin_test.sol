@@ -1,6 +1,7 @@
 import "dapple/test.sol";
 import "erc20/base.sol";
 import "feedbase/feedbase.sol";
+import "ds-roles/role_auth.sol";
 
 import "simplecoin.sol";
 import "simplecoin_factory.sol";
@@ -18,8 +19,6 @@ contract SimplecoinTest is Test {
     uint constant COIN = 1;
 
     Simplecoin   coin;
-    Whitelist    issuers;
-    Whitelist    holders;
     Feedbase     feedbase;
     Vault        vault;
     ERC20        col1;
@@ -27,20 +26,10 @@ contract SimplecoinTest is Test {
     uint24       feed1;
 
     function setUp() {
-        issuers = new Whitelist();
-        issuers.setWhitelisted(this, true);
-
-        holders = new Whitelist();
-        holders.setWhitelisted(this, true);
-
         feedbase = new Feedbase();
-        coin = new Simplecoin(feedbase, 0, issuers, holders);
+        var rules = bytes32("no rules!");
 
-        issuers.setWhitelisted(coin, true);
-        issuers.setEnabled(true);
-
-        holders.setWhitelisted(coin, true);
-        holders.setEnabled(true);
+        coin = new Simplecoin(feedbase, rules);
 
         col1 = new ERC20Base(10**24 * COL1);
         col1.approve(coin, 10**24 * COL1);
@@ -62,12 +51,11 @@ contract SimplecoinTest is Test {
     function testFactoryBuildsNonTestableVersionToo() {
         var factory = new SimplecoinFactory();
         var coin = factory.create(feedbase, "some rules");
-        assertEq(this, coin.owner());
         // TODO: check authority setup
     }
 
-    function testCreatorIsOwner() {
-        assertEq(this, coin.owner());
+    function testCreatorHasAuthority() {
+        assertEq(this, coin._authority());
     }
 
     function testBasics() {

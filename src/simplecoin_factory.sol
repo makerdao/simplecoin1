@@ -9,14 +9,11 @@ contract SimplecoinFactory is DSAuthUser {
 
     function create(
         Feedbase   feedbase,
-        bytes32    rules
-    ) returns (Simplecoin result) {
-        var issuers = new Whitelist();
-        var holders = new Whitelist();
-        setOwner(issuers, msg.sender);
-        setOwner(holders, msg.sender);
-        result = new Simplecoin(feedbase, rules, issuers, holders);
-        result.setOwner(msg.sender);
-        coins[count++] = result;
+        bytes32    rules,
+        DSRoleAuth authority
+    ) returns (Simplecoin coin) {
+        coin = new Simplecoin(feedbase, rules);
+        coin.updateAuthority(authority, DSAuthModesEnum.DSAuthModes.Authority);
+        coins[count++] = coin;
     }
 }

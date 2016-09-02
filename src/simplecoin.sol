@@ -1,4 +1,4 @@
-import "ds-whitelist/whitelist.sol";
+import "ds-roles/role_auth.sol";
 import "erc20/base.sol";
 import "erc20/erc20.sol";
 import "feedbase/feedbase.sol";
@@ -8,11 +8,8 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
     // precision of the price feed
     uint public constant PRICE_UNIT = 10**18;
 
-    address    public  owner;
-    Feedbase   public  feedbase;
-    bytes32    public  rules;
-    Whitelist  public  issuers;
-    Whitelist  public  holders;
+    Feedbase    public  feedbase;
+    bytes32     public  rules;
 
     CollateralType[] types;
 
@@ -26,20 +23,11 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
     }
 
     function Simplecoin(
-        Feedbase   _feedbase,
-        bytes32    _rules,
-        Whitelist  _issuers,
-        Whitelist  _holders
+        Feedbase    _feedbase,
+        bytes32     _rules
     ) {
-        owner    = msg.sender;
-        feedbase = _feedbase;
-        rules    = _rules;
-        issuers  = _issuers;
-        holders  = _holders;
-    }
-
-    function setOwner(address new_owner) noeth auth {
-        owner = new_owner;
+        feedbase  = _feedbase;
+        rules     = _rules;
     }
 
     //------------------------------------------------------
@@ -109,29 +97,19 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
 
     //------------------------------------------------------
 
-    modifier auth_holder(address who) {
-        assert(holders.isWhitelisted(who));
-        _
-    }
-
     function transfer(address to, uint amount)
-        auth_holder(msg.sender) auth_holder(to) returns (bool)
+        auth returns (bool)
     {
         return super.transfer(to, amount);
     }
 
     function transferFrom(address from, address to, uint amount)
-        auth_holder(from) auth_holder(to) returns (bool)
+        auth returns (bool)
     {
         return super.transferFrom(from, to, amount);
     }
 
     //------------------------------------------------------
-
-    modifier auth_issuer() {
-        assert(issuers.isWhitelisted(msg.sender));
-        _
-    }
 
     modifier zeroguard(uint48 collateral_type) {
         var t = types[collateral_type];
@@ -142,7 +120,7 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
     }
 
     function issue(uint48 collateral_type, uint pay_how_much)
-        auth_issuer
+        auth
         zeroguard(collateral_type)
         noeth
         synchronized
@@ -171,7 +149,7 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
     }
 
     function cover(uint48 collateral_type, uint stablecoin_quantity)
-        auth_issuer
+        auth
         zeroguard(collateral_type)
         noeth
         synchronized
