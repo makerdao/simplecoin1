@@ -16,13 +16,11 @@ withdrawing too much collateral. There are many different ways to handle
 these failure modes, which must be decided and written by each owner
 contract.
 
-This simplecoin has three permissioned user classes: "owner",
-"issuer" and "holder". The *owner* can manage collateral types,
-including registration, debt celings and price feeds. *Issuers* can
-exchange collateral for simplecoins and form the link with *holders*,
-who are able to use the simplecoin as an ERC20 token.  All questions
-of access and authentication are left up to the contract deployer,
-who can configure this as they wish.
+This simplecoin uses a flexible [access control system][ds-auth] to
+limit public access. This system can be completely configured by the
+contract deployer; see [below](#authentication) for more details.
+
+[ds-auth]: https://github.com/nexusdev/ds-auth
 
 The code is as simple as possible to reduce the cost of independent
 verification. It is just a building block that needs to be carefully
@@ -40,21 +38,42 @@ refinement.
 [makers]: https://github.com/makerdao/maker-market-matcher
 
 
+Authentication
+--------------
+
+Unrestricted token access is scary! Therefore, the default for this
+simplecoin is to only allow access to the owner (the contract
+deployer). This isn't completely useless: for example, the owner
+could use this for pre-allocation of user balances before enabling
+public access.
+
+A more flexible model is Role-Based Access Control, creating
+distinct classes of user with different permissions. Simplecoins
+deployed using the factory come with a simple pre-configured RBAC
+that has three classes: "owner", "issuer" and "holder".
+
+The *owner* can manage collateral types, including registration,
+debt celings and price feeds; *issuers* can exchange collateral for
+simplecoins (issue / cover) and form the link with *holders*, who
+are able to use the simplecoin as an ERC20 token.
+
+All questions of allocation to these user classes are left up to the
+contract deployer, who can configure this as they wish.
+
+The factory also allows creation of a Simplecoin with an arbitrary,
+user-supplied authority.
+
+
 Using
----
+-----
 
 
-Setting up the coin, with a feed, rules and whitelists:
+Setting up the coin, with a feed and rules:
 
 ```
 var fb = Feedbase(0x...);  // feedbase instance
 var rules = "http://link.to.rules";  // arbitrary rules the owner is working by
-
-var permission_factory = WhitelistFactory();  // unrestricted access is scary!
-var issuers = permission_factory.createWhitelist();
-var holders = permission_factory.createWhitelist();
-
-var coin = factory.newSimpleStablecoin();
+var coin = Simplecoin(feedbase, rules);
 ```
 
 Registration of collateral assets (owner only):
