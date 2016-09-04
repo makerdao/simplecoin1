@@ -341,4 +341,12 @@ contract SimpleAuthTest is Test {
         Simplecoin(issuer).transfer(holder, 50);
         Simplecoin(holder).transfer(unauthorised, 25);
     }
+    function testFailNonHolderTransfer() {
+        Tester unauthorised = new Tester();
+        unauthorised._target(coin);
+
+        Simplecoin(issuer).issue(_id, 100);
+        Simplecoin(issuer).approve(unauthorised, 100);
+        Simplecoin(unauthorised).transferFrom(issuer, holder, 25);
+    }
 }
