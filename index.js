@@ -13,9 +13,8 @@ fetch.coins = $ => begin([
     (address, $) => parallel({
       props: bind(extract_contract_props, chain.Simplecoin, address),
       balance: $ => Simplecoin(address).balanceOf(coinbase(), $),
-      whitelisted: $ => Simplecoin(address).whitelist(coinbase(), $),
-    }, hopefully(({ props, whitelisted, balance }) => {
-      $(null, assign(props, { whitelisted, balance }))
+    }, hopefully(({ props, balance }) => {
+      $(null, assign(props, { balance }))
     })),
     (x, $) => times(Number(x.nextType), (i, $) => parallel(fold(words(`
       token feed vault spread debt ceiling
@@ -44,18 +43,18 @@ let owner_view = ({ address, owner }) => div({}, [
   }, ["Transfer"]),
 ])
 
-let whitelist_view = ({ address, owner, whitelisted }) => div({}, [
-  whitelisted ? "Yes" : "No",
-  small({ style: { marginLeft: ".5rem" } }, [
-    " (cannot display whole whitelist)"
-  ]),
-  div({ style: { float: "right" } }, owner == coinbase() ? [a({
-    onClick: () => add_whitelist(address),
-  }, ["Add"]), " ", a({
-    style: { marginLeft: ".25rem" },
-    onClick: () => remove_whitelist(address),
-  }, ["Remove"])] : [])
-])
+// let whitelist_view = ({ address, owner, whitelisted }) => div({}, [
+//   whitelisted ? "Yes" : "No",
+//   small({ style: { marginLeft: ".5rem" } }, [
+//     " (cannot display whole whitelist)"
+//   ]),
+//   div({ style: { float: "right" } }, owner == coinbase() ? [a({
+//     onClick: () => add_whitelist(address),
+//   }, ["Add"]), " ", a({
+//     style: { marginLeft: ".25rem" },
+//     onClick: () => remove_whitelist(address),
+//   }, ["Remove"])] : [])
+// ])
 
 let balance_view = ({ address, balance }) => div({}, [
   Number(balance),
@@ -105,11 +104,11 @@ views.coins = ({ coins=[] }) => {
     "Feedbase":         x => feedbase(x.feedbase),
     "Owner":            x => owner_view(x),
     "Rules":            x => ascii(x.rules),
-    "Whitelisted":      x => whitelist_view(x),
+    "Whitelisted":      x => "[TODO]", // whitelist_view(x),
     "Total supply":     x => Number(x.totalSupply),
     "Your balance":     x => Number(x.balance),
     "Collateral types": x => [
-      Number(x.type_count), table_list(x.types, {
+      Number(x.nextType), table_list(x.types, {
         "Collateral type":  y => type_id_view(x, y),
         "Token":            y => code({}, [y.token]),
         "Vault":            y => code({}, [y.vault]),

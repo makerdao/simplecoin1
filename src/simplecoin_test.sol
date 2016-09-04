@@ -61,7 +61,7 @@ contract SimplecoinTest is Test {
 
     function testFactoryBuildsNonTestableVersionToo() {
         var factory = new SimplecoinFactory();
-        var coin = factory.create(feedbase, "some rules", issuers, holders);
+        var coin = factory.create(feedbase, "some rules");
         assertEq(this, coin.owner());
         // TODO: check authority setup
     }

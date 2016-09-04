@@ -8,4 +8,4 @@ environments:
     objects:
       factory:
         class: SimplecoinFactory
-        address: '0x76bf489ffbb49679531b0ab98b32009d7fd87178'
+        address: '0x9e21fb8014e240560258f5ac5fbc4f6185e2ed7c'
