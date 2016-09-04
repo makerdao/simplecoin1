@@ -23,6 +23,7 @@ contract SimplecoinFactory is DSAuthUser {
     ) returns (Simplecoin coin) {
         coin = new Simplecoin(feedbase, rules);
         DSRoleAuth authority = new SimpleRoleAuth(coin);
+        authority.updateAuthority(msg.sender, DSAuthModesEnum.DSAuthModes.Owner);
         coin.updateAuthority(authority, DSAuthModesEnum.DSAuthModes.Authority);
         coins[count++] = coin;
     }
@@ -43,23 +44,23 @@ contract SimpleRoleAuth is DSRoleAuth {
         setUserRole(owner, holder, true);
 
         // == admin
-        setRoleCapability(admin, target, sig("register(ERC20)"), true);
+        setRoleCapability(admin, target, sig("register(address)"), true);
         setRoleCapability(admin, target, sig("setVault(uint48,address)"), true);
         setRoleCapability(admin, target, sig("setFeed(uint48,uint24)"), true);
-        setRoleCapability(admin, target, sig("setSpread(uint48,uint)"), true);
-        setRoleCapability(admin, target, sig("setCeiling(uint48,uint)"), true);
+        setRoleCapability(admin, target, sig("setSpread(uint48,uint256)"), true);
+        setRoleCapability(admin, target, sig("setCeiling(uint48,uint256)"), true);
         setRoleCapability(admin, target, sig("unregister(uint48)"), true);
 
         // == issuer
-        setRoleCapability(issuer, target, sig("issue(uint48,uint)"), true);
-        setRoleCapability(issuer, target, sig("cover(uint48,uint)"), true);
+        setRoleCapability(issuer, target, sig("issue(uint48,uint256)"), true);
+        setRoleCapability(issuer, target, sig("cover(uint48,uint256)"), true);
 
         // == holder
-        setRoleCapability(holder, target, sig("transfer(address,uint)"), true);
-        setRoleCapability(holder, target, sig("transferFrom(address,address,uint)"), true);
+        setRoleCapability(holder, target, sig("transfer(address,uint256)"), true);
+        setRoleCapability(holder, target, sig("transferFrom(address,address,uint256)"), true);
     }
 
-    function sig(string name) internal returns (bytes4) {
+    function sig(string name) constant returns (bytes4) {
         return bytes4(sha3(name));
     }
 
