@@ -83,9 +83,4 @@ contract SimpleRoleAuth is DSRoleAuth {
         bytes32 shifted = bytes32(uint256(uint256(2) ** uint256(role)));
         return bytes32(0) != roles & shifted;
     }
-
-    function canReceive(address who, uint amount) constant returns (bool) {
-        // only holders can receive coin
-        return hasUserRole(who, holder);
-    }
 }

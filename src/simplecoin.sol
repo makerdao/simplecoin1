@@ -4,11 +4,6 @@ import "erc20/erc20.sol";
 import "feedbase/feedbase.sol";
 import "sensible.sol";
 
-// Simplecoin authorities must expose this api
-contract CoinAuth is DSAuthority {
-    // test whether a transfer recipient is allowed to hold coin
-    function canReceive(address who, uint amount) returns (bool);
-}
 
 contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
     // precision of the price feed
@@ -107,8 +102,11 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
 
     //------------------------------------------------------
 
+    bytes4 transfer_sig = bytes4(sha3("transfer(address,uint256)"));
+
     modifier transfer_auth(address to, uint amount) {
-        assert(CoinAuth(_authority).canReceive(to, amount));
+        // transfer recipients must also be able to call transfer
+        assert(DSAuthority(_authority).canCall(to, this, transfer_sig));
         _
     }
 
