@@ -13,7 +13,7 @@ contract SimplecoinFactory is DSAuthUser {
         DSAuthority authority
     ) returns (Simplecoin coin) {
         coin = new Simplecoin(feedbase, rules);
-        coin.updateAuthority(authority, DSAuthModesEnum.DSAuthModes.Authority);
+        setAuthority(coin, authority);
         coins[count++] = coin;
     }
 
@@ -23,8 +23,8 @@ contract SimplecoinFactory is DSAuthUser {
     ) returns (Simplecoin coin) {
         coin = new Simplecoin(feedbase, rules);
         DSRoleAuth authority = new SimpleRoleAuth(coin);
-        authority.updateAuthority(msg.sender, DSAuthModesEnum.DSAuthModes.Owner);
-        coin.updateAuthority(authority, DSAuthModesEnum.DSAuthModes.Authority);
+        setOwner(authority, msg.sender);
+        setAuthority(coin, authority);
         coins[count++] = coin;
     }
 }
