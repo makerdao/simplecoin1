@@ -61,21 +61,11 @@ All questions of allocation to these user classes are left up to the
 contract deployer, who can configure this as they wish.
 
 The factory also allows creation of a Simplecoin with an arbitrary,
-user-supplied authority. This authority needs to implement two
-public methods:
-
-1. `canCall(address caller, address callee, bytes4 sig) returns (bool)`
-  - determines whether `caller` can call the function with signature
-    `sig` at address `callee`.
-2. `canReceive(address who, uint amount)`
-  - determines whether `who` can receive `amount` via a `transfer` or
-    `transferFrom` call.
-
-`canCall` is tested for calls to any non-constant public function,
-controlling selective user access.
-`canReceive` is tested on calls to `transfer` and `transferFrom`,
-controlling ERC20 interactions.
-
+user-supplied authority implementing `canCall(address caller,
+address callee, bytes4 sig) returns (bool)`. `canCall` determines
+whether `caller` can call the function with signature `sig` at
+address `callee`, and is tested for calls to any non-constant public
+function, controlling selective user access.
 
 Using
 -----
