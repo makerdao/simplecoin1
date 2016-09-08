@@ -8,14 +8,24 @@ let feedbase = x => x == chain.feedbase.address ? "Standard" : code({}, [x])
 let own = x => x.owner == coinbase()
 
 fetch.coins = $ => begin([
-  chain.factory.count, (n, $) => times(n, (i, $) => begin([
+  chain.factory.count,
+  (n, $) => times(n, (i, $) => begin([
+
     bind(chain.factory.coins, i),
+
     (address, $) => parallel({
       props: bind(extract_contract_props, chain.Simplecoin, address),
       balance: $ => Simplecoin(address).balanceOf(coinbase(), $),
     }, hopefully(({ props, balance }) => {
       $(null, assign(props, { balance }))
     })),
+
+    (props, $) => parallel({
+      roles : bind(extract_authority_roles, props),
+    }, hopefully(({ roles }) => {
+      $(null, assign(props, { roles }))
+    })),
+
     (x, $) => times(Number(x.nextType), (i, $) => parallel(fold(words(`
       token feed vault spread debt ceiling
     `), { id: always(i) }, (result, name) => assign(result, {
@@ -35,6 +45,16 @@ function extract_contract_props(type, address, $) {
   parallel(assign(select(contract, names), convert({ address }, always)), $)
 }
 
+function extract_authority_roles(props, $) {
+  let role_auth = chain.SimpleRoleAuth.at(props.authority)
+  parallel(
+    { admin:  bind(role_auth.isAdmin,  coinbase()),
+      issuer: bind(role_auth.isIssuer, coinbase()),
+      holder: bind(role_auth.isHolder, coinbase()),
+    },
+  $)
+}
+
 let owner_view = ({ address, owner }) => div({}, [
   owner == coinbase() ? "You" : code({}, [owner]),
   owner == coinbase() && a({
@@ -43,18 +63,11 @@ let owner_view = ({ address, owner }) => div({}, [
   }, ["Transfer"]),
 ])
 
-// let whitelist_view = ({ address, owner, whitelisted }) => div({}, [
-//   whitelisted ? "Yes" : "No",
-//   small({ style: { marginLeft: ".5rem" } }, [
-//     " (cannot display whole whitelist)"
-//   ]),
-//   div({ style: { float: "right" } }, owner == coinbase() ? [a({
-//     onClick: () => add_whitelist(address),
-//   }, ["Add"]), " ", a({
-//     style: { marginLeft: ".25rem" },
-//     onClick: () => remove_whitelist(address),
-//   }, ["Remove"])] : [])
-// ])
+let role_view = ({ roles }) => div({}, [
+  roles.admin  && " [Admin] ",
+  roles.issuer && " [Issuer] ",
+  roles.holder && " [Holder] ",
+])
 
 let balance_view = ({ address, balance }) => div({}, [
   Number(balance),
@@ -118,7 +131,7 @@ views.coins = ({ coins=[] }) => {
     "Feedbase":         x => feedbase(x.feedbase),
     "Owner":            x => owner_view(x),
     "Rules":            x => ascii(x.rules),
-    "Whitelisted":      x => "[TODO]", // whitelist_view(x),
+    "Your roles":       x => role_view(x),
     "Total supply":     x => Number(x.totalSupply),
     "Your balance":     x => Number(x.balance),
     "Collateral types": x => [
@@ -185,8 +198,6 @@ function create_coin() {
   send(chain.factory.create, [
     chain.feedbase.address,
     hex(state.rules),
-    // TODO: issuer whitelist
-    // TODO: holder whitelist
   ], hopefully(tx => {
     alert(`Transaction created: ${tx}`)
     update({ rules: "" })
@@ -276,28 +287,6 @@ function cover(address, id) {
   let x = prompt(`Cover how many coins with this collateral type?`)
   if (Number(x)) {
     send(Simplecoin(address).cover, [id, Number(x)], hopefully(tx => {
-      alert(`Transaction created: ${tx}`)
-    }))
-  }
-}
-
-//----------------------------------------------------------
-
-// TODO: deprecated
-function add_whitelist(address) {
-  let x = prompt(`Add which address to whitelist for ${address}?`)
-  if (x) {
-    send(Simplecoin(address).setWhitelist, [x, true], hopefully(tx => {
-      alert(`Transaction created: ${tx}`)
-    }))
-  }
-}
-
-// TODO: deprecated
-function remove_whitelist(address) {
-  let x = prompt(`Remove which address from whitelist for ${address}?`)
-  if (x) {
-    send(Simplecoin(address).setWhitelist, [x, false], hopefully(tx => {
       alert(`Transaction created: ${tx}`)
     }))
   }
