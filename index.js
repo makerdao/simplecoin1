@@ -72,11 +72,25 @@ let type_id_view = ({ address }, { id, token }) => div({}, [
   }, ["Cancel collateral type"]) : small({}, ["(cancelled)"])])
 ])
 
+let vault_view = ({ address }, { id, token, vault }) => div({}, [
+  code({}, vault), !!Number(token) && a({
+    style: { float: "right" },
+    onClick: () => set_vault(address, id),
+  }, ["Change vault"])
+])
+
 let feed_view = ({ address }, { id, token, feed }) => div({}, [
   Number(feed), !!Number(token) && a({
     style: { float: "right" },
     onClick: () => set_feed(address, id),
   }, ["Change price feed"])
+])
+
+let spread_view = ({ address }, { id, token, spread }) => div({}, [
+  Number(spread), !!Number(token) && a({
+    style: { float: "right" },
+    onClick: () => set_spread(address, id),
+  }, ["Change spread"])
 ])
 
 let ceiling_view = ({ address }, { id, token, ceiling }) => div({}, [
@@ -111,9 +125,9 @@ views.coins = ({ coins=[] }) => {
       Number(x.nextType), table_list(x.types, {
         "Collateral type":  y => type_id_view(x, y),
         "Token":            y => code({}, [y.token]),
-        "Vault":            y => code({}, [y.vault]),
+        "Vault":            y => vault_view(x, y),
         "Price feed":       y => feed_view(x, y),
-        "Spread":           y => Number(y.spread),
+        "Spread":           y => spread_view(x, y),
         "Debt ceiling":     y => ceiling_view(x, y),
         "Debt":             y => Number(y.debt),
         "Your balance":     y => collateral_balance_view(x, y),
@@ -203,7 +217,14 @@ function register(address) {
   }))
 }
 
-// TODO: set_vault
+function set_vault(address, id) {
+  let new_value = prompt(`New vault for collateral type ${id}:`)
+  if (Number(new_value)) {
+    send(Simplecoin(address).setVault, [id, new_value], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
 
 function set_feed(address, id) {
   let new_value = prompt(`New price feed for collateral type ${id}:`)
@@ -214,7 +235,14 @@ function set_feed(address, id) {
   }
 }
 
-// TODO: set_spread
+function set_spread(address, id) {
+  let new_value = prompt(`New spread for collateral type ${id}:`)
+  if (Number(new_value)) {
+    send(Simplecoin(address).setSpread, [id, new_value], hopefully(tx => {
+      alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
 
 function set_ceiling(address, id) {
   let new_value = prompt(`New debt ceiling for collateral type ${id}:`)
