@@ -35,6 +35,10 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
         return _authority;
     }
 
+    function owner() constant returns (address) {
+        return DSAuth(_authority)._authority();
+    }
+
     //------------------------------------------------------
 
     function nextType() constant returns (uint48) {

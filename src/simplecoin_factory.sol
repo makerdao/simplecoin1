@@ -7,24 +7,21 @@ contract SimplecoinFactory is DSAuthUser {
     mapping (uint => Simplecoin)  public  coins;
     uint                          public  count;
 
-    function create(
-        Feedbase    feedbase,
-        bytes32     rules,
-        DSAuthority authority
-    ) returns (Simplecoin coin) {
+    function create(Feedbase feedbase, bytes32 rules)
+        returns (Simplecoin coin)
+    {
         coin = new Simplecoin(feedbase, rules);
-        setAuthority(coin, authority);
-        coins[count++] = coin;
-    }
 
-    function create(
-        Feedbase   feedbase,
-        bytes32    rules
-    ) returns (Simplecoin coin) {
-        coin = new Simplecoin(feedbase, rules);
-        DSRoleAuth authority = new SimpleRoleAuth(coin);
+        SimpleRoleAuth authority = new SimpleRoleAuth(coin);
+
+        // coin creator has all roles by default
+        authority.addAdmin(msg.sender);
+        authority.addIssuer(msg.sender);
+        authority.addHolder(msg.sender);
         setOwner(authority, msg.sender);
+
         setAuthority(coin, authority);
+
         coins[count++] = coin;
     }
 }
@@ -36,13 +33,6 @@ contract SimpleRoleAuth is DSRoleAuth {
     uint8 public holder = 2;
 
     function SimpleRoleAuth(address target) {
-        address owner = msg.sender;
-
-        // owner can do everything by default
-        setUserRole(owner, admin, true);
-        setUserRole(owner, issuer, true);
-        setUserRole(owner, holder, true);
-
         // == admin
         setRoleCapability(admin, target, sig("register(address)"), true);
         setRoleCapability(admin, target, sig("setVault(uint48,address)"), true);
@@ -75,6 +65,16 @@ contract SimpleRoleAuth is DSRoleAuth {
     }
     function addHolder(address who) {
         setUserRole(who, holder, true);
+    }
+
+    function isAdmin(address who) constant returns (bool) {
+        return hasUserRole(who, admin);
+    }
+    function isIssuer(address who) constant returns (bool) {
+        return hasUserRole(who, issuer);
+    }
+    function isHolder(address who) constant returns (bool) {
+        return hasUserRole(who, holder);
     }
 
     // TODO: add this upstream
