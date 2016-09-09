@@ -101,12 +101,6 @@ let role_view = ({ roles }) => div({}, [
 
 let balance_view = ({ address, balance, roles }) => div({}, [
   Number(balance),
-  roles.issuer && div({ style: { float: "right" } }, [a({
-    onClick: () => issue(address),
-  }, ["Issue"]), " ", a({
-    style: { marginLeft: ".25rem" },
-    onClick: () => cover(address),
-  }, ["Cover"])])
 ])
 
 let type_id_view = ({ address, roles }, { id, token }) => div({}, [
@@ -161,15 +155,16 @@ let collateral_balance_view = (
   { address, roles }, { id, token, balance }
 ) => div({}, [
   Number(balance),
-  div({ style: { float: "right" } },
-    roles.issuer && [a({ onClick: () => issue(address, id)
-                       }, ["Issue"]),
-                    " ",
-                     a({ style: { marginLeft: ".25rem" },
-                         onClick: () => cover(address, id),
-                       }, ["Cover"])
-                    ]
-     )
+  div({ style: { float: "right" } }, [
+    roles.issuer && a({ onClick: () => issue(address, id),
+                      }, ["Issue"]),
+    " ",
+    roles.issuer && a({ onClick: () => cover(address, id),
+                      }, ["Cover"]),
+    " ",
+    roles.holder && a({ onClick: () => transfer(address, id),
+                      }, ["Transfer"]),
+  ])
 ])
 
 views.coins = ({ coins=[] }) => {
@@ -313,6 +308,19 @@ function cover(address, id) {
   if (Number(x)) {
     send(Simplecoin(address).cover, [id, Number(x)], hopefully(tx => {
       alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+//----------------------------------------------------------
+
+function transfer(address, id) {
+  let recipient = prompt(`Transfer coins to who?`)
+  let how_much = prompt(`Transfer how many coins?`)
+  if (Number(how_much) && Number(recipient)) {
+    send(Simplecoin(address).transfer,
+         [id, recipient, Number(how_much)],
+         hopefully(tx => { alert(`Transaction created: ${tx}`)
     }))
   }
 }
