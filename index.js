@@ -95,9 +95,28 @@ let owner_view = ({ address, owner }) => div({}, [
 ])
 
 let role_view = ({ roles }) => div({}, [
-  roles.admin  && " [Admin] ",
-  roles.issuer && " [Issuer] ",
-  roles.holder && " [Holder] ",
+    roles.owner  && "Owner | ",
+    roles.admin  && "Admin | ",
+    roles.issuer && "Issuer | ",
+    roles.holder && "Holder",
+])
+
+let role_control_view = ({ roles, authority }) => div({}, [
+  roles.admin && div({ style: { float: "left" }}, [
+    "Admin: ",
+    a({ onClick: () => add_role(authority, "admin"), }, ["Add"]),
+    "/",
+    a({ onClick: () => del_role(authority, "admin"), }, ["Remove"]),
+    " | Issuer: ",
+    a({ onClick: () => add_role(authority, "issuer"), }, ["Add"]),
+    "/",
+    a({ onClick: () => del_role(authority, "issuer"), }, ["Remove"]),
+    "  | Holder: ",
+    a({ onClick: () => add_role(authority, "holder"), }, ["Add"]),
+    "/",
+    a({ onClick: () => del_role(authority, "holder"), }, ["Remove"]),
+  ]),
+  !roles.admin && "Unauthorized",
 ])
 
 let balance_view = ({ address, balance, roles }) => div({}, [
@@ -175,6 +194,7 @@ views.coins = ({ coins=[] }) => {
     "Owner":            x => owner_view(x),
     "Rules":            x => ascii(x.rules),
     "Your roles":       x => role_view(x),
+    "Role Control":     x => role_control_view(x),
     "Total supply":     x => Number(x.totalSupply),
     "Your balance":     x => balance_view(x),
     "Collateral types": x => [
@@ -321,6 +341,48 @@ function transfer(address, id) {
   if (Number(how_much) && Number(recipient)) {
     send(Simplecoin(address).transfer,
          [id, recipient, Number(how_much)],
+         hopefully(tx => { alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+//----------------------------------------------------------
+
+function add_role(authority, role) {
+  let address = prompt(`Address for new ${role}?`)
+  if (role == "admin") {
+    send(chain.SimpleRoleAuth.at(authority).addAdmin,
+         [address],
+         hopefully(tx => { alert(`Transaction created: ${tx}`)
+    }))
+  } else if (role == "issuer") {
+    send(chain.SimpleRoleAuth.at(authority).addIssuer,
+         [address],
+         hopefully(tx => { alert(`Transaction created: ${tx}`)
+    }))
+  } else if (role == "holder") {
+    send(chain.SimpleRoleAuth.at(authority).addHolder,
+         [address],
+         hopefully(tx => { alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+function del_role(authority, role) {
+  let address = prompt(`Address to remove from ${role}?`)
+  if (role == "admin") {
+    send(chain.SimpleRoleAuth.at(authority).delAdmin,
+         [address],
+         hopefully(tx => { alert(`Transaction created: ${tx}`)
+    }))
+  } else if (role == "issuer") {
+    send(chain.SimpleRoleAuth.at(authority).delIssuer,
+         [address],
+         hopefully(tx => { alert(`Transaction created: ${tx}`)
+    }))
+  } else if (role == "holder") {
+    send(chain.SimpleRoleAuth.at(authority).delHolder,
+         [address],
          hopefully(tx => { alert(`Transaction created: ${tx}`)
     }))
   }
