@@ -99,9 +99,9 @@ let role_view = ({ roles }) => div({}, [
   roles.holder && " [Holder] ",
 ])
 
-let balance_view = ({ address, balance }) => div({}, [
+let balance_view = ({ address, balance, roles }) => div({}, [
   Number(balance),
-  div({ style: { float: "right" } }, [a({
+  roles.issuer && div({ style: { float: "right" } }, [a({
     onClick: () => issue(address),
   }, ["Issue"]), " ", a({
     style: { marginLeft: ".25rem" },
@@ -163,7 +163,7 @@ views.coins = ({ coins=[] }) => {
     "Rules":            x => ascii(x.rules),
     "Your roles":       x => role_view(x),
     "Total supply":     x => Number(x.totalSupply),
-    "Your balance":     x => Number(x.balance),
+    "Your balance":     x => balance_view(x),
     "Collateral types": x => [
       Number(x.nextType), table_list(x.types, {
         "Collateral type":  y => type_id_view(x, y),
