@@ -54,26 +54,26 @@ contract SimpleRoleAuth is DSRoleAuth {
         return bytes4(sha3(name));
     }
 
-    function addAdmin(address who) {
+    function addAdmin(address who) auth {
         setUserRole(who, admin, true);
         setUserRole(who, issuer, true);
         setUserRole(who, holder, true);
     }
-    function addIssuer(address who) {
+    function addIssuer(address who) auth {
         setUserRole(who, issuer, true);
         setUserRole(who, holder, true);
     }
-    function addHolder(address who) {
+    function addHolder(address who) auth {
         setUserRole(who, holder, true);
     }
 
-    function delAdmin(address who) {
+    function delAdmin(address who) auth {
         setUserRole(who, admin, false);
     }
-    function delIssuer(address who) {
+    function delIssuer(address who) auth {
         setUserRole(who, issuer, false);
     }
-    function delHolder(address who) {
+    function delHolder(address who) auth {
         setUserRole(who, holder, false);
     }
 
