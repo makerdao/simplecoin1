@@ -111,7 +111,7 @@ let role_control_view = ({ roles, authority }) => div({}, [
     a({ onClick: () => add_role(authority, "issuer"), }, ["Add"]),
     "/",
     a({ onClick: () => del_role(authority, "issuer"), }, ["Remove"]),
-    "  | Holder: ",
+    " | Holder: ",
     a({ onClick: () => add_role(authority, "holder"), }, ["Add"]),
     "/",
     a({ onClick: () => del_role(authority, "holder"), }, ["Remove"]),
@@ -186,8 +186,10 @@ let collateral_balance_view = (
                       }, ["Cover"]),
     " ",
     !!Number(balance) && a({ onClick: () => transfer(token),
-                             style: { float: "right" },
                            }, ["Transfer"]),
+    " ",
+    !!Number(balance) && a({ onClick: () => approve(token, address),
+                           }, ["Approve"]),
   ])
 ])
 
@@ -339,11 +341,22 @@ function cover(address, id) {
 
 //----------------------------------------------------------
 
-function transfer(address) {
+function transfer(token) {
   let recipient = prompt(`Transfer coins to who?`)
   let how_much = prompt(`Transfer how many coins?`)
   if (Number(how_much) && Number(recipient)) {
-    send(Simplecoin(address).transfer,  // should use ERC20
+    send(Simplecoin(token).transfer,  // should use ERC20
+         [id, recipient, Number(how_much)],
+         hopefully(tx => { alert(`Transaction created: ${tx}`)
+    }))
+  }
+}
+
+function approve(token, address='') {
+  let recipient = prompt(`Approve who? (default this simplecoin)`, address)
+  let how_much = prompt(`Approve how much?`)
+  if (Number(how_much) && Number(recipient)) {
+    send(Simplecoin(token).approve,  // should use ERC20
          [id, recipient, Number(how_much)],
          hopefully(tx => { alert(`Transaction created: ${tx}`)
     }))
