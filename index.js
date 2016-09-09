@@ -55,6 +55,36 @@ function extract_authority_roles(props, $) {
   $)
 }
 
+let register_view = ({ address }) => (
+  state[`new_${address}`]
+  ? form({ onSubmit: event => {
+      event.preventDefault()
+      if (confirm(`Register new collateral type?`)) {
+        register(address)
+      }
+    }
+  }, [
+    h4({}, "Register collateral type"),
+    label({}, ["Token address", input({
+      value: state[`new_token_${address}`] || "",
+      onChange: event => update({
+        [`new_token_${address}`]: event.target.value,
+      }),
+    })]),
+    div({ style: { textAlign: "right" } }, [
+      button({}, ["Register collateral type"])
+    ]),
+  ])
+  : div({
+      style: { marginLeft: "1rem", marginTop: "1rem" },
+    },
+    [a({
+      onClick: () => update({ [`new_${address}`]: true }),
+    },
+    ["Register new collateral type"])])
+)
+
+
 let owner_view = ({ address, owner }) => div({}, [
   owner == coinbase() ? "You" : code({}, [owner]),
   owner == coinbase() && a({
@@ -144,29 +174,7 @@ views.coins = ({ coins=[] }) => {
         "Debt ceiling":     y => ceiling_view(x, y),
         "Debt":             y => Number(y.debt),
         "Your balance":     y => collateral_balance_view(x, y),
-      }), own(x) && (state[`new_${x.address}`] ? form({
-        onSubmit: event => {
-          event.preventDefault()
-          if (confirm(`Register new collateral type?`)) {
-            register(x.address)
-          }
-        }
-      }, [
-        h4({}, "Register collateral type"),
-        label({}, ["Token address", input({
-          value: state[`new_token_${x.address}`] || "",
-          onChange: event => update({
-            [`new_token_${x.address}`]: event.target.value,
-          }),
-        })]),
-        div({ style: { textAlign: "right" } }, [
-          button({}, ["Register collateral type"])
-        ]),
-      ]) : div({
-        style: { marginLeft: "1rem", marginTop: "1rem" },
-      }, [a({
-        onClick: () => update({ [`new_${x.address}`]: true }),
-      }, ["Register new collateral type"])]))
+      }), own(x) && register_view(x)
     ]
   }) : small({}, ["(none)"])
 }
