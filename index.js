@@ -121,6 +121,9 @@ let role_control_view = ({ roles, authority }) => div({}, [
 
 let balance_view = ({ address, balance, roles }) => div({}, [
   Number(balance),
+  roles.holder && a({ onClick: () => transfer(address),
+                      style: { float: "right" },
+                    }, ["Transfer"]),
 ])
 
 let type_id_view = ({ address, roles }, { id, token }) => div({}, [
@@ -182,14 +185,15 @@ let collateral_balance_view = (
     roles.issuer && a({ onClick: () => cover(address, id),
                       }, ["Cover"]),
     " ",
-    roles.holder && a({ onClick: () => transfer(address, id),
-                      }, ["Transfer"]),
+    !!Number(balance) && a({ onClick: () => transfer(token),
+                             style: { float: "right" },
+                           }, ["Transfer"]),
   ])
 ])
 
 views.coins = ({ coins=[] }) => {
   return coins.length ? table_list(coins, {
-    "Coin":       x => strong({}, [code({}, [x.address])]),
+    "Coin":             x => strong({}, [code({}, [x.address])]),
     "Feedbase":         x => feedbase(x.feedbase),
     "Owner":            x => owner_view(x),
     "Rules":            x => ascii(x.rules),
@@ -335,11 +339,11 @@ function cover(address, id) {
 
 //----------------------------------------------------------
 
-function transfer(address, id) {
+function transfer(address) {
   let recipient = prompt(`Transfer coins to who?`)
   let how_much = prompt(`Transfer how many coins?`)
   if (Number(how_much) && Number(recipient)) {
-    send(Simplecoin(address).transfer,
+    send(Simplecoin(address).transfer,  // should use ERC20
          [id, recipient, Number(how_much)],
          hopefully(tx => { alert(`Transaction created: ${tx}`)
     }))
