@@ -109,10 +109,16 @@ let balance_view = ({ address, balance, roles }) => div({}, [
   }, ["Cover"])])
 ])
 
-let type_id_view = ({ address }, { id, token }) => div({}, [
-  Number(id), span({ style: { float: "right" } }, [Number(token) ? a({
-    onClick: () => unregister(address, id),
-  }, ["Cancel collateral type"]) : small({}, ["(cancelled)"])])
+let type_id_view = ({ address, roles }, { id, token }) => div({}, [
+  Number(id),
+  span({ style: { float: "right" } },
+    [ !!Number(token)
+      && roles.admin
+      && a({ onClick: () => unregister(address, id), },
+           ["Cancel collateral type"]),
+
+      !Number(token) && small({}, ["(cancelled)"])
+    ])
 ])
 
 let vault_view = ({ address }, { id, token, vault }) => div({}, [
@@ -174,7 +180,7 @@ views.coins = ({ coins=[] }) => {
         "Debt ceiling":     y => ceiling_view(x, y),
         "Debt":             y => Number(y.debt),
         "Your balance":     y => collateral_balance_view(x, y),
-      }), own(x) && register_view(x)
+      }), x.roles.admin && register_view(x)
     ]
   }) : small({}, ["(none)"])
 }
