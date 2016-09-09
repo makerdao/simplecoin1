@@ -67,6 +67,16 @@ contract SimpleRoleAuth is DSRoleAuth {
         setUserRole(who, holder, true);
     }
 
+    function delAdmin(address who) {
+        setUserRole(who, admin, false);
+    }
+    function delIssuer(address who) {
+        setUserRole(who, issuer, false);
+    }
+    function delHolder(address who) {
+        setUserRole(who, holder, false);
+    }
+
     function isAdmin(address who) constant returns (bool) {
         return hasUserRole(who, admin);
     }
