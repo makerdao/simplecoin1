@@ -121,44 +121,55 @@ let type_id_view = ({ address, roles }, { id, token }) => div({}, [
     ])
 ])
 
-let vault_view = ({ address }, { id, token, vault }) => div({}, [
-  code({}, vault), !!Number(token) && a({
-    style: { float: "right" },
-    onClick: () => set_vault(address, id),
-  }, ["Change vault"])
+let vault_view = ({ address, roles }, { id, token, vault }) => div({}, [
+  code({}, vault),
+  !!Number(token)
+    && roles.admin
+    && a({ style: { float: "right" },
+           onClick: () => set_vault(address, id),
+         }, ["Change vault"])
 ])
 
-let feed_view = ({ address }, { id, token, feed }) => div({}, [
-  Number(feed), !!Number(token) && a({
-    style: { float: "right" },
-    onClick: () => set_feed(address, id),
-  }, ["Change price feed"])
+let feed_view = ({ address, roles }, { id, token, feed }) => div({}, [
+  Number(feed),
+  !!Number(token)
+    && roles.admin
+    && a({ style: { float: "right" },
+           onClick: () => set_feed(address, id),
+         }, ["Change price feed"])
 ])
 
-let spread_view = ({ address }, { id, token, spread }) => div({}, [
-  Number(spread), !!Number(token) && a({
-    style: { float: "right" },
-    onClick: () => set_spread(address, id),
-  }, ["Change spread"])
+let spread_view = ({ address, roles }, { id, token, spread }) => div({}, [
+  Number(spread),
+  !!Number(token)
+    && roles.admin
+    && a({ style: { float: "right" },
+           onClick: () => set_spread(address, id),
+         }, ["Change spread"])
 ])
 
-let ceiling_view = ({ address }, { id, token, ceiling }) => div({}, [
-  Number(ceiling), !!Number(token) && a({
-    style: { float: "right" },
-    onClick: () => set_ceiling(address, id),
-  }, ["Change debt ceiling"])
+let ceiling_view = ({ address, roles }, { id, token, ceiling }) => div({}, [
+  Number(ceiling),
+  !!Number(token)
+    && roles.admin
+    && a({ style: { float: "right" },
+           onClick: () => set_ceiling(address, id),
+         }, ["Change debt ceiling"])
 ])
 
 let collateral_balance_view = (
-  { address, whitelisted }, { id, token, balance }
+  { address, roles }, { id, token, balance }
 ) => div({}, [
   Number(balance),
-  div({ style: { float: "right" } }, whitelisted ? [a({
-    onClick: () => issue(address, id),
-  }, ["Issue"]), " ", a({
-    style: { marginLeft: ".25rem" },
-    onClick: () => cover(address, id),
-  }, ["Cover"])] : [small({}, ["(not whitelisted)"])])
+  div({ style: { float: "right" } },
+    roles.issuer && [a({ onClick: () => issue(address, id)
+                       }, ["Issue"]),
+                    " ",
+                     a({ style: { marginLeft: ".25rem" },
+                         onClick: () => cover(address, id),
+                       }, ["Cover"])
+                    ]
+     )
 ])
 
 views.coins = ({ coins=[] }) => {
