@@ -1,12 +1,12 @@
 [submodule "dapple_packages/feedbase"]
 	path = dapple_packages/feedbase
 	url = https://github.com/nexusdev/feedbase
-[submodule "dapple_packages/ds-whitelist"]
-	path = dapple_packages/ds-whitelist
-	url = https://github.com/nexusdev/ds-whitelist
 [submodule "dapple_packages/erc20"]
 	path = dapple_packages/erc20
 	url = https://github.com/nexusdev/erc20
 [submodule "dapple_packages/ds-auth"]
 	path = dapple_packages/ds-auth
 	url = https://github.com/nexusdev/ds-auth
+[submodule "dapple_packages/ds-roles"]
+	path = dapple_packages/ds-roles
+	url = git@github.com:rainbeam/ds-roles

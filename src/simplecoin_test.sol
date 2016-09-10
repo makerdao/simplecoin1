@@ -1,6 +1,7 @@
 import "dapple/test.sol";
 import "erc20/base.sol";
 import "feedbase/feedbase.sol";
+import "ds-roles/role_auth.sol";
 
 import "simplecoin.sol";
 import "simplecoin_factory.sol";
@@ -18,8 +19,6 @@ contract SimplecoinTest is Test {
     uint constant COIN = 1;
 
     Simplecoin   coin;
-    Whitelist    issuers;
-    Whitelist    holders;
     Feedbase     feedbase;
     Vault        vault;
     ERC20        col1;
@@ -27,20 +26,10 @@ contract SimplecoinTest is Test {
     uint24       feed1;
 
     function setUp() {
-        issuers = new Whitelist();
-        issuers.setWhitelisted(this, true);
-
-        holders = new Whitelist();
-        holders.setWhitelisted(this, true);
-
         feedbase = new Feedbase();
-        coin = new Simplecoin(feedbase, 0, issuers, holders);
+        var rules = bytes32("no rules!");
 
-        issuers.setWhitelisted(coin, true);
-        issuers.setEnabled(true);
-
-        holders.setWhitelisted(coin, true);
-        holders.setEnabled(true);
+        coin = new Simplecoin(feedbase, rules);
 
         col1 = new ERC20Base(10**24 * COL1);
         col1.approve(coin, 10**24 * COL1);
@@ -62,12 +51,16 @@ contract SimplecoinTest is Test {
     function testFactoryBuildsNonTestableVersionToo() {
         var factory = new SimplecoinFactory();
         var coin = factory.create(feedbase, "some rules");
-        assertEq(this, coin.owner());
         // TODO: check authority setup
     }
 
+    function testCreatorHasAuthority() {
+        assertEq(this, coin._authority());
+    }
+
     function testCreatorIsOwner() {
-        assertEq(this, coin.owner());
+        assertEq(uint(coin._auth_mode()),
+                 uint(DSAuthModesEnum.DSAuthModes.Owner));
     }
 
     function testBasics() {
@@ -173,5 +166,187 @@ contract SimplecoinTest is Test {
         var supply_after = coin.totalSupply();
 
         assertEq(supply_before - supply_after, 999000 * COIN);
+    }
+}
+
+contract SimpleAuthTest is Test {
+    Simplecoin coin;
+    SimpleRoleAuth authority;
+
+    Feedbase feedbase;
+    Vault vault;
+
+    Tester admin;
+    Tester issuer;
+    Tester holder;
+
+    ERC20 _token;
+    uint48 _id;
+
+    uint24 feed;
+
+    function setUp() {
+        var factory = new SimplecoinFactory();
+        feedbase = new Feedbase();
+        var rules = bytes32("no rules!");
+
+        coin = factory.create(feedbase, rules);
+
+        admin = new Tester();
+        issuer = new Tester();
+        holder = new Tester();
+
+        admin._target(coin);
+        issuer._target(coin);
+        holder._target(coin);
+
+        authority = SimpleRoleAuth(coin.authority());
+
+        authority.addAdmin(this);
+        authority.addAdmin(admin);
+        authority.addIssuer(issuer);
+        authority.addHolder(holder);
+
+        _token = ERC20Base(1000);
+        _id = coin.register(_token);
+        _token.transfer(admin, 100);
+        _token.transfer(holder, 100);
+        _token.transfer(issuer, 100);
+
+        var feed = feedbase.claim();
+        // set price to 1:1, never expire
+        feedbase.set(feed, bytes32(coin.PRICE_UNIT()), uint40(-1));
+        coin.setFeed(_id, feed);
+
+        vault = new Vault();
+        vault.approve(_token, coin, uint(-1));
+        coin.setVault(_id, vault);
+
+        coin.setSpread(_id, uint(-1));     // 0% cut
+        coin.setCeiling(_id, uint(-1));  // no debt limit
+    }
+    function testSetUp() {
+        // we own the authority
+        assertEq(authority._authority(), address(this));
+        assertEq(uint(authority._auth_mode()),
+                 uint(DSAuthModesEnum.DSAuthModes.Owner));
+
+        // the authority authorises the coin
+        assertEq(coin._authority(), address(authority));
+        assertEq(uint(coin._auth_mode()),
+                 uint(DSAuthModesEnum.DSAuthModes.Authority));
+
+        //@log admin roles:  `bytes32 authority.getUserRoles(admin)`
+        //@log issuer roles: `bytes32 authority.getUserRoles(issuer)`
+        //@log holder roles: `bytes32 authority.getUserRoles(holder)`
+    }
+    function testAdminCanRegister() {
+        var token = ERC20Base(1000);
+        var id = Simplecoin(admin).register(token);
+        assertEq(coin.token(id), token);
+    }
+    function testFailIssuerRegister() {
+        var token = ERC20Base(1000);
+        Simplecoin(issuer).register(token);
+    }
+    function testFailHolderRegister() {
+        var token = ERC20Base(1000);
+        Simplecoin(holder).register(token);
+    }
+
+    function testAdminCanSetVault() {
+        Simplecoin(admin).setVault(_id, 0x123);
+        assertEq(coin.vault(_id), 0x123);
+    }
+    function testFailIssuerSetVault() {
+        Simplecoin(issuer).setVault(_id, 0x123);
+    }
+    function testFailHolderSetVault() {
+        Simplecoin(holder).setVault(_id, 0x123);
+    }
+
+    function testAdminCanSetFeed() {
+        Simplecoin(admin).setFeed(_id, 123);
+        assertEq(uint(coin.feed(_id)), 123);
+    }
+    function testFailIssuerSetFeed() {
+        Simplecoin(issuer).setFeed(_id, 123);
+    }
+    function testFailHolderSetFeed() {
+        Simplecoin(holder).setFeed(_id, 123);
+    }
+
+    function testAdminCanSetSpread() {
+        Simplecoin(admin).setSpread(_id, 1000);
+        assertEq(coin.spread(_id), 1000);
+    }
+    function testFailIssuerSetSpread() {
+        Simplecoin(issuer).setSpread(_id, 1000);
+    }
+    function testFailHolderSetSpread() {
+        Simplecoin(holder).setSpread(_id, 1000);
+    }
+
+    function testAdminCanSetCeling() {
+        Simplecoin(admin).setCeiling(_id, 1000);
+        assertEq(coin.ceiling(_id), 1000);
+    }
+    function testFailIssuerSetCeling() {
+        Simplecoin(issuer).setCeiling(_id, 1000);
+    }
+    function testFailHolderSetCeiling() {
+        Simplecoin(holder).setCeiling(_id, 1000);
+    }
+
+    function testAdminCanUnregister() {
+        Simplecoin(admin).unregister(_id);
+        assertEq(coin.token(_id), 0);
+    }
+    function testFailIssuerUnregister() {
+        Simplecoin(issuer).unregister(_id);
+    }
+    function testFailHolderUnregister() {
+        Simplecoin(holder).unregister(_id);
+    }
+
+    function testIssuerCanIssue() {
+        Simplecoin(issuer).issue(_id, 100);
+        assertEq(coin.balanceOf(issuer), 100);
+    }
+    function testIssuerCanCover() {
+        Simplecoin(issuer).issue(_id, 100);
+        Simplecoin(issuer).cover(_id, 100);
+    }
+    function testFailHolderIssue() {
+        Simplecoin(holder).issue(_id, 100);
+    }
+    function testFailHolderCover() {
+        Simplecoin(issuer).issue(_id, 100);
+        Simplecoin(holder).cover(_id, 100);
+    }
+
+    function testHolderCanReceive() {
+        Simplecoin(issuer).issue(_id, 100);
+        Simplecoin(issuer).transfer(holder, 100);
+        assertEq(coin.balanceOf(holder), 100);
+    }
+    function testHolderCanTransfer() {
+        Simplecoin(issuer).issue(_id, 100);
+        Simplecoin(issuer).transfer(holder, 50);
+        Simplecoin(holder).transfer(admin, 25);
+    }
+    function testFailNonHolderReceive() {
+        Tester unauthorised = new Tester();
+        Simplecoin(issuer).issue(_id, 100);
+        Simplecoin(issuer).transfer(holder, 50);
+        Simplecoin(holder).transfer(unauthorised, 25);
+    }
+    function testFailNonHolderTransfer() {
+        Tester unauthorised = new Tester();
+        unauthorised._target(coin);
+
+        Simplecoin(issuer).issue(_id, 100);
+        Simplecoin(issuer).approve(unauthorised, 100);
+        Simplecoin(unauthorised).transferFrom(issuer, holder, 25);
     }
 }
