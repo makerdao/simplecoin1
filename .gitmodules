@@ -12,4 +12,4 @@
 	url = https://github.com/nexusdev/ds-auth
 [submodule "dapple_packages/ds-roles"]
 	path = dapple_packages/ds-roles
-	url = git@github.com:nexusdev/ds-roles
+	url = git@github.com:rainbeam/ds-roles
