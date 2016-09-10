@@ -26,13 +26,13 @@
   ways to handle these failure modes, but this code must be decided on and
   written by each contract owner.
 
-  <p>This simplecoin has three permissioned user classes: ”owner”;, ”issuer”
-  and ”holder”. The <em>owner</em> can manage collateral types, including
+  <p>This simplecoin has three permissioned user classes: "admin", "issuer"
+  and "holder". An <em>admin</em> can manage collateral types, including
   registration, debt celings and price feeds.  <em>Issuers</em> can exchange
   collateral for simplecoins and form the link with <em>holders</em>, who are
   able to use the simplecoin as an ERC20 token.  All questions of access and
-  authentication are left up to the contract deployer, who can configure this
-  as they wish.
+  authentication are left up to the contract deployer, the "owner", who can
+  configure this as they wish.
 
   <p>The code is as simple as possible to reduce the cost of independent
   verification. It is just a building block that needs to be carefully

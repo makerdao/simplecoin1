@@ -50,22 +50,22 @@ public access.
 A more flexible model is Role-Based Access Control, creating
 distinct classes of user with different permissions. Simplecoins
 deployed using the factory come with a simple pre-configured RBAC
-that has three classes: "owner", "issuer" and "holder".
+that has three classes: "admin", "issuer" and "holder".
 
-The *owner* can manage collateral types, including registration,
+An *admin* can manage collateral types, including registration,
 debt celings and price feeds; *issuers* can exchange collateral for
 simplecoins (issue / cover) and form the link with *holders*, who
 are able to use the simplecoin as an ERC20 token.
 
 All questions of allocation to these user classes are left up to the
-contract deployer, who can configure this as they wish.
+contract deployer, the "owner", who can configure this as they wish.
 
 The factory also allows creation of a Simplecoin with an arbitrary,
-user-supplied authority implementing `canCall(address caller,
-address callee, bytes4 sig) returns (bool)`. `canCall` determines
-whether `caller` can call the function with signature `sig` at
-address `callee`, and is tested for calls to any non-constant public
-function, controlling selective user access.
+user-supplied authority implementing
+`canCall(address caller, address callee, bytes4 sig) returns (bool)`.
+`canCall` determines whether `caller` can call the function with
+signature `sig` at address `callee`, and is tested for calls to any
+non-constant public function, controlling selective user access.
 
 Using
 -----
