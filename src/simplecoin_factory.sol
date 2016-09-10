@@ -86,11 +86,4 @@ contract SimpleRoleAuth is DSRoleAuth {
     function isHolder(address who) constant returns (bool) {
         return hasUserRole(who, holder);
     }
-
-    // TODO: add this upstream
-    function hasUserRole(address who, uint8 role) constant returns (bool) {
-        bytes32 roles = getUserRoles(who);
-        bytes32 shifted = bytes32(uint256(uint256(2) ** uint256(role)));
-        return bytes32(0) != roles & shifted;
-    }
 }
