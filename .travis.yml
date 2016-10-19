@@ -26,8 +26,7 @@ before_install:
   - if [ $TEST = "dapple" ]; then npm install --progress=false -g dapple; fi
   - if [ $TEST = "dapple" ]; then wget https://github.com/rainbeam/solidity-static/releases/download/v0.3.6/solc; fi
   - if [ $TEST = "dapple" ]; then sudo install solc /usr/local/bin/; fi
-  - if [ $TEST = "dapple" ]; then echo "environments:" > $HOME/.dapplerc; fi
-  - if [ $TEST = "dapple" ]; then echo '    env: default' >> $HOME/.dapplerc; fi
+  - if [ $TEST = "dapple" ]; then echo -e "environments:\n  env:default" > $HOME/.dapplerc; fi
 
 install:
   - if [ $TEST = "dapple" ]; then git submodule update --init --recursive; fi
