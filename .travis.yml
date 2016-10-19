@@ -20,7 +20,6 @@ git:
 
 env:
   - TEST=dapple
-  - DAPPLERC='environments:\n    env: default'
 
 before_install:
   - id
