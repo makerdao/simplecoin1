@@ -7,7 +7,7 @@ format="%5s  %8s  %-32s  %24s\n"
 printf "$format" COIN OWNER RULES SUPPLY
 
 display-coin() {
-  fields=$(simplecoin coin "$1")
+  fields=$(simplecoin info "$1")
   owner=$(seth --field owner <<<"$fields")
   rules=$(seth --field rules <<<"$fields")
   supply=$(seth --field supply <<<"$fields")

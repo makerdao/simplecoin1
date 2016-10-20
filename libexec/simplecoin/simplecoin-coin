@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-### simplecoin-coin -- print information about a simplecoin instance
-### Usage: simplecoin coin <coin>
 set -e
 [[ $# = 1 ]] || { simplecoin coin --help >&2; exit 1; }
 

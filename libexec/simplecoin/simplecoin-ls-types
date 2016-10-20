@@ -16,7 +16,7 @@ format="%5s  %8s  %8s  %-6s  %-6s  %-8s  %-8s\n"
 printf "$format" TYPE TOKEN VAULT FEED SPREAD CEILING DEBT
 
 display-type() {
-  fields=$(simplecoin type "$coin" "$1")
+  fields=$(simplecoin info "$coin" "$1")
   token=$(   seth <<<"$fields" --field token)
   vault=$(   seth <<<"$fields" --field vault)
   feed=$(    seth <<<"$fields" --field feed)

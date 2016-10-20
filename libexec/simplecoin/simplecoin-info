@@ -1,0 +1,12 @@
+#!/bin/sh -e
+### simplecoin-info -- print details about a simplecoin or collateral type
+### Usage: simplecoin info <coin> [<type>]
+
+if [[ $# = 1 ]]; then
+  simplecoin coin "$1"
+elif [[ $# = 2 ]]; then
+  simplecoin type "$1" "$2"
+else
+  simplecoin info --help >&2
+  exit 1
+fi
