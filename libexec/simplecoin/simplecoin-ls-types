@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -e
+case $1 in -a|--all) all=1; shift; esac
+[[ $# = 1 ]] || { simplecoin ls --help >&2; exit 1; }
+
+if [[ $1 = @* || ${#1} -ge 40 ]]; then
+  coin=$1
+else
+  coin=$(seth call @simplecoin_factory "coins(uint256)(address)" "$1")
+fi
+
+count=$(seth call "$coin" "nextType()(uint48)")
+count=$(seth --to-dec "$count")
+
+format="%5s  %8s  %8s  %-6s  %-6s  %-8s  %-8s\n"
+printf "$format" TYPE TOKEN VAULT FEED SPREAD CEILING DEBT
+
+display-type() {
+  fields=$(simplecoin type "$coin" "$1")
+  token=$(   seth <<<"$fields" --field token)
+  vault=$(   seth <<<"$fields" --field vault)
+  feed=$(    seth <<<"$fields" --field feed)
+  spread=$(  seth <<<"$fields" --field spread)
+  ceiling=$( seth <<<"$fields" --field ceiling)
+  debt=$(    seth <<<"$fields" --field debt)
+  printf "$format" "$1" "${token:0:8}" "${vault:0:8}" \
+  "$feed" "$spread" "$ceiling" "$debt"
+}
+
+for id in $(seq "$count"); do
+  display-type "$((id - 1))" &
+done | sort -n

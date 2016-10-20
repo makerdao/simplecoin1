@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+### simplecoin -- MakerDAO simple stablecoin CLI
+### Usage: simplecoin <command> [<args>]
+###    or: simplecoin <command> --help
+###
+### Use simple stablecoins from the comfort of your command line.
+
+set -e
+
+if [[ $2 = --help ]]; then
+  simplecoin-help "$1"
+elif [[ ${1-help} = help ]]; then
+  simplecoin-"${1-help}" "${@:2}"
+else
+  simplecoin-"$@"
+fi

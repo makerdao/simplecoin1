@@ -1,0 +1,13 @@
+#!/bin/sh -e
+### simplecoin-ls -- list simplecoins or collateral types
+### Usage: simplecoin ls
+###    or: simplecoin ls [-a|--all] <coin>
+###
+### Print a list of all simplecoins created by @simplecoin_factory.
+### If <coin> is given, instead print a list of its collateral types.
+
+if [[ $# = 0 ]]; then
+  simplecoin ls-coins
+else
+  simplecoin ls-types "$@"
+fi
