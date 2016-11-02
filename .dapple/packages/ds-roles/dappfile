@@ -1,8 +1,0 @@
-name: ds-roles
-version: 0.0.0-dev
-tags: []
-layout:
-  sol_sources: src
-  build_dir: build
-dependencies: {}
-ignore: []
