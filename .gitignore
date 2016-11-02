@@ -1,3 +1,4 @@
 /build/classes.json
 /build/environments
-/build/__*__
+/build/__*
+.dapple/chain_db
