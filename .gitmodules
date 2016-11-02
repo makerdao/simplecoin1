@@ -1,12 +1,12 @@
-[submodule "dapple_packages/feedbase"]
-	path = dapple_packages/feedbase
+[submodule ".dapple/packages/feedbase"]
+	path = .dapple/packages/feedbase
 	url = https://github.com/nexusdev/feedbase
-[submodule "dapple_packages/erc20"]
-	path = dapple_packages/erc20
+[submodule ".dapple/packages/erc20"]
+	path = .dapple/packages/erc20
 	url = https://github.com/nexusdev/erc20
-[submodule "dapple_packages/ds-auth"]
-	path = dapple_packages/ds-auth
+[submodule ".dapple/packages/ds-auth"]
+	path = .dapple/packages/ds-auth
 	url = https://github.com/nexusdev/ds-auth
-[submodule "dapple_packages/ds-roles"]
-	path = dapple_packages/ds-roles
+[submodule ".dapple/packages/ds-roles"]
+	path = .dapple/packages/ds-roles
 	url = https://github.com/nanexcool/ds-roles
