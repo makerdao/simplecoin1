@@ -1,3 +1,5 @@
+pragma solidity ^0.4.4;
+
 import "ds-roles/role_auth.sol";
 import "erc20/base.sol";
 import "erc20/erc20.sol";
@@ -111,7 +113,7 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
     modifier transfer_auth(address to, uint amount) {
         // transfer recipients must also be able to call transfer
         assert(DSAuthority(_authority).canCall(to, this, transfer_sig));
-        _
+        _;
     }
 
     function transfer(address to, uint amount)
@@ -137,7 +139,7 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
         assert(t.token != address(0));
         assert(t.vault != address(0));
         assert(t.feed  != 0);
-        _
+        _;
     }
 
     function issue(uint48 collateral_type, uint pay_how_much)

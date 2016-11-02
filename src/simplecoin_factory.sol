@@ -1,3 +1,5 @@
+pragma solidity ^0.4.4;
+
 import "ds-auth/auth.sol";
 import "ds-roles/role_auth.sol";
 

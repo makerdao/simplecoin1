@@ -1,3 +1,5 @@
+pragma solidity ^0.4.4;
+
 import "dapple/test.sol";
 import "erc20/base.sol";
 import "feedbase/feedbase.sol";
