@@ -1,0 +1,2 @@
+var feedbase = new Feedbase(31415)
+export feedbase
