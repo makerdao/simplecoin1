@@ -1,0 +1,18 @@
+name: simple-stablecoin
+version: 0.0.2
+layout:
+  sol_sources: src
+  build_dir: build
+  packages_directory: .dapple/packages/
+dependencies: {}
+environments:
+  develop:
+    objects: {}
+    type: internal
+  morden:
+    objects: {}
+    type: MORDEN
+  live:
+    objects: {}
+    type: UNKNOWN
+dapple_version: 0.8.20
