@@ -5,7 +5,7 @@ import "ds-roles/role_auth.sol";
 
 import "simplecoin.sol";
 
-contract SimplecoinFactory is DSAuthUser {
+contract SimplecoinFactory is DSAuthorized {
     mapping (uint => Simplecoin)  public  coins;
     uint                          public  count;
 

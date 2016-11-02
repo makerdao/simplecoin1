@@ -33,14 +33,6 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
         rules     = _rules;
     }
 
-    function authority() constant returns (address) {
-        return _authority;
-    }
-
-    function owner() constant returns (address) {
-        return DSAuth(_authority)._authority();
-    }
-
     //------------------------------------------------------
 
     function nextType() constant returns (uint48) {
@@ -112,7 +104,7 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
 
     modifier transfer_auth(address to, uint amount) {
         // transfer recipients must also be able to call transfer
-        assert(DSAuthority(_authority).canCall(to, this, transfer_sig));
+        assert(authority.canCall(to, this, transfer_sig));
         _;
     }
 
