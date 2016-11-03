@@ -57,7 +57,7 @@ contract SimplecoinTest is Test {
     }
 
     function testCreatorHasAuthority() {
-        assertEq(this, coin._authority());
+        assertEq(this, coin.authority());
     }
 
     // TODO: check if we can change this
@@ -230,7 +230,7 @@ contract SimpleAuthTest is Test {
     }
     function testSetUp() {
         // we own the authority
-        assertEq(authority._authority(), address(this));
+        assertEq(authority.authority(), address(this));
         
         // TODO: redo this
         //assertEq(uint(authority._auth_mode()),
@@ -238,7 +238,7 @@ contract SimpleAuthTest is Test {
 
         // TODO: redo this
         // the authority authorises the coin
-        assertEq(coin._authority(), address(authority));
+        assertEq(coin.authority(), address(authority));
         //assertEq(uint(coin._auth_mode()),
         //         uint(DSAuthModesEnum.DSAuthModes.Authority));
 

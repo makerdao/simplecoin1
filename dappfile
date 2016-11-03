@@ -10,7 +10,11 @@ environments:
     objects: {}
     type: internal
   morden:
-    objects: {}
+    objects:
+      factory:
+        value: '0x92fcc49c52e2a6d12494e0adc1220b6d3684bf42'
+        type: >-
+          SimplecoinFactory[22f73cfef1004e4dd88554e8228d8070e090ec418db016ebfd717681ad19244f]
     type: MORDEN
   live:
     objects: {}
