@@ -3,7 +3,6 @@ pragma solidity ^0.4.4;
 import "ds-roles/role_auth.sol";
 import "erc20/base.sol";
 import "erc20/erc20.sol";
-import "feedbase/feedbase.sol";
 import "sensible.sol";
 
 
@@ -11,7 +10,7 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
     // precision of the price feed
     uint public constant PRICE_UNIT = 10**18;
 
-    Feedbase    public  feedbase;
+    address     public  feedbase;
     bytes32     public  rules;
 
     CollateralType[] types;
@@ -26,7 +25,7 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
     }
 
     function Simplecoin(
-        Feedbase    _feedbase,
+        address    _feedbase,
         bytes32     _rules
     ) {
         feedbase  = _feedbase;
@@ -193,8 +192,9 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
     }
 
     function getPrice(uint24 feed) internal returns (uint) {
-        var (price, ok) = feedbase.get(feed);
-        assert(ok);
+        //var (price, ok) = feedbase.get(feed);
+        //assert(ok);
+        var price = 1 * PRICE_UNIT;
         return uint(price);
     }
 }
