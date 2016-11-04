@@ -9,4 +9,4 @@
 	url = https://github.com/nexusdev/ds-auth
 [submodule ".dapple/packages/ds-roles"]
 	path = .dapple/packages/ds-roles
-	url = https://github.com/nanexcool/ds-roles
+	url = https://github.com/nexusdev/ds-roles
