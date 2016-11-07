@@ -10,3 +10,6 @@
 [submodule ".dapple/packages/ds-roles"]
 	path = .dapple/packages/ds-roles
 	url = https://github.com/nexusdev/ds-roles
+[submodule ".dapple/packages/ds-base"]
+	path = .dapple/packages/ds-base
+	url = https://github.com/nexusdev/ds-base.git

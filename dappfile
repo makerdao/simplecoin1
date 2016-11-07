@@ -10,13 +10,9 @@ environments:
     objects: {}
     type: internal
   morden:
-    objects:
-      factory:
-        value: '0x77482f248cf1247a23720d6cae96954d30e645d4'
-        type: >-
-          SimplecoinFactory[c7b805bfafca42bde1ed3cac2ffa130a6f27e4a662f43929c734456130494361]
+    objects: {}
     type: MORDEN
   live:
     objects: {}
     type: UNKNOWN
-dapple_version: 0.8.20
+dapple_version: 0.8.23
