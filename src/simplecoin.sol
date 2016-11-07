@@ -10,7 +10,7 @@ contract Simplecoin is ERC20Base(0), DSAuth, DSBase {
     // precision of the price feed
     uint public constant PRICE_UNIT = 10**18;
 
-    Feedbase     public  feedbase;
+    Feedbase    public  feedbase;
     bytes32     public  rules;
 
     CollateralType[] types;
