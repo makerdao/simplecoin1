@@ -4,12 +4,13 @@ import "ds-roles/role_auth.sol";
 import "ds-base/base.sol";
 import "erc20/base.sol";
 import "erc20/erc20.sol";
+import "feedbase/feedbase.sol";
 
 contract Simplecoin is ERC20Base(0), DSAuth, DSBase {
     // precision of the price feed
     uint public constant PRICE_UNIT = 10**18;
 
-    address     public  feedbase;
+    Feedbase     public  feedbase;
     bytes32     public  rules;
 
     CollateralType[] types;
@@ -24,7 +25,7 @@ contract Simplecoin is ERC20Base(0), DSAuth, DSBase {
     }
 
     function Simplecoin(
-        address    _feedbase,
+        Feedbase    _feedbase,
         bytes32     _rules
     ) {
         feedbase  = _feedbase;
@@ -189,8 +190,8 @@ contract Simplecoin is ERC20Base(0), DSAuth, DSBase {
     }
 
     function getPrice(uint24 feed) internal returns (uint) {
-        //var (price, ok) = feedbase.get(feed);
-        //assert(ok);
+        var (price, ok) = feedbase.get(feed);
+        assert(ok);
         var price = 1 * PRICE_UNIT;
         return uint(price);
     }
