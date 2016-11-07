@@ -192,7 +192,6 @@ contract Simplecoin is ERC20Base(0), DSAuth, DSBase {
     function getPrice(uint24 feed) internal returns (uint) {
         var (price, ok) = feedbase.get(feed);
         assert(ok);
-        var price = 1 * PRICE_UNIT;
         return uint(price);
     }
 }

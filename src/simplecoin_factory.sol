@@ -9,7 +9,7 @@ contract SimplecoinFactory is DSAuthorized {
     mapping (uint => Simplecoin)  public  coins;
     uint                          public  count;
 
-    function create(address feedbase, bytes32 rules)
+    function create(Feedbase feedbase, bytes32 rules)
         returns (Simplecoin coin)
     {
         coin = new Simplecoin(feedbase, rules);
