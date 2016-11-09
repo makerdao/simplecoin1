@@ -20,9 +20,10 @@ contract SimplecoinFactory is DSAuthorized {
         authority.addAdmin(msg.sender);
         authority.addIssuer(msg.sender);
         authority.addHolder(msg.sender);
-        setOwner(msg.sender);
+        
+        authority.setOwner(msg.sender);
 
-        setAuthority(authority);
+        coin.setAuthority(authority);
 
         coins[count++] = coin;
     }

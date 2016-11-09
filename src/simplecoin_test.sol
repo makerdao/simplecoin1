@@ -51,20 +51,18 @@ contract SimplecoinTest is Test {
     }
 
     function testFactoryBuildsNonTestableVersionToo() {
-        var factory = new SimplecoinFactory();
+        SimplecoinFactory factory = new SimplecoinFactory();
         var coin = factory.create(feedbase, "some rules");
         // TODO: check authority setup
     }
 
-    function testCreatorHasAuthority() {
-        assertEq(this, coin.authority());
+    function testCreatedSimplecoinHasNoAuthority() {
+        assertEq(0, coin.authority());
     }
 
-    // TODO: check if we can change this
-    /*function testCreatorIsOwner() {
-        assertEq(uint(coin._auth_mode()),
-                 uint(DSAuthModesEnum.DSAuthModes.Owner));
-    }*/
+    function testCreatorIsOwner() {
+        assertEq(this, coin.owner());
+    }
 
     function testBasics() {
         coin.setCeiling(icol1, 10 ** 6 * COIN);
