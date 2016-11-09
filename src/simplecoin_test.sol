@@ -208,7 +208,7 @@ contract SimpleAuthTest is Test {
         authority.addIssuer(issuer);
         authority.addHolder(holder);
 
-        _token = ERC20Base(1000);
+        _token = new ERC20Base(1000);
         _id = coin.register(_token);
         _token.transfer(admin, 100);
         _token.transfer(holder, 100);
@@ -228,33 +228,22 @@ contract SimpleAuthTest is Test {
     }
     function testSetUp() {
         // we own the authority
-        assertEq(authority.authority(), address(this));
+        assertEq(authority.owner(), address(this));
         
-        // TODO: redo this
-        //assertEq(uint(authority._auth_mode()),
-        //         uint(DSAuthModesEnum.DSAuthModes.Owner));
-
-        // TODO: redo this
         // the authority authorises the coin
         assertEq(coin.authority(), address(authority));
-        //assertEq(uint(coin._auth_mode()),
-        //         uint(DSAuthModesEnum.DSAuthModes.Authority));
-
-        //@log admin roles:  `bytes32 authority.getUserRoles(admin)`
-        //@log issuer roles: `bytes32 authority.getUserRoles(issuer)`
-        //@log holder roles: `bytes32 authority.getUserRoles(holder)`
     }
     function testAdminCanRegister() {
-        var token = ERC20Base(1000);
+        var token = new ERC20Base(1000);
         var id = Simplecoin(admin).register(token);
         assertEq(coin.token(id), token);
     }
     function testFailIssuerRegister() {
-        var token = ERC20Base(1000);
+        var token = new ERC20Base(1000);
         Simplecoin(issuer).register(token);
     }
     function testFailHolderRegister() {
-        var token = ERC20Base(1000);
+        var token = new ERC20Base(1000);
         Simplecoin(holder).register(token);
     }
 
