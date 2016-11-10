@@ -236,10 +236,9 @@ contract SimpleAuthTest is Test {
     }
    
     function testAdminCanRegister() {
-        var nextType = coin.nextType();
         var token = ERC20Base(1000);
         Simplecoin(admin).register(token);
-        var lastTokenAdded = coin.token(nextType);
+        var lastTokenAdded = coin.token(coin.nextType() - 1);
         assertEq(lastTokenAdded, token);
     }
     
