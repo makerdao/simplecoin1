@@ -225,6 +225,11 @@ contract SimpleAuthTest is Test {
 
         coin.setSpread(_id, uint(-1));     // 0% cut
         coin.setCeiling(_id, uint(-1));  // no debt limit
+
+        //We need to allow the coin to get transfer _token from the issuer
+        issuer._target(_token);
+        ERC20Base(issuer).approve(coin, uint(-1));
+        issuer._target(coin);
     }
     
     function testSetUp() {
