@@ -7,20 +7,16 @@ layout:
 dependencies: {}
 environments:
   develop:
-    objects:
-      factory:
-        value: '0x39708debbc537454ca33de154669c4bf6ddef8c9'
-        type: >-
-          SimplecoinFactory[8a7ca7b3bfa3860bf661f553c4b2f63941eb65438e82ceecd042c2ad88a27f5e]
-    type: TestRPC
+    objects: {}
+    type: internal
   morden:
     objects:
       factory:
-        value: '0x728fde11a0cfdca89516dd98ff11890f04ea6850'
+        value: '0x2b992f2901ce9561f9b1ee11c30db45c24a7d47c'
         type: >-
-          SimplecoinFactory[c1927921d2df31c434c088074f908d7bfb69890f0dc4be732874a99f17a06d3a]
-    type: UNKNOWN
+          SimplecoinFactory[8a7ca7b3bfa3860bf661f553c4b2f63941eb65438e82ceecd042c2ad88a27f5e]
+    type: MORDEN
   live:
     objects: {}
     type: UNKNOWN
-dapple_version: 0.8.26
+dapple_version: 0.8.28
