@@ -107,7 +107,7 @@ contract Simplecoin is ERC20Base(0), DSAuth, DSBase {
 
     modifier transfer_auth(address to, uint amount) {
         // transfer recipients must also be able to call transfer
-        assert(authority.canCall(to, this, transfer_sig));
+        assert(DSAuthority(authority).canCall(to, this, transfer_sig));
         _;
     }
 

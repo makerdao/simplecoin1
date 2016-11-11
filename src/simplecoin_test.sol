@@ -60,10 +60,6 @@ contract SimplecoinTest is Test {
         assertEq(0, coin.authority());
     }
 
-    /*function testCreatorIsOwner() {
-        assertEq(this, coin.owner());
-    }*/
-
     function testBasics() {
         coin.setCeiling(icol1, 10 ** 6 * COIN);
 
@@ -226,7 +222,7 @@ contract SimpleAuthTest is Test {
         coin.setSpread(_id, uint(-1));     // 0% cut
         coin.setCeiling(_id, uint(-1));  // no debt limit
 
-        //We need to allow the coin to get transfer _token from the issuer
+        //We need to allow the coin to transfer _token from the issuer
         issuer._target(_token);
         ERC20Base(issuer).approve(coin, uint(-1));
         issuer._target(coin);
@@ -239,11 +235,14 @@ contract SimpleAuthTest is Test {
         // the authority authorises the coin
         assertEq(coin.authority(), address(authority));
     }
+
+    function testCreatorIsOwner() {
+        assertEq(this, coin.owner());
+    }
    
     function testAdminCanRegister() {
         var token = new ERC20Base(1000);
         var id = admin.register(token);
-        var lastTokenAdded = coin.token(coin.nextType() - 1);
         assertEq(coin.token(id), token);
     }
     

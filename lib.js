@@ -40,7 +40,7 @@ let parallel  = async.parallel
 let pick      = (o, k) => kv(k, o[k])
 let render    = ReactDOM.render
 let select    = (o, ks) => fold(ks, {}, (r, k) => assign(r, pick(o, k)))
-let send      = (f, xs, $) => f(...xs.concat([{ from: coinbase() }, $]))
+let send      = (f, xs, $) => f(...xs.concat([{ from: coinbase(), gas: 4500000 }, $]))
 let sheet     = document.styleSheets[0]
 let small     = Tag("small")
 let span      = Tag("span")
