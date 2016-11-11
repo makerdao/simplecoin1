@@ -177,9 +177,9 @@ contract SimpleAuthTest is Test {
     Feedbase feedbase;
     Vault vault;
 
-    Tester admin;
-    Tester issuer;
-    Tester holder;
+    FakePerson admin;
+    FakePerson issuer;
+    FakePerson holder;
 
     ERC20 _token;
     uint48 _id;
@@ -193,9 +193,9 @@ contract SimpleAuthTest is Test {
 
         coin = factory.create(feedbase, rules);
 
-        admin = new Tester();
-        issuer = new Tester();
-        holder = new Tester();
+        admin = new FakePerson();
+        issuer = new FakePerson();
+        holder = new FakePerson();
 
         admin._target(coin);
         issuer._target(coin);
@@ -236,10 +236,10 @@ contract SimpleAuthTest is Test {
     }
    
     function testAdminCanRegister() {
-        var token = ERC20Base(1000);
-        Simplecoin(admin).register(token);
+        var token = new ERC20Base(1000);
+        var id = admin.register(token);
         var lastTokenAdded = coin.token(coin.nextType() - 1);
-        assertEq(lastTokenAdded, token);
+        assertEq(coin.token(id), token);
     }
     
     function testFailIssuerRegister() {
@@ -347,5 +347,11 @@ contract SimpleAuthTest is Test {
         Simplecoin(issuer).issue(_id, 100);
         Simplecoin(issuer).approve(unauthorised, 100);
         Simplecoin(unauthorised).transferFrom(issuer, holder, 25);
+    }
+}
+
+contract FakePerson is Tester {
+    function register(ERC20 token) returns (uint48) {
+        return Simplecoin(_t).register(token);
     }
 }
