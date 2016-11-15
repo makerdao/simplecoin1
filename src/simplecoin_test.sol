@@ -238,35 +238,13 @@ contract SimpleAuthTest is Test {
     }
 
     function testCreatorIsOwner() {
-        //@log this                     `address this`
-        //@log factory                  `address factory`
-        //@log coin.owner()             `address coin.owner()`
-        //@log authority.owner()        `address authority.owner()`
-        assertEq(authority.owner(), this);
+        assertEq(coin.authorityOwner(), this);
     }
 
     function testCreatorCanTransferOwnership() {
-        //@log authority.owner()        `address authority.owner()`
         FakePerson newOwner = new FakePerson();
         DSAuth(coin.authority()).setOwner(newOwner);
-        //@log authority.owner()        `address authority.owner()`
-        newOwner._target(authority);
-        SimpleRoleAuth(newOwner).setOwner(this);
-        //@log this                     `address this`
-        //@log newOwner                 `address newOwner`
-        //@log factory                  `address factory`
-        //@log coin.owner()             `address coin.owner()`
-        //@log authority.owner()        `address authority.owner()`
-    }
-
-    function testTransferOwnership() {
-        FakePerson newOwner = new FakePerson();
-        coin.transferOwnership(newOwner);
-        //@log this                     `address this`
-        //@log newOwner                 `address newOwner`
-        //@log factory                  `address factory`
-        //@log coin.owner()             `address coin.owner()`
-        //@log authority.owner()        `address authority.owner()`
+        assertEq(coin.authorityOwner(), newOwner);
     }
    
     function testAdminCanRegister() {
