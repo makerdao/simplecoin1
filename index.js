@@ -86,11 +86,11 @@ let register_view = ({ address }) => (
 )
 
 
-let owner_view = ({ address, owner }) => div({}, [
-  owner == coinbase() ? "You" : code({}, [owner]),
-  owner == coinbase() && a({
+let owner_view = ({ address, authorityOwner, authority }) => div({}, [
+  authorityOwner == coinbase() ? "You" : code({}, [authorityOwner]),
+  authorityOwner == coinbase() && a({
     style: { float: "right" },
-    onClick: () => set_owner(address),
+    onClick: () => set_owner(address, authority),
   }, ["Transfer"]),
 ])
 
@@ -101,8 +101,8 @@ let role_view = ({ roles }) => div({}, [
     roles.holder && "Holder",
 ])
 
-let role_control_view = ({ roles, authority }) => div({}, [
-  roles.admin && div({ style: { float: "left" }}, [
+let role_control_view = ({ authorityOwner, authority }) => div({}, [
+  authorityOwner == coinbase() && div({ style: { float: "left" }}, [
     "Admin: ",
     a({ onClick: () => add_role(authority, "admin"), }, ["Add"]),
     "/",
@@ -116,7 +116,7 @@ let role_control_view = ({ roles, authority }) => div({}, [
     "/",
     a({ onClick: () => del_role(authority, "holder"), }, ["Remove"]),
   ]),
-  !roles.admin && "Unauthorized",
+  authorityOwner != coinbase() && "Unauthorized",
 ])
 
 let balance_view = ({ address, balance, roles }) => div({}, [
@@ -251,10 +251,10 @@ function create_coin() {
   }))
 }
 
-function set_owner(address) {
+function set_owner(address, authority) {
   let new_value = prompt(`New owner for coin ${address}:`)
   if (new_value) {
-    send(Simplecoin(address).setOwner, [new_value], hopefully(tx => {
+    send(chain.SimpleRoleAuth.at(authority).setOwner, [new_value], hopefully(tx => {
       alert(`Transaction created: ${tx}`)
     }))
   }
