@@ -32,8 +32,12 @@ contract Simplecoin is ERC20Base(0), DSAuth, DSBase {
         rules     = _rules;
     }
 
-    function owner() constant returns (address) {
+    function authorityOwner() constant returns (address) {
         return DSAuth(authority).owner();
+    }
+
+    function tranferOwnership(address newOwner) {
+        DSAuth(authority).setOwner(newOwner);
     }
 
     //------------------------------------------------------

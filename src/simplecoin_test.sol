@@ -169,6 +169,7 @@ contract SimplecoinTest is Test {
 contract SimpleAuthTest is Test {
     Simplecoin coin;
     SimpleRoleAuth authority;
+    SimplecoinFactory factory;
 
     Feedbase feedbase;
     Vault vault;
@@ -183,7 +184,7 @@ contract SimpleAuthTest is Test {
     uint24 feed;
 
     function setUp() {
-        var factory = new SimplecoinFactory();
+        factory = new SimplecoinFactory();
         feedbase = new Feedbase();
         var rules = bytes32("no rules!");
 
@@ -237,7 +238,35 @@ contract SimpleAuthTest is Test {
     }
 
     function testCreatorIsOwner() {
-        assertEq(this, coin.owner());
+        //@log this                     `address this`
+        //@log factory                  `address factory`
+        //@log coin.owner()             `address coin.owner()`
+        //@log authority.owner()        `address authority.owner()`
+        assertEq(authority.owner(), this);
+    }
+
+    function testCreatorCanTransferOwnership() {
+        //@log authority.owner()        `address authority.owner()`
+        FakePerson newOwner = new FakePerson();
+        DSAuth(coin.authority()).setOwner(newOwner);
+        //@log authority.owner()        `address authority.owner()`
+        newOwner._target(authority);
+        SimpleRoleAuth(newOwner).setOwner(this);
+        //@log this                     `address this`
+        //@log newOwner                 `address newOwner`
+        //@log factory                  `address factory`
+        //@log coin.owner()             `address coin.owner()`
+        //@log authority.owner()        `address authority.owner()`
+    }
+
+    function testTransferOwnership() {
+        FakePerson newOwner = new FakePerson();
+        coin.transferOwnership(newOwner);
+        //@log this                     `address this`
+        //@log newOwner                 `address newOwner`
+        //@log factory                  `address factory`
+        //@log coin.owner()             `address coin.owner()`
+        //@log authority.owner()        `address authority.owner()`
     }
    
     function testAdminCanRegister() {
