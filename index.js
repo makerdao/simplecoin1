@@ -346,7 +346,7 @@ function transfer(token) {
   let how_much = prompt(`Transfer how many coins?`)
   if (Number(how_much) && Number(recipient)) {
     send(Simplecoin(token).transfer,  // should use ERC20
-         [id, recipient, Number(how_much)],
+         [recipient, Number(how_much)],
          hopefully(tx => { alert(`Transaction created: ${tx}`)
     }))
   }
@@ -357,7 +357,7 @@ function approve(token, address='') {
   let how_much = prompt(`Approve how much?`)
   if (Number(how_much) && Number(recipient)) {
     send(Simplecoin(token).approve,  // should use ERC20
-         [id, recipient, Number(how_much)],
+         [recipient, Number(how_much)],
          hopefully(tx => { alert(`Transaction created: ${tx}`)
     }))
   }
