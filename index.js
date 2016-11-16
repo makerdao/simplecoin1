@@ -48,7 +48,7 @@ function extract_contract_props(type, address, $) {
 function extract_authority_roles(props, $) {
   let role_auth = chain.SimpleRoleAuth.at(props.authority)
   parallel(
-    { owner:  async.constant(props.owner == coinbase()),
+    { owner:  async.constant(props.authorityOwner == coinbase()),
       admin:  bind(role_auth.isAdmin,  coinbase()),
       issuer: bind(role_auth.isIssuer, coinbase()),
       holder: bind(role_auth.isHolder, coinbase()),
