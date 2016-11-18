@@ -6,7 +6,12 @@ import "erc20/base.sol";
 import "erc20/erc20.sol";
 import "feedbase/feedbase.sol";
 
-contract Simplecoin is ERC20Base(0), DSAuth, DSBase {
+contract SimplecoinEvents {
+    event LogIssue(address indexed from, uint48 collateral_type, uint stablecoin_quantity);
+    event LogCover(address indexed to, uint48 collateral_type, uint stablecoin_quantity);
+}
+
+contract Simplecoin is ERC20Base(0), DSAuth, DSBase, SimplecoinEvents {
     // precision of the price feed
     uint public constant PRICE_UNIT = 10**18;
 
@@ -163,6 +168,8 @@ contract Simplecoin is ERC20Base(0), DSAuth, DSBase {
 
         assert(t.debt <= t.ceiling);
         assert(_balances[msg.sender] <= _supply);
+
+        LogIssue(msg.sender, collateral_type, issued_quantity);
     }
 
     function cover(uint48 collateral_type, uint stablecoin_quantity)
@@ -191,6 +198,8 @@ contract Simplecoin is ERC20Base(0), DSAuth, DSBase {
 
         assert(t.debt <= t.ceiling);
         assert(_balances[msg.sender] <= _supply);
+
+        LogCover(msg.sender, collateral_type, returned_amount);
     }
 
     function getPrice(uint24 feed) internal returns (uint) {
