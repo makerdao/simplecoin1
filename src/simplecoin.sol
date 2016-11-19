@@ -1,11 +1,12 @@
+pragma solidity ^0.4.4;
+
 import "ds-roles/role_auth.sol";
+import "ds-base/base.sol";
 import "erc20/base.sol";
 import "erc20/erc20.sol";
 import "feedbase/feedbase.sol";
-import "sensible.sol";
 
-
-contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
+contract Simplecoin is ERC20Base(0), DSAuth, DSBase {
     // precision of the price feed
     uint public constant PRICE_UNIT = 10**18;
 
@@ -31,12 +32,8 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
         rules     = _rules;
     }
 
-    function authority() constant returns (address) {
-        return _authority;
-    }
-
-    function owner() constant returns (address) {
-        return DSAuth(_authority)._authority();
+    function authorityOwner() constant returns (address) {
+        return DSAuth(authority).owner();
     }
 
     //------------------------------------------------------
@@ -46,7 +43,7 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
     }
 
     function register(ERC20 token)
-        noeth auth returns (uint48 id)
+        auth returns (uint48 id)
     {
         return uint48(types.push(CollateralType({
             token:    token,
@@ -58,23 +55,23 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
         })) - 1);
     }
 
-    function setVault(uint48 type_id, address vault) noeth auth {
+    function setVault(uint48 type_id, address vault) auth {
         types[type_id].vault = vault;
     }
 
-    function setFeed(uint48 type_id, uint24 feed) noeth auth {
+    function setFeed(uint48 type_id, uint24 feed) auth {
         types[type_id].feed = feed;
     }
 
-    function setSpread(uint48 type_id, uint spread) noeth auth {
+    function setSpread(uint48 type_id, uint spread) auth {
         types[type_id].spread = spread;
     }
 
-    function setCeiling(uint48 type_id, uint ceiling) noeth auth {
+    function setCeiling(uint48 type_id, uint ceiling) auth {
         types[type_id].ceiling = ceiling;
     }
 
-    function unregister(uint48 collateral_type) noeth auth {
+    function unregister(uint48 collateral_type) auth {
         delete types[collateral_type];
     }
 
@@ -110,8 +107,8 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
 
     modifier transfer_auth(address to, uint amount) {
         // transfer recipients must also be able to call transfer
-        assert(DSAuthority(_authority).canCall(to, this, transfer_sig));
-        _
+        assert(DSAuthority(authority).canCall(to, this, transfer_sig));
+        _;
     }
 
     function transfer(address to, uint amount)
@@ -137,14 +134,13 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
         assert(t.token != address(0));
         assert(t.vault != address(0));
         assert(t.feed  != 0);
-        _
+        _;
     }
 
     function issue(uint48 collateral_type, uint pay_how_much)
         auth
         zeroguard(collateral_type)
-        noeth
-        synchronized
+        mutex
         returns (uint issued_quantity)
     {
         var t = types[collateral_type];
@@ -172,8 +168,7 @@ contract Simplecoin is ERC20Base(0), DSAuth, Sensible {
     function cover(uint48 collateral_type, uint stablecoin_quantity)
         auth
         zeroguard(collateral_type)
-        noeth
-        synchronized
+        mutex
         returns (uint returned_amount)
     {
         var t = types[collateral_type];

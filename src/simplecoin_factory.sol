@@ -1,9 +1,11 @@
+pragma solidity ^0.4.4;
+
 import "ds-auth/auth.sol";
 import "ds-roles/role_auth.sol";
 
 import "simplecoin.sol";
 
-contract SimplecoinFactory is DSAuthUser {
+contract SimplecoinFactory is DSAuthorized {
     mapping (uint => Simplecoin)  public  coins;
     uint                          public  count;
 
@@ -18,9 +20,10 @@ contract SimplecoinFactory is DSAuthUser {
         authority.addAdmin(msg.sender);
         authority.addIssuer(msg.sender);
         authority.addHolder(msg.sender);
-        setOwner(authority, msg.sender);
+        
+        authority.setOwner(msg.sender);
 
-        setAuthority(coin, authority);
+        coin.setAuthority(authority);
 
         coins[count++] = coin;
     }

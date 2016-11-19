@@ -12,7 +12,7 @@ for (let phase of uniq(map(all("[data-when]"), x => x.dataset.when))) {
 
 let chain = {} // Holds contract classes and instances (from dapple)
 let dapple_import = ({ classes, objects }) => assign(chain, classes, objects)
-let dapple_package = name => new dapple[name].class(web3, chain.env)
+let dapple_package = name => new dapple[name].class(web3, dapple[name].environments[chain.env])
 let dapple_packages = () => keys(dapple).map(dapple_package)
 let web3 = new Web3(this.web3 ? this.web3.currentProvider : (
   new Web3.providers.HttpProvider("http://localhost:8545")
@@ -36,7 +36,8 @@ function init() {
       state.phase = "failed"
     } else {
       // Proceed to initialize the application
-      chain.env = [, "live", "morden"][network]
+      if (network > 2) { network = 3; }
+      chain.env = [, "live", "morden", "develop"][network]
       console.log(`Environment: ${chain.env}`)
       each(dapple_packages(), dapple_import)
       reload(() => update({ phase: "loaded" }))
