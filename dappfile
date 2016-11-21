@@ -15,7 +15,7 @@ environments:
         value: '0xf21622e8d90b4501e0126b632db1dd1a5c4b16ca'
         type: >-
           SimplecoinFactory[3c00d2ffbaaf6c87a75b5c3e4f013b214bd3811426b0eda0f9b1f012a915f217]
-    type: UNKNOWN
+    type: morden
   live:
     objects: {}
     type: UNKNOWN
