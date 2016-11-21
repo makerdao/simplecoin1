@@ -36,8 +36,8 @@ function init() {
       state.phase = "failed"
     } else {
       // Proceed to initialize the application
-      if (network > 2) { network = 3; }
-      chain.env = [, "live", "morden", "develop"][network]
+      if (network > 3) { network = 4; }
+      chain.env = [, "live", "morden", "ropsten", "develop"][network]
       console.log(`Environment: ${chain.env}`)
       each(dapple_packages(), dapple_import)
       reload(() => update({ phase: "loaded" }))

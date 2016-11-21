@@ -15,8 +15,15 @@ environments:
         value: '0xf21622e8d90b4501e0126b632db1dd1a5c4b16ca'
         type: >-
           SimplecoinFactory[3c00d2ffbaaf6c87a75b5c3e4f013b214bd3811426b0eda0f9b1f012a915f217]
-    type: MORDEN
+    type: UNKNOWN
   live:
     objects: {}
     type: UNKNOWN
-dapple_version: 0.8.34
+  ropsten:
+    objects:
+      factory:
+        value: '0xc1652f846a29acd82e2367c1b66465687cb16e6c'
+        type: >-
+          SimplecoinFactory[3c00d2ffbaaf6c87a75b5c3e4f013b214bd3811426b0eda0f9b1f012a915f217]
+    type: ropsten
+dapple_version: 0.8.36
