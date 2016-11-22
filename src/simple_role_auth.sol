@@ -8,22 +8,22 @@ contract SimpleRoleAuth is DSRoleAuth {
     uint8 public issuer = 1;
     uint8 public holder = 2;
 
-    function SimpleRoleAuth(address target) {
+    function SimpleRoleAuth() {
         // == admin
-        setRoleCapability(admin, target, sig("register(address)"), true);
-        setRoleCapability(admin, target, sig("setVault(uint48,address)"), true);
-        setRoleCapability(admin, target, sig("setFeed(uint48,uint24)"), true);
-        setRoleCapability(admin, target, sig("setSpread(uint48,uint256)"), true);
-        setRoleCapability(admin, target, sig("setCeiling(uint48,uint256)"), true);
-        setRoleCapability(admin, target, sig("unregister(uint48)"), true);
+        setRoleCapability(admin, this, sig("register(address)"), true);
+        setRoleCapability(admin, this, sig("setVault(uint48,address)"), true);
+        setRoleCapability(admin, this, sig("setFeed(uint48,uint24)"), true);
+        setRoleCapability(admin, this, sig("setSpread(uint48,uint256)"), true);
+        setRoleCapability(admin, this, sig("setCeiling(uint48,uint256)"), true);
+        setRoleCapability(admin, this, sig("unregister(uint48)"), true);
 
         // == issuer
-        setRoleCapability(issuer, target, sig("issue(uint48,uint256)"), true);
-        setRoleCapability(issuer, target, sig("cover(uint48,uint256)"), true);
+        setRoleCapability(issuer, this, sig("issue(uint48,uint256)"), true);
+        setRoleCapability(issuer, this, sig("cover(uint48,uint256)"), true);
 
         // == holder
-        setRoleCapability(holder, target, sig("transfer(address,uint256)"), true);
-        setRoleCapability(holder, target, sig("transferFrom(address,address,uint256)"), true);
+        setRoleCapability(holder, this, sig("transfer(address,uint256)"), true);
+        setRoleCapability(holder, this, sig("transferFrom(address,address,uint256)"), true);
     }
 
     function sig(string name) constant returns (bytes4) {

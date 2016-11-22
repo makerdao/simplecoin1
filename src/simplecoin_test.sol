@@ -3,7 +3,6 @@ pragma solidity ^0.4.4;
 import "dapple/test.sol";
 import "erc20/base.sol";
 import "feedbase/feedbase.sol";
-import "ds-roles/role_auth.sol";
 
 import "simplecoin.sol";
 import "simplecoin_factory.sol";
@@ -197,7 +196,6 @@ contract SimpleAuthTest is Test {
         issuer._target(coin);
         holder._target(coin);
 
-        coin.addAdmin(this);
         coin.addAdmin(admin);
         coin.addIssuer(issuer);
         coin.addHolder(holder);
@@ -228,10 +226,7 @@ contract SimpleAuthTest is Test {
     
     function testSetUp() {
         // we own the authority
-        assertEq(coin.owner(), address(this));
-        
-        /*// the authority authorises the coin
-        assertEq(coin.authority(), address(authority));*/
+        assertEq(coin.owner(), address(this));      
     }
 
     function testCreatorIsOwner() {

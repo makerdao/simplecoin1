@@ -13,6 +13,7 @@ contract SimplecoinFactory {
 
         // coin creator has all roles by default
         coin.addAdmin(msg.sender);
+        coin.setOwner(msg.sender);
         
         coins[count++] = coin;
     }
