@@ -1,6 +1,6 @@
 pragma solidity ^0.4.4;
 
-import "ds-roles/role_auth.sol";
+import "simple_role_auth.sol";
 import "ds-base/base.sol";
 import "erc20/base.sol";
 import "erc20/erc20.sol";
@@ -11,7 +11,7 @@ contract SimplecoinEvents {
     event LogCover(address indexed to, uint48 collateral_type, uint stablecoin_quantity);
 }
 
-contract Simplecoin is ERC20Base(0), DSAuth, DSBase, SimplecoinEvents {
+contract Simplecoin is ERC20Base(0), SimpleRoleAuth, DSBase, SimplecoinEvents {
     // precision of the price feed
     uint public constant PRICE_UNIT = 10**18;
 

@@ -168,7 +168,6 @@ contract SimplecoinTest is Test {
 
 contract SimpleAuthTest is Test {
     Simplecoin coin;
-    SimpleRoleAuth authority;
     SimplecoinFactory factory;
 
     Feedbase feedbase;
@@ -198,12 +197,10 @@ contract SimpleAuthTest is Test {
         issuer._target(coin);
         holder._target(coin);
 
-        authority = SimpleRoleAuth(coin.authority());
-
-        authority.addAdmin(this);
-        authority.addAdmin(admin);
-        authority.addIssuer(issuer);
-        authority.addHolder(holder);
+        coin.addAdmin(this);
+        coin.addAdmin(admin);
+        coin.addIssuer(issuer);
+        coin.addHolder(holder);
 
         _token = new ERC20Base(1000);
         _id = coin.register(_token);
@@ -231,20 +228,20 @@ contract SimpleAuthTest is Test {
     
     function testSetUp() {
         // we own the authority
-        assertEq(authority.owner(), address(this));
+        assertEq(coin.owner(), address(this));
         
-        // the authority authorises the coin
-        assertEq(coin.authority(), address(authority));
+        /*// the authority authorises the coin
+        assertEq(coin.authority(), address(authority));*/
     }
 
     function testCreatorIsOwner() {
-        assertEq(coin.authorityOwner(), this);
+        assertEq(coin.owner(), this);
     }
 
     function testCreatorCanTransferOwnership() {
         FakePerson newOwner = new FakePerson();
-        DSAuth(coin.authority()).setOwner(newOwner);
-        assertEq(coin.authorityOwner(), newOwner);
+        coin.setOwner(newOwner);
+        assertEq(coin.owner(), newOwner);
     }
    
     function testAdminCanRegister() {
