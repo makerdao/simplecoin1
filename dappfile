@@ -10,11 +10,7 @@ environments:
     objects: {}
     type: TestRPC
   morden:
-    objects:
-      factory:
-        value: '0xf21622e8d90b4501e0126b632db1dd1a5c4b16ca'
-        type: >-
-          SimplecoinFactory[3c00d2ffbaaf6c87a75b5c3e4f013b214bd3811426b0eda0f9b1f012a915f217]
+    objects: {}
     type: UNKNOWN
   live:
     objects: {}
@@ -22,8 +18,8 @@ environments:
   ropsten:
     objects:
       factory:
-        value: '0xc1652f846a29acd82e2367c1b66465687cb16e6c'
+        value: '0x3afed6f9f1676236b68d2b58aba970250a6fcb3d'
         type: >-
-          SimplecoinFactory[3c00d2ffbaaf6c87a75b5c3e4f013b214bd3811426b0eda0f9b1f012a915f217]
-    type: UNKNOWN
+          SimplecoinFactory[f59b79575a58db7a903835e076f46793fc3a12ef09453dc93a45f6fa050d5d28]
+    type: ropsten
 dapple_version: 0.8.36
