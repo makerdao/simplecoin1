@@ -9,6 +9,9 @@ contract SimpleRoleAuth is DSRoleAuth {
     uint8 public holder = 2;
 
     function SimpleRoleAuth() {
+        // The coin itself will be the authority
+        setAuthority(this);
+        
         // == admin
         setRoleCapability(admin, this, sig("register(address)"), true);
         setRoleCapability(admin, this, sig("setVault(uint48,address)"), true);
@@ -28,6 +31,11 @@ contract SimpleRoleAuth is DSRoleAuth {
 
     function sig(string name) constant returns (bytes4) {
         return bytes4(sha3(name));
+    }
+
+    function setOwner(address newOwner) auth {
+        addAdmin(newOwner);
+        super.setOwner(newOwner);
     }
 
     function addAdmin(address who) auth {

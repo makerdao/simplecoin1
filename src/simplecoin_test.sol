@@ -55,8 +55,8 @@ contract SimplecoinTest is Test {
         // TODO: check authority setup
     }
 
-    function testCreatedSimplecoinHasNoAuthority() {
-        assertEq(0, coin.authority());
+    function testCreatorHasAuthority() {
+        assertEq(DSAuth(coin.authority()).owner(), this);
     }
 
     function testBasics() {
