@@ -4,9 +4,6 @@
 [submodule ".dapple/packages/erc20"]
 	path = .dapple/packages/erc20
 	url = https://github.com/nexusdev/erc20
-[submodule ".dapple/packages/ds-auth"]
-	path = .dapple/packages/ds-auth
-	url = https://github.com/nexusdev/ds-auth
 [submodule ".dapple/packages/ds-roles"]
 	path = .dapple/packages/ds-roles
 	url = https://github.com/nexusdev/ds-roles

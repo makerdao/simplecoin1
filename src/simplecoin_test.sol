@@ -3,7 +3,6 @@ pragma solidity ^0.4.4;
 import "dapple/test.sol";
 import "erc20/base.sol";
 import "feedbase/feedbase.sol";
-import "ds-roles/role_auth.sol";
 
 import "simplecoin.sol";
 import "simplecoin_factory.sol";
@@ -56,8 +55,9 @@ contract SimplecoinTest is Test {
         // TODO: check authority setup
     }
 
-    function testCreatedSimplecoinHasNoAuthority() {
-        assertEq(0, coin.authority());
+    function testAuthSetup() {
+        assertEq(coin.authority(), coin);
+        assertEq(coin.owner(), this);
     }
 
     function testBasics() {
@@ -168,7 +168,6 @@ contract SimplecoinTest is Test {
 
 contract SimpleAuthTest is Test {
     Simplecoin coin;
-    SimpleRoleAuth authority;
     SimplecoinFactory factory;
 
     Feedbase feedbase;
@@ -198,12 +197,9 @@ contract SimpleAuthTest is Test {
         issuer._target(coin);
         holder._target(coin);
 
-        authority = SimpleRoleAuth(coin.authority());
-
-        authority.addAdmin(this);
-        authority.addAdmin(admin);
-        authority.addIssuer(issuer);
-        authority.addHolder(holder);
+        coin.addAdmin(admin);
+        coin.addIssuer(issuer);
+        coin.addHolder(holder);
 
         _token = new ERC20Base(1000);
         _id = coin.register(_token);
@@ -231,20 +227,17 @@ contract SimpleAuthTest is Test {
     
     function testSetUp() {
         // we own the authority
-        assertEq(authority.owner(), address(this));
-        
-        // the authority authorises the coin
-        assertEq(coin.authority(), address(authority));
+        assertEq(coin.owner(), address(this));      
     }
 
     function testCreatorIsOwner() {
-        assertEq(coin.authorityOwner(), this);
+        assertEq(coin.owner(), this);
     }
 
     function testCreatorCanTransferOwnership() {
         FakePerson newOwner = new FakePerson();
-        DSAuth(coin.authority()).setOwner(newOwner);
-        assertEq(coin.authorityOwner(), newOwner);
+        coin.setOwner(newOwner);
+        assertEq(coin.owner(), newOwner);
     }
    
     function testAdminCanRegister() {
