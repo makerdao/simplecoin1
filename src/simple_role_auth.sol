@@ -15,7 +15,7 @@ contract SimpleRoleAuth is DSRoleAuth {
         // == admin
         setRoleCapability(admin, this, sig("register(address)"), true);
         setRoleCapability(admin, this, sig("setVault(uint48,address)"), true);
-        setRoleCapability(admin, this, sig("setFeed(uint48,uint24)"), true);
+        setRoleCapability(admin, this, sig("setFeed(uint48,bytes12)"), true);
         setRoleCapability(admin, this, sig("setSpread(uint48,uint256)"), true);
         setRoleCapability(admin, this, sig("setCeiling(uint48,uint256)"), true);
         setRoleCapability(admin, this, sig("unregister(uint48)"), true);

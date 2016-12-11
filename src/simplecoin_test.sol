@@ -24,7 +24,7 @@ contract SimplecoinTest is Test {
     Vault        vault;
     ERC20        col1;
     uint48       icol1;
-    uint24       feed1;
+    bytes12      feed1;
 
     function setUp() {
         feedbase = new Feedbase();
@@ -180,7 +180,7 @@ contract SimpleAuthTest is Test {
     ERC20 _token;
     uint48 _id;
 
-    uint24 feed;
+    bytes12 feed;
 
     function setUp() {
         factory = new SimplecoinFactory();

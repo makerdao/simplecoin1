@@ -22,7 +22,7 @@ contract Simplecoin is ERC20Base(0), SimpleRoleAuth, DSBase, SimplecoinEvents {
 
     struct CollateralType {
         ERC20    token;
-        uint24   feed;
+        bytes12   feed;
         address  vault;
         uint     spread;
         uint     debt;
@@ -60,7 +60,7 @@ contract Simplecoin is ERC20Base(0), SimpleRoleAuth, DSBase, SimplecoinEvents {
         types[type_id].vault = vault;
     }
 
-    function setFeed(uint48 type_id, uint24 feed) auth {
+    function setFeed(uint48 type_id, bytes12 feed) auth {
         types[type_id].feed = feed;
     }
 
@@ -86,7 +86,7 @@ contract Simplecoin is ERC20Base(0), SimpleRoleAuth, DSBase, SimplecoinEvents {
        return types[type_id].vault;
     }
 
-    function feed(uint48 type_id) constant returns (uint24) {
+    function feed(uint48 type_id) constant returns (bytes12) {
        return types[type_id].feed;
     }
 
@@ -198,8 +198,8 @@ contract Simplecoin is ERC20Base(0), SimpleRoleAuth, DSBase, SimplecoinEvents {
         LogCover(msg.sender, collateral_type, returned_amount);
     }
 
-    function getPrice(uint24 feed) internal returns (uint) {
-        var (price, ok) = feedbase.get(feed);
+    function getPrice(bytes12 feed) internal returns (uint) {
+        var (price, ok) = feedbase.tryGet(feed);
         assert(ok);
         return uint(price);
     }
