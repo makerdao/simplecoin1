@@ -1,12 +1,12 @@
 [submodule ".dapple/packages/feedbase"]
-	path = .dapple/packages/feedbase
+	path = lib/feedbase
 	url = https://github.com/nexusdev/feedbase
 [submodule ".dapple/packages/erc20"]
-	path = .dapple/packages/erc20
+	path = lib/erc20
 	url = https://github.com/nexusdev/erc20
 [submodule ".dapple/packages/ds-roles"]
-	path = .dapple/packages/ds-roles
+	path = lib/ds-roles
 	url = https://github.com/nexusdev/ds-roles
 [submodule ".dapple/packages/ds-base"]
-	path = .dapple/packages/ds-base
+	path = lib/ds-base
 	url = https://github.com/nexusdev/ds-base.git
