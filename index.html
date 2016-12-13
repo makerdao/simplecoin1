@@ -75,8 +75,11 @@
   <form onsubmit="event.preventDefault()">
     <h3>Create simple stablecoin</h3>
     <label>
-      Stablecoin rules <small>(max 32 characters)</small>:
-      <div data-view=textarea></div>
+      Coin Name:
+      <div data-view=coinName></div>
+      <br />
+      Coin Symbol:
+      <div data-view=coinSymbol></div>
     </label>
     <div style="text-align: right">
       <button onclick="create_coin()">Create stablecoin</button>

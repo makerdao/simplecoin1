@@ -28,9 +28,8 @@ contract SimplecoinTest is Test {
 
     function setUp() {
         feedbase = new Feedbase();
-        var rules = bytes32("no rules!");
 
-        coin = new Simplecoin(feedbase, rules);
+        coin = new Simplecoin(feedbase, "Test Coin Token", "TCT");
 
         col1 = new ERC20Base(10**24 * COL1);
         col1.approve(coin, 10**24 * COL1);
@@ -51,7 +50,7 @@ contract SimplecoinTest is Test {
 
     function testFactoryBuildsNonTestableVersionToo() {
         SimplecoinFactory factory = new SimplecoinFactory();
-        var coin = factory.create(feedbase, "some rules");
+        var coin = factory.create(feedbase, "Test Coin Token", "TCT");
         // TODO: check authority setup
     }
 
@@ -185,9 +184,8 @@ contract SimpleAuthTest is Test {
     function setUp() {
         factory = new SimplecoinFactory();
         feedbase = new Feedbase();
-        var rules = bytes32("no rules!");
 
-        coin = factory.create(feedbase, rules);
+        coin = factory.create(feedbase, "Test Coin Token", "TCT");
 
         admin = new FakePerson();
         issuer = new FakePerson();

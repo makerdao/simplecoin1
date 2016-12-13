@@ -6,10 +6,10 @@ contract SimplecoinFactory {
     mapping (uint => Simplecoin)  public  coins;
     uint                          public  count;
 
-    function create(Feedbase feedbase, bytes32 rules)
+    function create(Feedbase feedbase, string name, string symbol)
         returns (Simplecoin coin)
     {
-        coin = new Simplecoin(feedbase, rules);
+        coin = new Simplecoin(feedbase, name, symbol);
 
         // coin creator has all roles by default
         coin.addAdmin(msg.sender);

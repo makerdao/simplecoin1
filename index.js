@@ -195,10 +195,11 @@ let collateral_balance_view = (
 
 views.coins = ({ coins=[] }) => {
   return coins.length ? table_list(coins, {
-    "Coin":             x => strong({}, [code({}, [x.address])]),
+    "Coin Symbol":      x => x.symbol,
+    "Coin Name":        x => x.name,
+    "Coin Address":     x => strong({}, [code({}, [x.address])]),
     "Feedbase":         x => feedbase(x.feedbase),
     "Owner":            x => owner_view(x),
-    "Rules":            x => ascii(x.rules),
     "Your roles":       x => role_view(x),
     "Role Control":     x => role_control_view(x),
     "Total supply":     x => Number(x.totalSupply),
@@ -236,18 +237,24 @@ function table_list(xs, fields) {
 // Forms and actions
 //----------------------------------------------------------
 
-views.textarea = ({ rules }) => textarea({
-  value: rules, maxLength: 32,
-  onChange: event => update({ rules: event.target.value }),
+views.coinName = ({ coinName }) => input({
+  value: coinName, maxLength: 32,
+  onChange: event => update({ coinName: event.target.value }),
+})
+
+views.coinSymbol = ({ coinSymbol }) => input({
+  value: coinSymbol, maxLength: 5,
+  onChange: event => update({ coinSymbol: event.target.value }),
 })
 
 function create_coin() {
   send(chain.factory.create, [
     chain.feedbase.address,
-    hex(state.rules),
+    state.coinName,
+    state.coinSymbol,
   ], hopefully(tx => {
     alert(`Transaction created: ${tx}`)
-    update({ rules: "" })
+    update({ coinName: "", coinSymbol: "" })
   }))
 }
 
