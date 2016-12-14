@@ -18,7 +18,7 @@ contract Simplecoin is ERC20Base(0), SimpleRoleAuth, DSBase, SimplecoinEvents {
     Feedbase    public  feedbase;
     string      public  name;
     string      public  symbol;
-    uint8       public constant decimals = 18;  // 18 decimal places, the same as ETH.
+    uint8       public  constant  decimals = 18;  // 18 decimal places, the same as ETH.
 
     CollateralType[] types;
 
