@@ -1,0 +1,30 @@
+name: simple-stablecoin
+version: 0.0.2
+layout:
+  sol_sources: ./src
+  build_dir: ./build
+  packages_directory: ./lib
+dependencies: {}
+environments:
+  develop:
+    objects: {}
+    type: internal
+  morden:
+    objects: {}
+    type: UNKNOWN
+  live:
+    objects: {}
+    type: UNKNOWN
+  ropsten:
+    objects:
+      factory:
+        value: '0x2e291f79c5145997208a5e6136f47f02bc3cbf38'
+        type: >-
+          SimplecoinFactory[6e8990ba27165743ecce2a095d2f546ccf37b40384f768a46ae231339ec68836]
+    type: ropsten
+dapple_version: 0.8.38
+description: ''
+authors: []
+license: Apache-2.0
+keywords:
+  - dapple

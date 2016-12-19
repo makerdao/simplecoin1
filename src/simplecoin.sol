@@ -16,7 +16,9 @@ contract Simplecoin is ERC20Base(0), SimpleRoleAuth, DSBase, SimplecoinEvents {
     uint public constant PRICE_UNIT = 10**18;
 
     Feedbase    public  feedbase;
-    bytes32     public  rules;
+    string      public  name;
+    string      public  symbol;
+    uint8       public  constant  decimals = 18;  // 18 decimal places, the same as ETH.
 
     CollateralType[] types;
 
@@ -31,10 +33,12 @@ contract Simplecoin is ERC20Base(0), SimpleRoleAuth, DSBase, SimplecoinEvents {
 
     function Simplecoin(
         Feedbase    _feedbase,
-        bytes32     _rules
+        string      _name,
+        string      _symbol
     ) {
         feedbase  = _feedbase;
-        rules     = _rules;
+        name      = _name;
+        symbol    = _symbol;
     }
 
     //------------------------------------------------------
