@@ -20,14 +20,14 @@ contract SimplecoinTest is Test {
     uint constant COIN = 1;
 
     Simplecoin   coin;
-    Feedbase     feedbase;
+    Feedbase200  feedbase;
     Vault        vault;
     ERC20        col1;
     uint48       icol1;
     bytes12      feed1;
 
     function setUp() {
-        feedbase = new Feedbase();
+        feedbase = new Feedbase200();
 
         coin = new Simplecoin(feedbase, "Test Coin Token", "TCT");
 
@@ -169,7 +169,7 @@ contract SimpleAuthTest is Test {
     Simplecoin coin;
     SimplecoinFactory factory;
 
-    Feedbase feedbase;
+    Feedbase200 feedbase;
     Vault vault;
 
     FakePerson admin;
@@ -183,7 +183,7 @@ contract SimpleAuthTest is Test {
 
     function setUp() {
         factory = new SimplecoinFactory();
-        feedbase = new Feedbase();
+        feedbase = new Feedbase200();
 
         coin = factory.create(feedbase, "Test Coin Token", "TCT");
 

@@ -18,11 +18,11 @@ environments:
   ropsten:
     objects:
       factory:
-        value: '0x2e291f79c5145997208a5e6136f47f02bc3cbf38'
+        value: '0x21f8a783399b634e6944d72de30ae370c75c0d06'
         type: >-
-          SimplecoinFactory[6e8990ba27165743ecce2a095d2f546ccf37b40384f768a46ae231339ec68836]
+          SimplecoinFactory[3459d8b33d886603c28311a12a2ace00b2b21cce5783ff515835e94e3efb903d]
     type: ropsten
-dapple_version: 0.8.38
+dapple_version: 0.8.39
 description: ''
 authors: []
 license: Apache-2.0

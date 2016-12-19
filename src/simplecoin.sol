@@ -15,7 +15,7 @@ contract Simplecoin is ERC20Base(0), SimpleRoleAuth, DSBase, SimplecoinEvents {
     // precision of the price feed
     uint public constant PRICE_UNIT = 10**18;
 
-    Feedbase    public  feedbase;
+    Feedbase200 public  feedbase;
     string      public  name;
     string      public  symbol;
     uint8       public  constant  decimals = 18;  // 18 decimal places, the same as ETH.
@@ -32,7 +32,7 @@ contract Simplecoin is ERC20Base(0), SimpleRoleAuth, DSBase, SimplecoinEvents {
     }
 
     function Simplecoin(
-        Feedbase    _feedbase,
+        Feedbase200 _feedbase,
         string      _name,
         string      _symbol
     ) {
