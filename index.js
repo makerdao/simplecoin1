@@ -148,7 +148,7 @@ let vault_view = ({ address, roles }, { id, token, vault }) => div({}, [
 ])
 
 let feed_view = ({ address, roles }, { id, token, feed }) => div({}, [
-  Number(feed),
+  feed,
   !!Number(token)
     && roles.admin
     && a({ style: { float: "right" },
