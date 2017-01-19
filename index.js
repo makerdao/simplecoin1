@@ -4,7 +4,7 @@ init()
 setInterval(() => chain.env && reload(), 3000)
 
 let Simplecoin = x => chain.Simplecoin.at(x)
-let feedbase = x => x == chain.feedbase.address ? "Standard" : code({}, [x])
+let feedbase = x => x == feed[chain.env] ? "Standard" : code({}, [x])
 let own = x => x.owner == coinbase()
 
 fetch.coins = $ => begin([
@@ -237,6 +237,11 @@ function table_list(xs, fields) {
 // Forms and actions
 //----------------------------------------------------------
 
+views.feedAddress = ({ feedAddress }) => input({
+  value: feedAddress ? feedAddress : feed[chain.env], maxLength: 32,
+  onChange: event => update({ feedAddress: event.target.value }),
+})
+
 views.coinName = ({ coinName }) => input({
   value: coinName, maxLength: 32,
   onChange: event => update({ coinName: event.target.value }),
@@ -249,7 +254,7 @@ views.coinSymbol = ({ coinSymbol }) => input({
 
 function create_coin() {
   send(chain.factory.create, [
-    chain.feedbase.address,
+    state.feedAddress,
     state.coinName,
     state.coinSymbol,
   ], hopefully(tx => {
