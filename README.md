@@ -32,7 +32,7 @@ The idea is to give potential [oracles], [keepers] and [market]
 [makers] something to do while Maker's stablecoin engine undergoes
 refinement.
 
-[oracles]: http://feedbase.io
+[oracles]: https://github.com/nexusdev/feedbase
 [keepers]: https://github.com/nexusdev/keeper
 [market]: https://github.com/makerdao/maker-market
 [makers]: https://github.com/makerdao/maker-market-matcher
