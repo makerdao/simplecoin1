@@ -24,7 +24,7 @@ contract Simplecoin is ERC20Base(0), SimpleRoleAuth, DSBase, SimplecoinEvents {
 
     struct CollateralType {
         ERC20    token;
-        bytes12   feed;
+        bytes12  feed;
         address  vault;
         uint     spread;
         uint     debt;
