@@ -1,4 +1,4 @@
 const feedConfig = {
-    'ropsten' : '0xaa63c8683647ef91b3fdab4b4989ee9588da297b',
+    'ropsten' : '0xf0cca23691ecf6aec18ea34d7ecf5bd4ffd15f78',
     'live'    : '',
 }
