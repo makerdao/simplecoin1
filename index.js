@@ -238,25 +238,28 @@ function table_list(xs, fields) {
 //----------------------------------------------------------
 
 views.feedAddress = ({ feedAddress }) => input({
-  value: feedAddress ? feedAddress : feedConfig[chain.env], maxLength: 32,
+  id: 'feedAddress',
+  value: feedAddress ? feedAddress : feedConfig[chain.env],
   onChange: event => update({ feedAddress: event.target.value }),
 })
 
 views.coinName = ({ coinName }) => input({
+  id: 'coinName',
   value: coinName, maxLength: 32,
   onChange: event => update({ coinName: event.target.value }),
 })
 
 views.coinSymbol = ({ coinSymbol }) => input({
+  id: 'coinSymbol',
   value: coinSymbol, maxLength: 5,
   onChange: event => update({ coinSymbol: event.target.value }),
 })
 
 function create_coin() {
   send(chain.factory.create, [
-    state.feedAddress,
-    state.coinName,
-    state.coinSymbol,
+    document.getElementById('feedAddress').value,
+    document.getElementById('coinName').value,
+    document.getElementById('coinSymbol').value,
   ], hopefully(tx => {
     alert(`Transaction created: ${tx}`)
     update({ coinName: "", coinSymbol: "" })
