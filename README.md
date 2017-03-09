@@ -1,8 +1,6 @@
 Simplecoin
 ==========
 
-See HACKING.md for pointers on how to work on the UI.
-
 A simplecoin is one type of stablecoin which can be run by an
 individual or organization.
 
