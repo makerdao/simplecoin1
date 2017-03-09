@@ -1,6 +1,6 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.8;
 
-import "ds-roles/role_auth.sol";
+import "ds-roles/role-auth.sol";
 
 contract SimpleRoleAuth is DSRoleAuth {
     // role identifiers
@@ -10,7 +10,7 @@ contract SimpleRoleAuth is DSRoleAuth {
 
     function SimpleRoleAuth() {
         // The coin itself will be the authority
-        setAuthority(this);
+        //setAuthority(this);
         
         // == admin
         setRoleCapability(admin, this, sig("register(address)"), true);
@@ -33,10 +33,10 @@ contract SimpleRoleAuth is DSRoleAuth {
         return bytes4(sha3(name));
     }
 
-    function setOwner(address newOwner) auth {
-        addAdmin(newOwner);
-        super.setOwner(newOwner);
-    }
+    // function setOwner(address newOwner) auth {
+    //     addAdmin(newOwner);
+    //     super.setOwner(newOwner);
+    // }
 
     function addAdmin(address who) auth {
         setUserRole(who, admin, true);
