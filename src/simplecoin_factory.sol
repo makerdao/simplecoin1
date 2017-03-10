@@ -11,10 +11,11 @@ contract SimplecoinFactory {
         returns (Simplecoin coin)
     {
         coin = new Simplecoin(feeds, name, symbol);
-        var role = new SimpleRoleAuth();
+        var role = new SimpleRoleAuth(address(coin));
         
         coin.setAuthority(role);
-        role.addAdmin(msg.sender);
+        role.setRootUser(DSIAuthority(msg.sender), true);
+        role.setAuthority(DSIAuthority(msg.sender));
         
         coins[count++] = coin;
     }
