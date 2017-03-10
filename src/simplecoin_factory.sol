@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.8;
 
 import "./simplecoin.sol";
 import "./simple_role_auth.sol";
