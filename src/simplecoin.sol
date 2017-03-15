@@ -1,21 +1,21 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.8;
 
-import "simple_role_auth.sol";
 import "ds-base/base.sol";
-import "erc20/base.sol";
-import "erc20/erc20.sol";
-import "feedbase/feedbase.sol";
+import "ds-token/base.sol";
+import "ds-feeds/feeds.sol";
+
+import "./simple_role_auth.sol";
 
 contract SimplecoinEvents {
     event LogIssue(address indexed from, uint48 collateral_type, uint stablecoin_quantity);
     event LogCover(address indexed to, uint48 collateral_type, uint stablecoin_quantity);
 }
 
-contract Simplecoin is ERC20Base(0), SimpleRoleAuth, DSBase, SimplecoinEvents {
+contract Simplecoin is DSTokenBase(0), DSAuth, DSBase, SimplecoinEvents {
     // precision of the price feed
     uint public constant PRICE_UNIT = 10**18;
 
-    Feedbase200 public  feedbase;
+    DSFeeds     public  feeds;
     string      public  name;
     string      public  symbol;
     uint8       public  constant  decimals = 18;  // 18 decimal places, the same as ETH.
@@ -23,20 +23,20 @@ contract Simplecoin is ERC20Base(0), SimpleRoleAuth, DSBase, SimplecoinEvents {
     CollateralType[] types;
 
     struct CollateralType {
-        ERC20    token;
-        bytes12  feed;
-        address  vault;
-        uint     spread;
-        uint     debt;
-        uint     ceiling;
+        ERC20         token;
+        bytes12       feed;
+        address       vault;
+        uint          spread;
+        uint          debt;
+        uint          ceiling;
     }
 
     function Simplecoin(
-        Feedbase200 _feedbase,
+        DSFeeds     _feeds,
         string      _name,
         string      _symbol
     ) {
-        feedbase  = _feedbase;
+        feeds     = _feeds;
         name      = _name;
         symbol    = _symbol;
     }
@@ -203,7 +203,7 @@ contract Simplecoin is ERC20Base(0), SimpleRoleAuth, DSBase, SimplecoinEvents {
     }
 
     function getPrice(bytes12 feed) internal returns (uint) {
-        var (price, ok) = feedbase.tryGet(feed);
+        var (price, ok) = feeds.tryGet(feed);
         assert(ok);
         return uint(price);
     }

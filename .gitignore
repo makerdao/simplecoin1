@@ -1,5 +1,1 @@
-/build/classes.json
-/build/environments
-/build/__*
-.dapple/chain_db
-**/chain_db/**/chain_db/
+/out
