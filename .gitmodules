@@ -1,15 +1,15 @@
 [submodule "lib/ds-feeds"]
 	path = lib/ds-feeds
-	url = https://github.com/nanexcool/ds-feeds
+	url = https://github.com/dapphub/ds-feeds
 [submodule "lib/ds-token"]
 	path = lib/ds-token
-	url = https://github.com/nanexcool/ds-token
+	url = https://github.com/dapphub/ds-token
 [submodule "lib/ds-roles"]
 	path = lib/ds-roles
-	url = https://github.com/gbalabasquer/ds-roles
+	url = https://github.com/dapphub/ds-roles
 [submodule "lib/ds-base"]
 	path = lib/ds-base
-	url = https://github.com/gbalabasquer/ds-base
+	url = https://github.com/dapphub/ds-base
 [submodule "lib/ds-test"]
 	path = lib/ds-test
 	url = https://github.com/dapphub/ds-test
