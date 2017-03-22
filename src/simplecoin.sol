@@ -203,8 +203,9 @@ contract Simplecoin is DSTokenBase(0), DSAuth, DSBase, SimplecoinEvents {
     }
 
     function getPrice(bytes12 feed) internal returns (uint) {
-        var (price, ok) = feeds.tryGet(feed);
+        var ok = feeds.peek(feed);
         assert(ok);
+        var price = feeds.read(feed);
         return uint(price);
     }
 }
