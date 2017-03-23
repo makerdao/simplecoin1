@@ -2,7 +2,7 @@ pragma solidity ^0.4.8;
 
 import "ds-base/base.sol";
 import "ds-token/base.sol";
-import "ds-feeds/feeds.sol";
+import "ds-feeds/interface.sol";
 
 import "./simple_role_auth.sol";
 
@@ -15,10 +15,10 @@ contract Simplecoin is DSTokenBase(0), DSAuth, DSBase, SimplecoinEvents {
     // precision of the price feed
     uint public constant PRICE_UNIT = 10**18;
 
-    DSFeeds     public  feeds;
-    string      public  name;
-    string      public  symbol;
-    uint8       public  constant  decimals = 18;  // 18 decimal places, the same as ETH.
+    DSFeedsInterface        public  feeds;
+    string                  public  name;
+    string                  public  symbol;
+    uint8                   public  constant  decimals = 18;  // 18 decimal places, the same as ETH.
 
     CollateralType[] types;
 
@@ -32,9 +32,9 @@ contract Simplecoin is DSTokenBase(0), DSAuth, DSBase, SimplecoinEvents {
     }
 
     function Simplecoin(
-        DSFeeds     _feeds,
-        string      _name,
-        string      _symbol
+        DSFeedsInterface        _feeds,
+        string                  _name,
+        string                  _symbol
     ) {
         feeds     = _feeds;
         name      = _name;
